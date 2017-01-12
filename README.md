@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# MELHARFI-2D-Game-Engine
-2D Game Engine All in one (Lidgren Network, AStar Pathfinding, Manager Engine)
-=======
 # MELHARFI 2D Game Engine
 2D Game Engine + Network Library + Path finding + Windows GUI + Event handler "ALL-IN-ONE"
 
