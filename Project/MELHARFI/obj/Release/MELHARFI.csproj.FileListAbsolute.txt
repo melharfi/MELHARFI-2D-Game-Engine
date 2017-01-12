@@ -1,0 +1,4 @@
+D:\GitHub\MELHARFI 2D Game Engine\MELHARFI\MELHARFI\bin\Release\MELHARFI.dll
+D:\GitHub\MELHARFI 2D Game Engine\MELHARFI\MELHARFI\bin\Release\MELHARFI.pdb
+D:\GitHub\MELHARFI 2D Game Engine\MELHARFI\MELHARFI\obj\Release\MELHARFI.dll
+D:\GitHub\MELHARFI 2D Game Engine\MELHARFI\MELHARFI\obj\Release\MELHARFI.pdb

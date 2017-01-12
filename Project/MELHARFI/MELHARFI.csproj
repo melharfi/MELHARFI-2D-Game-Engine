@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{43274663-6680-4687-AC90-D60A7DCB9D72}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MELHARFI</RootNamespace>
+    <AssemblyName>MELHARFI</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Presentation" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gfx\Anim.cs" />
+    <Compile Include="AStar.cs" />
+    <Compile Include="Gfx\Bmp.cs" />
+    <Compile Include="Crypt.cs" />
+    <Compile Include="Draw.cs" />
+    <Compile Include="Events\MouseClicHandleEvents.cs" />
+    <Compile Include="Events\MouseDoubleClicHandleEvents.cs" />
+    <Compile Include="Events\MouseDownHandleEvents.cs" />
+    <Compile Include="Events\MouseMoveHandleEvents.cs" />
+    <Compile Include="Events\MouseUpHandleEvents.cs" />
+    <Compile Include="IGfx.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\INetEncryption.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\NetAESEncryption.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\NetBlockEncryptionBase.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\NetDESEncryption.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\NetRC2Encryption.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\NetTripleDESEncryption.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\NetXorEncryption.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\NetXteaEncryption.cs" />
+    <Compile Include="LidgrenNetwork\NamespaceDoc.cs" />
+    <Compile Include="LidgrenNetwork\NetBigInteger.cs" />
+    <Compile Include="LidgrenNetwork\NetBitVector.cs" />
+    <Compile Include="LidgrenNetwork\NetBitWriter.cs" />
+    <Compile Include="LidgrenNetwork\NetBuffer.cs" />
+    <Compile Include="LidgrenNetwork\NetBuffer.Peek.cs" />
+    <Compile Include="LidgrenNetwork\NetBuffer.Read.cs" />
+    <Compile Include="LidgrenNetwork\NetBuffer.Read.Reflection.cs" />
+    <Compile Include="LidgrenNetwork\NetBuffer.Write.cs" />
+    <Compile Include="LidgrenNetwork\NetBuffer.Write.Reflection.cs" />
+    <Compile Include="LidgrenNetwork\NetClient.cs" />
+    <Compile Include="LidgrenNetwork\NetConnection.cs" />
+    <Compile Include="LidgrenNetwork\NetConnection.Handshake.cs" />
+    <Compile Include="LidgrenNetwork\NetConnection.Latency.cs" />
+    <Compile Include="LidgrenNetwork\NetConnection.MTU.cs" />
+    <Compile Include="LidgrenNetwork\NetConnectionStatistics.cs" />
+    <Compile Include="LidgrenNetwork\NetConnectionStatus.cs" />
+    <Compile Include="LidgrenNetwork\NetConstants.cs" />
+    <Compile Include="LidgrenNetwork\NetDeliveryMethod.cs" />
+    <Compile Include="LidgrenNetwork\NetException.cs" />
+    <Compile Include="LidgrenNetwork\NetFragmentationHelper.cs" />
+    <Compile Include="LidgrenNetwork\NetIncomingMessage.cs" />
+    <Compile Include="LidgrenNetwork\NetIncomingMessageType.cs" />
+    <Compile Include="LidgrenNetwork\NetInfos.cs" />
+    <Compile Include="LidgrenNetwork\NetMessageType.cs" />
+    <Compile Include="LidgrenNetwork\NetNatIntroduction.cs" />
+    <Compile Include="LidgrenNetwork\NetOutgoingMessage.cs" />
+    <Compile Include="LidgrenNetwork\NetPeer.cs" />
+    <Compile Include="LidgrenNetwork\NetPeer.Discovery.cs" />
+    <Compile Include="LidgrenNetwork\NetPeer.Fragmentation.cs" />
+    <Compile Include="LidgrenNetwork\NetPeer.Internal.cs" />
+    <Compile Include="LidgrenNetwork\NetPeer.LatencySimulation.cs" />
+    <Compile Include="LidgrenNetwork\NetPeer.Logging.cs" />
+    <Compile Include="LidgrenNetwork\NetPeer.MessagePools.cs" />
+    <Compile Include="LidgrenNetwork\NetPeer.Send.cs" />
+    <Compile Include="LidgrenNetwork\NetPeerConfiguration.cs" />
+    <Compile Include="LidgrenNetwork\NetPeerStatistics.cs" />
+    <Compile Include="LidgrenNetwork\NetPeerStatus.cs" />
+    <Compile Include="LidgrenNetwork\NetQueue.cs" />
+    <Compile Include="LidgrenNetwork\NetRandom.cs" />
+    <Compile Include="LidgrenNetwork\NetReceiverChannelBase.cs" />
+    <Compile Include="LidgrenNetwork\NetReliableOrderedReceiver.cs" />
+    <Compile Include="LidgrenNetwork\NetReliableSenderChannel.cs" />
+    <Compile Include="LidgrenNetwork\NetReliableSequencedReceiver.cs" />
+    <Compile Include="LidgrenNetwork\NetReliableUnorderedReceiver.cs" />
+    <Compile Include="LidgrenNetwork\NetSenderChannelBase.cs" />
+    <Compile Include="LidgrenNetwork\NetSendResult.cs" />
+    <Compile Include="LidgrenNetwork\NetServer.cs" />
+    <Compile Include="LidgrenNetwork\NetSRP.cs" />
+    <Compile Include="LidgrenNetwork\NetStoredReliableMessage.cs" />
+    <Compile Include="LidgrenNetwork\NetTime.cs" />
+    <Compile Include="LidgrenNetwork\NetTuple.cs" />
+    <Compile Include="LidgrenNetwork\NetUnreliableSenderChannel.cs" />
+    <Compile Include="LidgrenNetwork\NetUnreliableSequencedReceiver.cs" />
+    <Compile Include="LidgrenNetwork\NetUnreliableUnorderedReceiver.cs" />
+    <Compile Include="LidgrenNetwork\NetUPnP.cs" />
+    <Compile Include="LidgrenNetwork\NetUtility.cs" />
+    <Compile Include="LidgrenNetwork\SenderChannelBase.cs" />
+    <Compile Include="Manager.cs" />
+    <Compile Include="OldDataMouseMove.cs" />
+    <Compile Include="PressedGfx.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Gfx\Rec.cs" />
+    <Compile Include="ReverseZindex.cs" />
+    <Compile Include="SpriteSheet.cs" />
+    <Compile Include="Gfx\Txt.cs" />
+    <Compile Include="Zindex.cs" />
+    <Compile Include="ZOrder.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
