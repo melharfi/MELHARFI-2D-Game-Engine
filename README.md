@@ -164,4 +164,3 @@ m.elharfi@gmail.com
 If you like the project and would bay me a coffee I’ll appreciate that
 
 Paypal account : m.elharfi@gmail.com
->>>>>>> fixing mouse event issues
