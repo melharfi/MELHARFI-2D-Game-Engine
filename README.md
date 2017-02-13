@@ -1,7 +1,7 @@
 # MELHARFI 2D Game Engine
 2D Game Engine + Network Library + Path finding + Windows GUI + Event handler "ALL-IN-ONE"
 
-*Description*
+## *Description*
 
 MELHARFI.dll is a DLL file that make you create 2D games with a simple way or even an animated graphics on a form, so you don't worry about many details in the usual way or add a complex third party only to make some dynamic graphics in your form.
 
@@ -11,14 +11,14 @@ The library is built in C# language so you can use it in any .NET language as VB
 
 It's the first and unik library for graphics using GDI+ as far as i know.
 
-*Tutorial*
+## *Tutorial*
 
 See Wiki section
 
 https://github.com/melharfi/MELHARFI-2D-Game-Engine/wiki
 
 
-*Features:*
+## *Features:*
 
 *GDI+ with double buffering.
 
@@ -57,24 +57,24 @@ The library is divided by 3 pieces:
 
 **MELHARFI.LidgrenNetwork** for networking.
 
-Question 1
+### Question 1
 What is 2D Game Engine?
 
-Response 1
+### Response 1
 2D game engine is a library that you should integrate to your existing project and then let you build games or graphics representation, the engine already handle so many details about initializing game, parameters, screen, event ... without get bored with that details and then create a game in some few lines of code.
 
-Question 2
+### Question 2
 Why another 2D game engine while there's dozens of them?
 
-Response 2 :
+### Response 2 :
 In reality, I have a pation for creating games it was some couple of years, so i just wanted to create one just like you right now.
 
 my favor games was always 2D especially RPG/MMORPG, in that case you'll soon admit that there's not a lot of 2D MMORPG games (good ones), nor for 2D games engines, maybe some old stuff no longer supported like SDL or XNA, and you'll soon get staked and no one help you, in the other hand i was only familiar with C# language in the .NET technology, so all most of the engine was in C++.
 
-Question 3
-What distinguish it from the others 2D Game Engines
+### Question 3
+What distinguishes it from the others 2D Game Engines
 
-Response 3:
+### Response 3:
 create a scene, animation ... in a game is not that hard using any library/engine you want with some peace of code given to help you to start, BUT the big problem i found is when i need to create some GUI (Graphic User Interface) or simply the controls to interact with user, as a Chat Box, Text Input, Buttons, copy / past / click...
 
 So you have to create all of them programmatically, and design them and i know that create a game is more easy than create a controls itself because it need to handle some windows events like click/Keyboard on the shape and so many other stuff ... you know it's really complicated.
@@ -112,10 +112,10 @@ Searching google ...> nothing dud lol
 What a good challenge if i write it myself and include all that in ALL-In-One stuff!!
 and job done for you, don't worry anymore ^^
 
-Question 4
+### Question 4
 Why GDI+ ? DirectX is more powerful that GDI+
 
-Response 4
+### Response 4
 Windows use GDI+ to draw some stuff on the Forms of its applications, and it was not created for gaming purpose, even it's not supposed to support so many stuff on the same form, BUT nothing stop you from using it.
 
 in fact GDI+ is slower because it was not designed for such thing BUT only in the really old and slow computers like Pentium 3 or earlier with old windows version, all of us use minimum a Core processor that is sufficient to handle it.
@@ -125,20 +125,20 @@ DirectX use many technology that let it pretty fast but if you are not a master 
 Another thing is, that lib is not only made for gaming purpose, it's a way to animate your application, or a representation.
 Showing a tutorial in the first starting of your application for example, or a lot of stuff you can do.
 
-Question 6
+### Question 5
 Did that library need me to know programing?
 
-Response 6
+### Response 5
 Yes, the library only care about create a context of gaming, like initializing the GDI+, parameters of screen, double buffering and encapsulation of method that let you draw thing on the screen instead of the original stuff a bit hard to figure out.
 
 Make the network interaction, generating waypoint for a player, handling mouse event, i could add other stuff but my engine was created in the context of what my game needed until now, (well i had stopped to continue my game because of less time i have and other personal stuff)
 
 so you had to know or learn .Net technology to finish your game but i am sur that it's not really hard to achieve what you need.
 
-Question 7
+### Question 6
 What is the disadvantage of MELHARFI
 
-Response 7
+### Response 6
 First problem come about resizing the form, you would like to make your game a bit bigger or smaller, but such thing is not supported because of a pixel handling, you still can do it but all mouse event will not work.
 the issue come when you resize a picture, it's pixel inside become different than the original, you know degradation or scale ..., and when you use an event like mouse click on an image, it compare the pixel taken on the screen with the one of the original format of image, not the one stretched. So the condition will never be true.
 
@@ -161,6 +161,6 @@ Feel free to contact me for any purpose or issue you find by my adresse email :
 
 m.elharfi@gmail.com
 
-If you like the project and would bay me a coffee I’ll appreciate that
+If you like the project and would like to buy me a coffee, I’ll appreciate that
 
 Paypal account : m.elharfi@gmail.com
