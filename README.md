@@ -69,7 +69,7 @@ Why another 2D game engine while there are dozens of them?
 ### Response 2 :
 In reality, I have a passion for creating games it was some couple of years. I just wanted to create a game like you right now.
 
-my favorite games were always 2D especially RPG/MMORPGs. you'll soon see that there's not a lot of 2D MMORPG games (good ones), nor 2D games engines, maybe some old ones, but they are no longer supported, like SDL or XNA. You'll soon get stuck and no one can help you. On the other hand, I was only familiar with C# language and the .NET technology, so most of all of the engine was in C++.
+my favorite games were always 2D especially RPG/MMORPGs. you'll soon see that there's not a lot of 2D MMORPG games (good ones), nor 2D games engines, maybe some old ones, but they are no longer supported, like SDL or XNA(reported to MONO by now). You'll soon get stuck and no one can help you. On the other hand, I was only familiar with C# language and the .NET technology, so most of all of the engine was in C++.
 
 ### Question 3
 What distinguishes it from the others 2D Game Engines
@@ -105,7 +105,7 @@ After some search I found NOTHING that I can appreciate, so here is the deal
 
 -I need a network library for my multiplayer game
 
--I need an algorithm of path finding between point An until point B in a Map with obstacles.
+-I need an algorithm of path finding between point A until point B in a Map with obstacles.
 
 -I need to crypt my assets to prevent others people from stole it or modify it
 
@@ -128,7 +128,7 @@ Another thing is, that lib is not only made for gaming purpose, it's a way to an
 Showing a tutorial in the first starting off your application for example, or a lot of stuff you can do.
 
 ### Question 5
-Does this library need me to know programming?
+Does this library need me to know programming 
 
 ### Response 5
 Yes, the library only cares about creating a context of gaming, like initializing the GDI+, parameters of the screen, double buffering and encapsulation of method that let you draw thing on the screen instead of the original stuff a bit hard to figure out.
@@ -138,11 +138,11 @@ Make the network interaction, generating waypoint for a player, handling mouse e
 so you had to know or learn.Net technology to finish your game but I am sure that it's not really hard to achieve what you need.
 
 ### Question 6
-What is the disadvantage of MELHARFI
+What is the disadvantage of MELHARFI 2D Game Engine ?
 
 ### Response 6
-The first problem come about resizing the form, you would like to make your game a bit bigger or smaller, but such thing is not supported because of a pixel handling, you still can do it but all mouse event will not work.
-the issue come when you resize a picture, it's pixel inside become different than the original, you know degradation or scale ..., and when you use an event like mouse click on an image, it compare the pixel taken on the screen with one of the original formats of image, not the one stretched. So the condition will never be true.
+The first problem come about resizing the form, you would like to make your game a bit bigger or smaller ?, but such thing is not supported because of a pixel handling, you still can do it but all mouse event will not work.
+the issue come when you resize a picture, its pixels inside becomes different than the original, you know degradation or scale ..., and when you use an event like mouse click on an image, it compare the pixel taken on the screen with one of the original formats of image, not the one stretched. So the condition will never be true.
 
 No special effect in animation like particle animation unless you add another library. No rotation of image unless you create many instances of images in different situation and use it like animation by showing them one by one (purpose of Anim class)
 
@@ -151,7 +151,7 @@ It work only in windows form, so no cross-platform
 I apologize if I say a mistake about something,
 My code may look not optimized for some as I am not a professional programmer I have to say.
 
-Here is 2 link about one game I design to let you get an idea how is powerful, sorry if it's in French
+Here is 2 links about one game I design to let you get an idea how is powerful, sorry if it's in French
 https://www.youtube.com/watch?v=D6VQARWxfvs
 https://www.youtube.com/watch?v=ufQObcknmVY
 
