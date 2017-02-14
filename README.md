@@ -1,5 +1,5 @@
 # MELHARFI 2D Game Engine
-2D Game Engine + Network Library + Pathfinding + Windows GUI + Event handler "ALL-IN-ONE"
+2D Game Engine + Network Library + Pathfinding + Windows GUI + Mouse Event handler "ALL-IN-ONE"
 
 ## *Description*
 
