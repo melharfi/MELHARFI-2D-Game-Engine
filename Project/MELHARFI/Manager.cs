@@ -26,7 +26,7 @@ namespace MELHARFI
         /// <summary>
         /// mainForm is a pointer to your form where graphics should be drawn
         /// </summary>
-        public Form mainForm;
+        public Control control;
 
         /// <summary>
         /// Changing the background color, Black is the color by default if not initialized
@@ -134,17 +134,17 @@ namespace MELHARFI
         /// <summary>
         /// Manager method to initialize MELHARFI Engine
         /// </summary>
-        /// <param name="form">form to be drawn</param>
-        public Manager(Form form)
+        /// <param name="_control">Control to be drawn</param>
+        public Manager(Control _control)
         {
-            mainForm = form;
-            g = mainForm.CreateGraphics();
-            mainForm.Paint += mainForm_Paint;
-            mainForm.MouseClick += mainForm_MouseClick;
-            mainForm.MouseDown += mainForm_MouseDown;
-            mainForm.MouseUp += mainForm_MouseUp;
-            mainForm.MouseMove += mainForm_MouseMove;
-            mainForm.MouseDoubleClick += mainForm_MouseDoubleClick;
+            control = _control;
+            g = control.CreateGraphics();
+            control.Paint += mainForm_Paint;
+            control.MouseClick += mainForm_MouseClick;
+            control.MouseDown += mainForm_MouseDown;
+            control.MouseUp += mainForm_MouseUp;
+            control.MouseMove += mainForm_MouseMove;
+            control.MouseDoubleClick += mainForm_MouseDoubleClick;
             RefreshTimer.Interval = Fps;
             RefreshTimer.Tick += refreshTimer_Tick;
             RefreshTimer.Enabled = true;
@@ -153,27 +153,28 @@ namespace MELHARFI
         #region Dynamique Methode
         void refreshTimer_Tick(object sender, EventArgs e)
         {
-            mainForm.Refresh();
+            control.Refresh();
         }
         void mainForm_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            manager.MouseDoubleClicHandleEvents(e);
+            this.MouseDoubleClicHandleEvents(e);
         }
         void mainForm_MouseMove(object sender, MouseEventArgs e)
         {
-            manager.MouseMoveHandleEvents(e);
+            this.MouseMoveHandleEvents(e);
         }
         void mainForm_MouseUp(object sender, MouseEventArgs e)
         {
-            manager.MouseUpHandleEvents(e);
+            this.MouseUpHandleEvents(e);
         }
         void mainForm_MouseDown(object sender, MouseEventArgs e)
         {
-            manager.MouseDownHandleEvents(e);
+            this.MouseDownHandleEvents(e);
         }
         void mainForm_MouseClick(object sender, MouseEventArgs e)
         {
-            manager.MouseClicHandleEvents(e);
+            this.MouseClicHandleEvents(e);
+            //manager.MouseClicHandleEvents(e);
         }
         void mainForm_Paint(object sender, PaintEventArgs e)
         {
@@ -347,14 +348,14 @@ namespace MELHARFI
         {
             // pour avoir la couleur du pixel pointé par la souris
             Color color = Color.Empty;
-            if (mainForm == null) return color;
-            IntPtr hDc = GetDC(mainForm.Handle);
+            if (control == null) return color;
+            IntPtr hDc = GetDC(control.Handle);
             int colorRef = GetPixel(hDc, x, y);
             color = Color.FromArgb(
                 colorRef & 0x000000FF,
                 (colorRef & 0x0000FF00) >> 8,
                 (colorRef & 0x00FF0000) >> 16);
-            ReleaseDC(mainForm.Handle, hDc);
+            ReleaseDC(control.Handle, hDc);
             return color;
         }
 
@@ -363,11 +364,11 @@ namespace MELHARFI
         /// </summary>
         public void Close()
         {
-            mainForm.MouseClick -= mainForm_MouseClick;
-            mainForm.MouseDown -= mainForm_MouseDown;
-            mainForm.MouseMove -= mainForm_MouseMove;
-            mainForm.MouseUp -= mainForm_MouseUp;
-            mainForm.Paint -= mainForm_Paint;
+            control.MouseClick -= mainForm_MouseClick;
+            control.MouseDown -= mainForm_MouseDown;
+            control.MouseMove -= mainForm_MouseMove;
+            control.MouseUp -= mainForm_MouseUp;
+            control.Paint -= mainForm_Paint;
             Clear(true);
             RefreshTimer.Stop();
             RefreshTimer.Dispose();

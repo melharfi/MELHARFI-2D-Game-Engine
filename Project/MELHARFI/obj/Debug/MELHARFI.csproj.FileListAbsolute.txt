@@ -36,3 +36,17 @@ H:\MELHARFI\MELHARFI\bin\Debug\MELHARFI.pdb
 H:\MELHARFI\MELHARFI\obj\Debug\MELHARFI.csprojResolveAssemblyReference.cache
 H:\MELHARFI\MELHARFI\obj\Debug\MELHARFI.dll
 H:\MELHARFI\MELHARFI\obj\Debug\MELHARFI.pdb
+D:\mohssine\Nova\MELHARFI\MELHARFI\obj\Debug\MELHARFI.csprojResolveAssemblyReference.cache
+D:\mohssine\Nova\MELHARFI\MELHARFI\bin\Debug\MELHARFI.dll
+D:\mohssine\Nova\MELHARFI\MELHARFI\bin\Debug\MELHARFI.pdb
+D:\mohssine\Nova\MELHARFI\MELHARFI\obj\Debug\MELHARFI.dll
+D:\mohssine\Nova\MELHARFI\MELHARFI\obj\Debug\MELHARFI.pdb
+D:\mohssine\MELHARFI\MELHARFI\bin\Debug\MELHARFI.dll
+D:\mohssine\MELHARFI\MELHARFI\bin\Debug\MELHARFI.pdb
+D:\mohssine\MELHARFI\MELHARFI\obj\Debug\MELHARFI.dll
+D:\mohssine\MELHARFI\MELHARFI\obj\Debug\MELHARFI.pdb
+D:\mohssine\MELHARFI\MELHARFI\obj\Debug\MELHARFI.csprojResolveAssemblyReference.cache
+E:\project\MELHARFI\MELHARFI\bin\Debug\MELHARFI.dll
+E:\project\MELHARFI\MELHARFI\bin\Debug\MELHARFI.pdb
+E:\project\MELHARFI\MELHARFI\obj\Debug\MELHARFI.dll
+E:\project\MELHARFI\MELHARFI\obj\Debug\MELHARFI.pdb

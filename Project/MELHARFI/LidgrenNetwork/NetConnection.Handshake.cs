@@ -63,7 +63,7 @@ namespace MELHARFI
                     if (m_handshakeAttempts >= m_peerConfiguration.m_maximumHandshakeAttempts)
                     {
                         // failed to connect
-                        ExecuteDisconnect("Failed to establish connection - no response from remote host", true);
+                        ExecuteDisconnect("REMOTE_HOST_NOT_RESPONDING", true);
                         return;
                     }
 

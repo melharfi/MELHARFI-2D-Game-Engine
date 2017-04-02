@@ -2,3 +2,8 @@ D:\GitHub\MELHARFI 2D Game Engine\MELHARFI\MELHARFI\bin\Release\MELHARFI.dll
 D:\GitHub\MELHARFI 2D Game Engine\MELHARFI\MELHARFI\bin\Release\MELHARFI.pdb
 D:\GitHub\MELHARFI 2D Game Engine\MELHARFI\MELHARFI\obj\Release\MELHARFI.dll
 D:\GitHub\MELHARFI 2D Game Engine\MELHARFI\MELHARFI\obj\Release\MELHARFI.pdb
+E:\project\MELHARFI\MELHARFI\bin\Release\MELHARFI.dll
+E:\project\MELHARFI\MELHARFI\bin\Release\MELHARFI.pdb
+E:\project\MELHARFI\MELHARFI\obj\Release\MELHARFI.csprojResolveAssemblyReference.cache
+E:\project\MELHARFI\MELHARFI\obj\Release\MELHARFI.dll
+E:\project\MELHARFI\MELHARFI\obj\Release\MELHARFI.pdb
