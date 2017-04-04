@@ -51,7 +51,7 @@ https://github.com/melharfi/MELHARFI-2D-Game-Engine/wiki
 
 The library is divided into 3 pieces: 
 
-**MELHARFI.Gfx** : for all gaming/graphic stuff you need.
+**MELHARFI** : for all gaming/graphic stuff you need.
 
 **MELHARFI.AStar** : for pathfinding
 
@@ -75,9 +75,7 @@ my favorite games were always 2D especially RPG/MMORPGs. you'll soon see that th
 What distinguishes it from the others 2D Game Engines
 
 ### Response 3:
-[//]: # (Needs Clarification)
-[//]: # (I Would Suggest A Rewrite Of This Part)
-Create a scene animation ... in a game is not that hard using any library/engine you want with some peace of code given to help you to start, BUT the big problem I found is when I need to create some GUI (Graphic User Interface) or simply the controls to interact with user, as a Chat Box, Text Input, Buttons, copy/paste / click...
+create a game is not that hard using any library/engine you want with some peace of code given to help you to start, BUT the big problem I found is when I need to create some GUI (Graphic User Interface) or simply the controls to interact with user, as a Chat Box, Text Input, Buttons, copy/paste / click i didn't find any clue
 
 So you have to create all of them programmatically and design them and I know that create a game is easier than creating a controls itself because it needs to handle some windows events like click/Keyboard on the shape and so many other stuff ... you know it's really complicated.
 
