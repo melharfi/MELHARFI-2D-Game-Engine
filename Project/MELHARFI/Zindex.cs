@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using MELHARFI.Gfx;
 
 namespace MELHARFI
 {
@@ -22,48 +21,48 @@ namespace MELHARFI
             }
             int tmpX, tmpY;
 
-            if (x.GetType() == typeof(Bmp))
+            if (x.GetType() == typeof(MELHARFI.Manager.Bmp))
             {
-                Bmp b = x as Bmp;
-                tmpX = b.zindex;
+                MELHARFI.Manager.Bmp b = x as MELHARFI.Manager.Bmp;
+                tmpX = b.Zindex;
             }
-            else if (x.GetType() == typeof(Anim))
+            else if (x.GetType() == typeof(MELHARFI.Manager.Anim))
             {
-                Anim a = x as Anim;
-                tmpX = a.img.zindex;
+                MELHARFI.Manager.Anim a = x as MELHARFI.Manager.Anim;
+                tmpX = a.img.Zindex;
             }
-            else if (x.GetType() == typeof(Txt))
+            else if (x.GetType() == typeof(MELHARFI.Manager.Txt))
             {
-                Txt t = x as Txt;
-                tmpX = t.zindex;
+                MELHARFI.Manager.Txt t = x as MELHARFI.Manager.Txt;
+                tmpX = t.Zindex;
             }
             else
             {
-                // Rec
-                Rec r = x as Rec;
-                tmpX = r.zindex;
+                // MELHARFI.Manager.Rec
+                MELHARFI.Manager.Rec r = x as MELHARFI.Manager.Rec;
+                tmpX = r.Zindex;
             }
 
-            if (y.GetType() == typeof(Bmp))
+            if (y.GetType() == typeof(MELHARFI.Manager.Bmp))
             {
-                Bmp b = y as Bmp;
-                tmpY = b.zindex;
+                MELHARFI.Manager.Bmp b = y as MELHARFI.Manager.Bmp;
+                tmpY = b.Zindex;
             }
-            else if (y.GetType() == typeof(Anim))
+            else if (y.GetType() == typeof(MELHARFI.Manager.Anim))
             {
-                Anim a = y as Anim;
-                tmpY = a.img.zindex;
+                MELHARFI.Manager.Anim a = y as MELHARFI.Manager.Anim;
+                tmpY = a.img.Zindex;
             }
-            else if (y.GetType() == typeof(Txt))
+            else if (y.GetType() == typeof(MELHARFI.Manager.Txt))
             {
-                Txt t = y as Txt;
-                tmpY = t.zindex;
+                MELHARFI.Manager.Txt t = y as MELHARFI.Manager.Txt;
+                tmpY = t.Zindex;
             }
             else
             {
-                // Rec
-                Rec r = y as Rec;
-                tmpY = r.zindex;
+                // MELHARFI.Manager.Rec
+                MELHARFI.Manager.Rec r = y as MELHARFI.Manager.Rec;
+                tmpY = r.Zindex;
             }
 
             if (tmpX > tmpY)

@@ -1,18 +1,21 @@
-﻿using MELHARFI.Gfx;
+﻿using MELHARFI;
 
 namespace MELHARFI
 {
-    public class PressedGfx
+    public partial class Manager
     {
-        // pour stoquer les gfx simulé en bouton lorsqu'il ont subit un changement lors de l'evenement clic
-        // pour leurs donner leurs form d'origine si le MouseUp ne la pas fait
-        public Bmp bmp;
-        public string OldPath;
-
-        public PressedGfx(Bmp _bmp, string _oldPath)
+        public class PressedGfx
         {
-            bmp = _bmp;
-            OldPath = _oldPath;
+            // pour stoquer les gfx simulé en bouton lorsqu'il ont subit un changement lors de l'evenement clic
+            // pour leurs donner leurs form d'origine si le MouseUp ne la pas fait
+            public Bmp bmp;
+            public string OldPath;
+
+            public PressedGfx(Bmp _bmp, string _oldPath)
+            {
+                bmp = _bmp;
+                OldPath = _oldPath;
+            }
         }
     }
 }

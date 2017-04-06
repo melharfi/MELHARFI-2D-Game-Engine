@@ -16,7 +16,7 @@ namespace MELHARFI
         /// <summary>
         /// Singleton of Manager that lead to deal with all graphic and drawing stuff
         /// </summary>
-        public static Manager manager;
+        public static Dictionary<Manager, string> ManagerInstances = new Dictionary<Manager, string>();
 
         /// <summary>
         /// g is the graphic object used in the paint method, usfull if you need to do some tweak to it
@@ -52,67 +52,68 @@ namespace MELHARFI
         //[DllImport("gdi32.dll")]
         //static extern int SetPixel(IntPtr hDC, int x, int y, int color);
 
+        
         /// <summary>
         /// First layer to display object considered as a background objects
         /// </summary>
-        public List<IGfx> GfxBgrList = new List<IGfx>();    // Premiere couche des objets {Bmp (Bitmap), et Txt(Text)} arriere plan
+        public List<IGfx> BackgroundLayer = new List<IGfx>();    // Premiere couche des objets {Bmp (Bitmap), et Txt(Text)} arriere plan
 
         /// <summary>
         /// Second layer to display your dynamic objects
         /// </summary>
-        public List<IGfx> GfxObjList = new List<IGfx>();    // Deuxieme couche des objets {Bmp (Bitmap), et Txt(Text)} objet de jeu
+        public List<IGfx> ObjectLayer = new List<IGfx>();    // Deuxieme couche des objets {Bmp (Bitmap), et Txt(Text)} objet de jeu
 
         /// <summary>
         /// Third layer to display object that must stay on the front, like statistics, information, interaction, controls ...
         /// </summary>
-        public List<IGfx> GfxTopList = new List<IGfx>();    // troisieme couche des objets sur le devant,obj na pas d'event, non cliquable
+        public List<IGfx> TopLayer = new List<IGfx>();    // troisieme couche des objets sur le devant,obj na pas d'event, non cliquable
 
         /// <summary>
         /// Layer to store object you don't want them to be removed when you call the clean method
         /// </summary>
-        public List<IGfx> GfxFixedList = new List<IGfx>();  // troisieme couche des objets {Bmp (Bitmap), et Txt(Text)} hud + menu option ...
-            
+        public List<IGfx> FixedObjectLayer = new List<IGfx>();  // troisieme couche des objets {Bmp (Bitmap), et Txt(Text)} hud + menu option ...
+
         /// <summary>
         /// Layer to record Windows Controls depending on the game purpose
         /// </summary>
-        public List<Control> GfxCtrlList = new List<Control>(); // Troiseme couche des objet {Control}  
+        public List<Control> ControlLayer = new List<Control>(); // Troiseme couche des objet {Control}  
               
-        private readonly List<Control> _gfxCtrlListOnlyVisible = new List<Control>(); // pour memoriser just les controles qui sont visible
+        private readonly List<Control> _gfxControlLayerOnlyVisible = new List<Control>(); // pour memoriser just les controles qui sont visible
 
         /// <summary>
         /// Layer to store all objects has been clicked by mouse, it's a Mouse Down mechanisme, 
         /// </summary>
-        public List<PressedGfx> GfxMousePressedList = new List<PressedGfx>();  // enregistre tout les bouttons qui ont été enfancé pour s'assurer qu'il ont bien été relaché lords du MouseUp
+        private List<PressedGfx> MouseDownRecorder = new List<PressedGfx>();  // enregistre tout les bouttons qui ont été enfancé pour s'assurer qu'il ont bien été relaché lords du MouseUp
 
         /// <summary>
         /// Layer to store all objects the opacity is 0 (invisible), it's a Mouse Over mechanisme
         /// </summary>
-        public List<OldDataMouseMove> GfxOpacityMouseMoveList = new List<OldDataMouseMove>();      // stock tout les gfx dons l'opacité <1 puis devenu opaque pour les remetre a leurs opacité quand la souris en MouseOut sur le meme gfx
+        public List<OldDataMouseMove> OpacityMouseMoveRecorder = new List<OldDataMouseMove>();      // stock tout les gfx dons l'opacité <1 puis devenu opaque pour les remetre a leurs opacité quand la souris en MouseOut sur le meme gfx
 
         /// <summary>
         /// Layer store all graphics when dealing with Mouse Out event, not usfull for you, it's only a MouseOut mechanisme
         /// </summary>
-        private readonly List<IGfx> _gfxMouseOutList = new List<IGfx>();  // stoque tout les gfx abonnée à l'evenement MouseOut
+        private readonly List<IGfx> MouseOutRecorder = new List<IGfx>();  // stoque tout les gfx abonnée à l'evenement MouseOut
 
         /// <summary>
         /// Layer store all graphics when dealing with Mouse over event, not usfull for you, it's only a MouseOver mechanisme
         /// </summary>
-        public List<IGfx> GfxMouseOverList = new List<IGfx>(); // stoque tout les gfx en mode MouseOver pour lancer l'evenement MouseOut lors des superposition des objet, comme ca on saura si un autre objet est déja sur le devant
+        public List<IGfx> MouseOverRecorder = new List<IGfx>(); // stoque tout les gfx en mode MouseOver pour lancer l'evenement MouseOut lors des superposition des objet, comme ca on saura si un autre objet est déja sur le devant
 
         /// <summary>
         /// If it's true, all Background graphics will be invisible
         /// </summary>
-        bool _hideGfxBgr;
+        bool hideBagroundLayer;
 
         /// <summary>
         /// If it's true, all Objects graphics will be invisible
         /// </summary>
-        bool _hideGfxObj;
+        bool hideObjectLayer;
 
         /// <summary>
         /// If it's true, all Top graphics will be invisible
         /// </summary>
-        bool _hideGfxTop;
+        bool hideTopLayer;
 
         /// <summary>
         /// Callback delegate to follow errors to a method string that accept a string parameter, not usfull for user
@@ -129,25 +130,34 @@ namespace MELHARFI
         /// IF true the error message will be shown in MessageBox control
         /// </summary>
         public static bool ShowErrorsInMessageBox = true;
+
+        private string name;
+
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
         #endregion
         #region Contructor
         /// <summary>
         /// Manager method to initialize MELHARFI Engine
         /// </summary>
         /// <param name="_control">Control to be drawn</param>
-        public Manager(Control _control)
+        public Manager(Control _control, string _name)
         {
             control = _control;
             g = control.CreateGraphics();
-            control.Paint += mainForm_Paint;
-            control.MouseClick += mainForm_MouseClick;
-            control.MouseDown += mainForm_MouseDown;
-            control.MouseUp += mainForm_MouseUp;
-            control.MouseMove += mainForm_MouseMove;
-            control.MouseDoubleClick += mainForm_MouseDoubleClick;
+            control.Paint += control_Paint;
+            control.MouseClick += control_MouseClick;
+            control.MouseDown += control_MouseDown;
+            control.MouseUp += control_MouseUp;
+            control.MouseMove += control_MouseMove;
+            control.MouseDoubleClick += control_MouseDoubleClick;
             RefreshTimer.Interval = Fps;
             RefreshTimer.Tick += refreshTimer_Tick;
             RefreshTimer.Enabled = true;
+            ManagerInstances.Add(this, _name);
         }
         #endregion
         #region Dynamique Methode
@@ -155,28 +165,28 @@ namespace MELHARFI
         {
             control.Refresh();
         }
-        void mainForm_MouseDoubleClick(object sender, MouseEventArgs e)
+        void control_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             this.MouseDoubleClicHandleEvents(e);
         }
-        void mainForm_MouseMove(object sender, MouseEventArgs e)
+        void control_MouseMove(object sender, MouseEventArgs e)
         {
             this.MouseMoveHandleEvents(e);
         }
-        void mainForm_MouseUp(object sender, MouseEventArgs e)
+        void control_MouseUp(object sender, MouseEventArgs e)
         {
             this.MouseUpHandleEvents(e);
         }
-        void mainForm_MouseDown(object sender, MouseEventArgs e)
+        void control_MouseDown(object sender, MouseEventArgs e)
         {
             this.MouseDownHandleEvents(e);
         }
-        void mainForm_MouseClick(object sender, MouseEventArgs e)
+        void control_MouseClick(object sender, MouseEventArgs e)
         {
             this.MouseClicHandleEvents(e);
             //manager.MouseClicHandleEvents(e);
         }
-        void mainForm_Paint(object sender, PaintEventArgs e)
+        void control_Paint(object sender, PaintEventArgs e)
         {
             ImageAnimator.UpdateFrames();   // pour metre a jour les images gif animés
             e.Graphics.Clear(Background);   // effacement de l'ecran
@@ -184,132 +194,132 @@ namespace MELHARFI
         }
 
         /// <summary>
-        /// Clear() methode to clear all layers (GfxBgrList, GfxObjList, GfxTopList, GfxCtrlList), make attention that the graphics object marked as Fixed in GfxFixedList layer are not removed
+        /// Clear() methode to clear all layers (BackgroundLayer, ObjectLayer, TopLayer, ControlLayer), make attention that the graphics object marked as Fixed in FixedObjectLayer layer are not removed
         /// </summary>
         public void Clear()
         {
-            for (var cnt = GfxBgrList.Count - 1; cnt >= 0; cnt--)
+            for (var cnt = BackgroundLayer.Count - 1; cnt >= 0; cnt--)
             {
-                if (GfxFixedList.IndexOf(GfxBgrList[cnt]) != -1) continue;
-                GfxBgrList[cnt].Visible(false);
-                GfxBgrList.RemoveAt(cnt);
+                if (FixedObjectLayer.IndexOf(BackgroundLayer[cnt]) != -1) continue;
+                BackgroundLayer[cnt].Visible = false;
+                BackgroundLayer.RemoveAt(cnt);
             }
 
-            for (var cnt = GfxObjList.Count - 1; cnt >= 0; cnt--)
+            for (var cnt = ObjectLayer.Count - 1; cnt >= 0; cnt--)
             {
-                if (GfxFixedList.IndexOf(GfxObjList[cnt]) != -1) continue;
-                if (GfxObjList[cnt] == null) continue;
-                GfxObjList[cnt].Visible(false);
-                GfxObjList.RemoveAt(cnt);
+                if (FixedObjectLayer.IndexOf(ObjectLayer[cnt]) != -1) continue;
+                if (ObjectLayer[cnt] == null) continue;
+                ObjectLayer[cnt].Visible = false;
+                ObjectLayer.RemoveAt(cnt);
             }
 
-            for (int cnt = GfxTopList.Count - 1; cnt >= 0; cnt--)
+            for (int cnt = TopLayer.Count - 1; cnt >= 0; cnt--)
             {
-                if (GfxFixedList.IndexOf(GfxTopList[cnt]) != -1) continue;
-                if (GfxTopList[cnt] == null) continue;
-                GfxTopList[cnt].Visible(false);
-                GfxTopList.RemoveAt(cnt);
+                if (FixedObjectLayer.IndexOf(TopLayer[cnt]) != -1) continue;
+                if (TopLayer[cnt] == null) continue;
+                TopLayer[cnt].Visible = false;
+                TopLayer.RemoveAt(cnt);
             }
 
-            foreach (var t in GfxCtrlList)
+            foreach (var t in ControlLayer)
                 t?.Dispose();
-            GfxCtrlList.Clear();
+            ControlLayer.Clear();
 
-            GfxMousePressedList.Clear();    // netoiyage de la liste des gfx/button enfancé
-            GfxOpacityMouseMoveList.Clear();
+            MouseDownRecorder.Clear();    // netoiyage de la liste des gfx/button enfancé
+            OpacityMouseMoveRecorder.Clear();
             ZOrder.Clear();
                 
         }
 
         /// <summary>
-        /// Clear() methode to clear all layers (GfxBgrList, GfxObjList, GfxTopList, GfxCtrlList), make attention that the graphics object marked as Fixed in GfxFixedList layer are not removed
+        /// Clear() methode to clear all layers (BackgroundLayer, ObjectLayer, TopLayer, ControlLayer), make attention that the graphics object marked as Fixed in FixedObjectLayer layer are not removed
         /// </summary>
-        /// <param name="all">if All = true, all objects will be removed even those one marked as Fixed in GfxFixedList layer, if All = false nothing happen</param>
+        /// <param name="all">if All = true, all objects will be removed even those one marked as Fixed in FixedObjectLayer layer, if All = false nothing happen</param>
         public void Clear(bool all)
         {
-            for (int cnt = GfxBgrList.Count - 1; cnt >= 0; cnt--)
-                GfxBgrList[cnt].Visible(false);
-            GfxBgrList.Clear();
+            for (int cnt = BackgroundLayer.Count - 1; cnt >= 0; cnt--)
+                BackgroundLayer[cnt].Visible = false;
+            BackgroundLayer.Clear();
 
-            for (int cnt = GfxObjList.Count - 1; cnt >= 0; cnt--)
-                GfxObjList[cnt].Visible(false);
-            GfxObjList.Clear();
+            for (int cnt = ObjectLayer.Count - 1; cnt >= 0; cnt--)
+                ObjectLayer[cnt].Visible = false;
+            ObjectLayer.Clear();
 
-            for (int cnt = GfxTopList.Count - 1; cnt >= 0; cnt--)
-                GfxTopList[cnt].Visible(false);
-            GfxTopList.Clear();
+            for (int cnt = TopLayer.Count - 1; cnt >= 0; cnt--)
+                TopLayer[cnt].Visible = false;
+            TopLayer.Clear();
 
-            for (int cnt = GfxCtrlList.Count - 1; cnt >= 0; cnt--)
-                GfxCtrlList[cnt].Dispose();
-            GfxCtrlList.Clear();
+            for (int cnt = ControlLayer.Count - 1; cnt >= 0; cnt--)
+                ControlLayer[cnt].Dispose();
+            ControlLayer.Clear();
         }
 
         /// <summary>
-        /// Clear() method to clear a specific layer (GfxBgrList or GfxObjList or GfxTopList or GfxCtrlList)
+        /// Clear() method to clear a specific layer (BackgroundLayer or ObjectLayer or TopLayer or ControlLayer)
         /// </summary>
-        /// <param name="igfxListName">Igfx layer to be cleared, use "Bgr" for GfxBgrList, or "Obj" for GfxObjList, or "Ctrl" for GfxCtrlList, or "Top" for GfxTopList, or "Fixed" for GfxFixedList</param>
-        /// <param name="all">if All = true, all objects will be removed even those one marked as Fixed in GfxFixedList layer, if All = false only non fixed objects is removed</param>
-        public void Clear(string igfxListName, bool all)
+        /// <param name="LayerName">Igfx layer to be cleared, use "Bgr" for BackgroundLayer, or "Obj" for ObjectLayer, or "Ctrl" for ControlLayer, or "Top" for TopLayer, or "Fixed" for FixedcLayer</param>
+        /// <param name="all">if All = true, all objects will be removed even those one marked as Fixed in FixedObjectLayer layer, if All = false only non fixed objects is removed</param>
+        public void Clear(Layers LayerName, bool all)
         {
-            switch (igfxListName)
+            switch (LayerName)
             {
-                case "Bgr":
-                    for (int cnt = GfxBgrList.Count - 1; cnt >= 0; cnt--)
+                case Layers.Background:
+                    for (int cnt = BackgroundLayer.Count - 1; cnt >= 0; cnt--)
                     {
                         if (all)
                         {
-                            GfxBgrList[cnt].Visible(false);
-                            GfxBgrList.RemoveAt(cnt);
+                            BackgroundLayer[cnt].Visible = false;
+                            BackgroundLayer.RemoveAt(cnt);
                         }
-                        else if (GfxFixedList.IndexOf(GfxBgrList[cnt]) == -1)
+                        else if (FixedObjectLayer.IndexOf(BackgroundLayer[cnt]) == -1)
                         {
-                            GfxBgrList[cnt].Visible(false);
-                            GfxBgrList.RemoveAt(cnt);
+                            BackgroundLayer[cnt].Visible = false;
+                            BackgroundLayer.RemoveAt(cnt);
                         }
                     }
-                    GfxBgrList.RemoveAll(f => f == null);
+                    BackgroundLayer.RemoveAll(f => f == null);
                     break;
-                case "Obj":
-                    for (int cnt = GfxObjList.Count - 1; cnt >= 0; cnt--)
+                case Layers.Object:
+                    for (int cnt = ObjectLayer.Count - 1; cnt >= 0; cnt--)
                     {
                         if (all)
                         {
-                            GfxObjList[cnt].Visible(false);
-                            GfxObjList.RemoveAt(cnt);
+                            ObjectLayer[cnt].Visible = false;
+                            ObjectLayer.RemoveAt(cnt);
                         }
-                        else if (GfxFixedList.IndexOf(GfxObjList[cnt]) == -1)
+                        else if (FixedObjectLayer.IndexOf(ObjectLayer[cnt]) == -1)
                         {
-                            GfxObjList[cnt].Visible(false);
-                            GfxObjList.RemoveAt(cnt);
+                            ObjectLayer[cnt].Visible = false;
+                            ObjectLayer.RemoveAt(cnt);
                         }
                     }
-                    GfxBgrList.RemoveAll(f => f == null);
+                    BackgroundLayer.RemoveAll(f => f == null);
                     break;
-                case "Ctrl":
-                    foreach (Control t in GfxCtrlList)
+                case Layers.Control:
+                    foreach (Control t in ControlLayer)
                         t.Dispose();
-                    GfxCtrlList.Clear();
+                    ControlLayer.Clear();
                     break;
-                case "Top":
-                    for (int cnt = GfxTopList.Count - 1; cnt >= 0; cnt--)
+                case Layers.Top:
+                    for (int cnt = TopLayer.Count - 1; cnt >= 0; cnt--)
                     {
                         if (all)
                         {
-                            GfxTopList[cnt].Visible(false);
-                            GfxTopList.RemoveAt(cnt);
+                            TopLayer[cnt].Visible = false;
+                            TopLayer.RemoveAt(cnt);
                         }
-                        else if (GfxFixedList.IndexOf(GfxTopList[cnt]) == -1)
+                        else if (FixedObjectLayer.IndexOf(TopLayer[cnt]) == -1)
                         {
-                            GfxTopList[cnt].Visible(false);
-                            GfxTopList.RemoveAt(cnt);
+                            TopLayer[cnt].Visible = false;
+                            TopLayer.RemoveAt(cnt);
                         }
                     }
-                    GfxBgrList.RemoveAll(f => f == null);
+                    BackgroundLayer.RemoveAll(f => f == null);
                     break;
-                case "Fixed":
-                    foreach (IGfx t in GfxFixedList)
-                        t.Visible(false);
-                    GfxFixedList.Clear();
+                case Layers.Fixed:
+                    foreach (IGfx t in FixedObjectLayer)
+                        t.Visible = false;
+                    FixedObjectLayer.Clear();
                     break;
             }
 
@@ -322,7 +332,7 @@ namespace MELHARFI
         /// <param name="img">img is an Image object</param>
         /// <param name="opacityvalue">opacityvalue is a float number if equal to 0F mean the image will be completly transparent(invisible), if opacityvalue = 0.5F mean the image is transparent by 50%, if opacityvalue = 1F mean the image is 100% visible</param>
         /// <returns>Return new image with the new opacity</returns>
-        public static Bitmap ChangeOpacity(Image img, float opacityvalue)
+        public static Bitmap Opacity(Image img, float opacityvalue)
         {
             // methode qui créée une matrice de tout les couleurs de l'imag, et qui modifie la couche Alpha pour la transparence.
             // la methode dois être appelé delui le nom de la classe "Manager" et non l'instance "manager", puisqu'elle est static(non instanciable)
@@ -364,11 +374,11 @@ namespace MELHARFI
         /// </summary>
         public void Close()
         {
-            control.MouseClick -= mainForm_MouseClick;
-            control.MouseDown -= mainForm_MouseDown;
-            control.MouseMove -= mainForm_MouseMove;
-            control.MouseUp -= mainForm_MouseUp;
-            control.Paint -= mainForm_Paint;
+            control.MouseClick -= control_MouseClick;
+            control.MouseDown -= control_MouseDown;
+            control.MouseMove -= control_MouseMove;
+            control.MouseUp -= control_MouseUp;
+            control.Paint -= control_Paint;
             Clear(true);
             RefreshTimer.Stop();
             RefreshTimer.Dispose();
@@ -376,64 +386,64 @@ namespace MELHARFI
         }
 
         /// <summary>
-        /// Hide or Show all graphics stored in the Background layer "HideGfxBgrList"
+        /// Hide or Show all graphics stored in the Background layer "HideBackgroundLayer"
         /// </summary>
         /// <param name="hide">Hide = true or false</param>
-        public void HideGfxBgrList(bool hide)
+        public void HideBackgroundLayer(bool hide)
         {
-            _hideGfxBgr = hide;
+            hideBagroundLayer = hide;
         }
 
         /// <summary>
-        /// Hide or Show all graphics stored in the Object layer "HideGfxObjList"
+        /// Hide or Show all graphics stored in the Object layer "HideObjectList"
         /// </summary>
         /// <param name="hide">Hide = true or false</param>
-        public void HideGfxObjList(bool hide)
+        public void HideObjectLayer(bool hide)
         {
-            _hideGfxObj = hide;
+            hideObjectLayer = hide;
         }
 
         /// <summary>
-        /// Hide or Show all graphics stored in the Top layer "HideGfxTopList"
+        /// Hide or Show all graphics stored in the Top layer "HideTopList"
         /// </summary>
         /// <param name="hide">Hide = true or false</param>
-        public void HideGfxTopList(bool hide)
+        public void HideTopLayer(bool hide)
         {
-            _hideGfxTop = hide;
+            hideTopLayer = hide;
         }
 
         /// <summary>
-        /// Hide or Show all windows controls stored in the Control layer "GfxCtrlList"
+        /// Hide or Show all windows controls stored in the Control layer "ControlLayer"
         /// </summary>
         /// <param name="hide">Hide = true or false</param>
-        public void HideGfxCtrlList(bool hide)
+        public void HideControlLayer(bool hide)
         {
             if (hide)
-                foreach (Control t in GfxCtrlList)
+                foreach (Control t in ControlLayer)
                     t.Hide();
             else
-                foreach (Control t in GfxCtrlList)
+                foreach (Control t in ControlLayer)
                     t.Show();
         }
 
         /// <summary>
-        /// Hide or Show windows controls, it's different than "HideGfxCtrlList(bool Hide)", assuming you have 10 controls, 1 already hidden, and 9 visibles, and in some point you want to show an animation and need to hide all controls, after the animation is exited you want to show back the controls but ONLY the one that has been visible (9 controls), so this method store the visible object in an extra layer called GfxCtrlListOnlyVisible to check them later
+        /// Hide or Show windows controls, it's different than "HideControlLayer(bool Hide)", assuming you have 10 controls, 1 already hidden, and 9 visibles, and in some point you want to show an animation and need to hide all controls, after the animation is exited you want to show back the controls but ONLY the one that has been visible (9 controls), so this method store the visible object in an extra layer called _gfxControlLayerOnlyVisible to check them later
         /// </summary>
         /// <param name="hide">Hide is a boolean value True or False</param>
-        public void HideGfxCtrlListOnlyVisible(bool hide)
+        public void HideControlLayerOnlyVisible(bool hide)
         {
             if (hide)
-                foreach (Control t in GfxCtrlList)
+                foreach (Control t in ControlLayer)
                 {
                     if (!t.Visible) continue;
-                    _gfxCtrlListOnlyVisible.Add(t);
+                    _gfxControlLayerOnlyVisible.Add(t);
                     t.Hide();
                 }
             else
             {
-                foreach (Control t in _gfxCtrlListOnlyVisible)
+                foreach (Control t in _gfxControlLayerOnlyVisible)
                     t.Visible = true;
-                _gfxCtrlListOnlyVisible.Clear();
+                _gfxControlLayerOnlyVisible.Clear();
             }
         }
         #endregion
@@ -445,6 +455,11 @@ namespace MELHARFI
         {
             Bgr, Obj, Top
             // bgr=Background, obj=objet, top= sur le devant
+        }
+
+        public enum Layers
+        {
+            Background, Object, Top, Control, Fixed
         }
     }
 }

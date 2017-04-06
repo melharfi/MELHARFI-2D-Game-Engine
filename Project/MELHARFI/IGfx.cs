@@ -7,10 +7,10 @@ namespace MELHARFI
     /// </summary>
     public interface IGfx : ICloneable
     {
-        string Name();
-        object Tag();
-        void Visible(bool visible);
-        bool Visible();
-        int Zindex();
+        string Name { get; set; }
+        object Tag { get; set; }
+        bool Visible { get; set; }
+        int Zindex { get; set; }
+        Manager ParentManager { get; set; }
     }
 }

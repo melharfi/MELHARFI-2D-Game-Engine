@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using MELHARFI.Gfx;
 
 namespace MELHARFI
 {
@@ -19,9 +18,9 @@ namespace MELHARFI
             try
             {
                 // nétoyage des listes des objets null
-                GfxBgrList.RemoveAll(f => f == null);
-                GfxObjList.RemoveAll(f => f == null);
-                GfxTopList.RemoveAll(f => f == null);
+                BackgroundLayer.RemoveAll(f => f == null);
+                ObjectLayer.RemoveAll(f => f == null);
+                TopLayer.RemoveAll(f => f == null);
 
                 // copie des liste
                 List<IGfx> gfxBgrList;  // clone du GfxBgrList pour eviter de modifier une liste lors du rendu
@@ -31,22 +30,22 @@ namespace MELHARFI
                 Zindex zi = new Zindex();                   // triage des listes
 
                 // créer un miroire des listes pour eviter tous changement lors de l'affichage
-                lock ((GfxBgrList as ICollection).SyncRoot)
-                    gfxBgrList = GfxBgrList.GetRange(0, GfxBgrList.Count);
+                lock ((BackgroundLayer as ICollection).SyncRoot)
+                    gfxBgrList = BackgroundLayer.GetRange(0, BackgroundLayer.Count);
                 gfxBgrList.Sort(0, gfxBgrList.Count, zi);
 
-                lock ((GfxObjList as ICollection).SyncRoot)
-                    gfxObjList = GfxObjList.GetRange(0, GfxObjList.Count);
+                lock ((ObjectLayer as ICollection).SyncRoot)
+                    gfxObjList = ObjectLayer.GetRange(0, ObjectLayer.Count);
                 gfxObjList.Sort(0, gfxObjList.Count, zi);
 
-                lock ((GfxTopList as ICollection).SyncRoot)
-                    gfxTopList = GfxTopList.GetRange(0, GfxTopList.Count);
+                lock ((TopLayer as ICollection).SyncRoot)
+                    gfxTopList = TopLayer.GetRange(0, TopLayer.Count);
                 gfxTopList.Sort(0, gfxTopList.Count, zi);
 
                 // affichage de la 1ere couche réservé au Assets de l'arriere plant
                 #region GfxBgr
                 lock (((ICollection) gfxBgrList).SyncRoot)
-                    if (!_hideGfxBgr)
+                    if (!hideBagroundLayer)
                     {
                         foreach (IGfx t1 in gfxBgrList)
                         {
@@ -54,7 +53,7 @@ namespace MELHARFI
                             {
                                 Bmp b = t1 as Bmp;
                                 b.Child.Sort(0, b.Child.Count, zi);
-                                if (!b.visible) continue;
+                                if (!b.Visible) continue;
 
                                 #region parent
                                 ImageAttributes imageAttrParent = new ImageAttributes();
@@ -69,7 +68,7 @@ namespace MELHARFI
                                     if (t != null && t.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t as Bmp;
-                                        if (!childB.visible) continue;
+                                        if (!childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
@@ -78,7 +77,7 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t as Anim;
-                                        if (!childA.img.visible) continue;
+                                        if (!childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
@@ -87,13 +86,13 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t as Txt;
-                                        if (childT.visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.point.X, b.point.Y + childT.point.Y);
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.Location.X, b.point.Y + childT.Location.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t as Rec;
-                                        if (childR.visible)
+                                        if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(b.point.X + childR.point.X, b.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
@@ -104,7 +103,7 @@ namespace MELHARFI
                             {
                                 Anim a = t1 as Anim;
                                 a.Child.Sort(0, a.Child.Count, zi);
-                                if (!a.img.visible) continue;
+                                if (!a.img.Visible) continue;
 
                                 #region parent
                                 ImageAttributes imageAttrParent = new ImageAttributes();
@@ -119,7 +118,7 @@ namespace MELHARFI
                                     if (t != null && t.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t as Bmp;
-                                        if (!childB.visible) continue;
+                                        if (!childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
@@ -128,7 +127,7 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t as Anim;
-                                        if (!childA.img.visible) continue;
+                                        if (!childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
@@ -137,13 +136,13 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t as Txt;
-                                        if (childT.visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.point.X, a.img.point.Y + childT.point.Y);
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.Location.X, a.img.point.Y + childT.Location.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t as Rec;
-                                        if (childR.visible)
+                                        if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(a.img.point.X + childR.point.X, a.img.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
@@ -154,10 +153,10 @@ namespace MELHARFI
                             {
                                 Txt t = t1 as Txt;
                                 t.Child.Sort(0, t.Child.Count, zi);
-                                if (!t.visible) continue;
+                                if (!t.Visible) continue;
 
                                 #region parent
-                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.point);
+                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.Location);
                                 #endregion
                                 #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
@@ -166,32 +165,32 @@ namespace MELHARFI
                                     if (t2 != null && t2.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t2 as Bmp;
-                                        if (!childB.visible) continue;
+                                        if (!childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
-                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.point.X, childB.point.Y + t.point.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.Location.X, childB.point.Y + t.Location.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t2 as Anim;
-                                        if (!childA.img.visible) continue;
+                                        if (!childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
-                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.point.X, childA.img.point.Y + t.point.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.Location.X, childA.img.point.Y + t.Location.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t2 as Txt;
-                                        if (!childT.visible) continue;
-                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.point.X + childT.point.X, t.point.Y + childT.point.Y);
+                                        if (!childT.Visible) continue;
+                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.Location.X + childT.Location.X, t.Location.Y + childT.Location.Y);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t2 as Rec;
-                                        if (!childR.visible) continue;
-                                        e.Graphics.FillRectangle(childR.brush, new Rectangle(t.point.X + childR.point.X, t.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
+                                        if (!childR.Visible) continue;
+                                        e.Graphics.FillRectangle(childR.brush, new Rectangle(t.Location.X + childR.point.X, t.Location.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -201,7 +200,7 @@ namespace MELHARFI
                             {
                                 Rec r = t1 as Rec;
                                 r.Child.Sort(0, r.Child.Count, zi);
-                                if (!r.visible) continue;
+                                if (!r.Visible) continue;
 
                                 #region parent
                                 e.Graphics.FillRectangle(r.brush, new Rectangle(r.point, r.size));
@@ -213,7 +212,7 @@ namespace MELHARFI
                                     if (t != null && t.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t as Bmp;
-                                        if (!childB.visible) continue;
+                                        if (!childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
@@ -222,7 +221,7 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t as Anim;
-                                        if (!childA.img.visible) continue;
+                                        if (!childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
@@ -231,13 +230,13 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t as Txt;
-                                        if (!childT.visible) continue;
-                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.point.X, r.point.Y + childT.point.Y);
+                                        if (!childT.Visible) continue;
+                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.Location.X, r.point.Y + childT.Location.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t as Rec;
-                                        if (!childR.visible) continue;
+                                        if (!childR.Visible) continue;
                                         e.Graphics.FillRectangle(childR.brush, new Rectangle(r.point.X + childR.point.X, r.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
@@ -251,7 +250,7 @@ namespace MELHARFI
                 // affichage de la 2eme couche qui contiens les Assets
                 #region GfxObj
                 lock ((gfxObjList as ICollection).SyncRoot)
-                    if (!_hideGfxObj)
+                    if (!hideObjectLayer)
                     {
                         foreach (IGfx t1 in gfxObjList)
                         {
@@ -259,7 +258,7 @@ namespace MELHARFI
                             {
                                 Bmp b = t1 as Bmp;
                                 b.Child.Sort(0, b.Child.Count, zi);
-                                if (b.bmp == null || !b.visible) continue;
+                                if (b.bmp == null || !b.Visible) continue;
 
                                 #region parent
                                 ImageAttributes imageAttrParent = new ImageAttributes();
@@ -274,7 +273,7 @@ namespace MELHARFI
                                     if (t != null && t.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t as Bmp;
-                                        if (childB.bmp == null || !childB.visible) continue;
+                                        if (childB.bmp == null || !childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
@@ -283,7 +282,7 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t as Anim;
-                                        if (childA.img.bmp == null || !childA.img.visible) continue;
+                                        if (childA.img.bmp == null || !childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
@@ -292,13 +291,13 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t as Txt;
-                                        if (childT.visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.point.X, b.point.Y + childT.point.Y);
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.Location.X, b.point.Y + childT.Location.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t as Rec;
-                                        if (childR.visible)
+                                        if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(b.point.X + childR.point.X, b.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
@@ -309,7 +308,7 @@ namespace MELHARFI
                             {
                                 Anim a = t1 as Anim;
                                 a.Child.Sort(0, a.Child.Count, zi);
-                                if (a.img.bmp == null || !a.img.visible) continue;
+                                if (a.img.bmp == null || !a.img.Visible) continue;
 
                                 #region parent
                                 ImageAttributes imageAttrParent = new ImageAttributes();
@@ -324,7 +323,7 @@ namespace MELHARFI
                                     if (t != null && t.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t as Bmp;
-                                        if (childB.bmp == null || !childB.visible) continue;
+                                        if (childB.bmp == null || !childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
@@ -333,7 +332,7 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t as Anim;
-                                        if (childA.img.bmp == null || !childA.img.visible) continue;
+                                        if (childA.img.bmp == null || !childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
@@ -342,13 +341,13 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t as Txt;
-                                        if (childT.visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.point.X, a.img.point.Y + childT.point.Y);
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.Location.X, a.img.point.Y + childT.Location.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t as Rec;
-                                        if (childR.visible)
+                                        if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(a.img.point.X + childR.point.X, a.img.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
@@ -359,10 +358,10 @@ namespace MELHARFI
                             {
                                 Txt t = t1 as Txt;
                                 t.Child.Sort(0, t.Child.Count, zi);
-                                if (!t.visible) continue;
+                                if (!t.Visible) continue;
 
                                 #region parent
-                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.point);
+                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.Location);
                                 #endregion
                                 #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
@@ -371,32 +370,32 @@ namespace MELHARFI
                                     if (t2 != null && t2.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t2 as Bmp;
-                                        if (childB.bmp == null || !childB.visible) continue;
+                                        if (childB.bmp == null || !childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
-                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.point.X, childB.point.Y + t.point.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.Location.X, childB.point.Y + t.Location.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t2 as Anim;
-                                        if (childA.img.bmp == null || !childA.img.visible) continue;
+                                        if (childA.img.bmp == null || !childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
-                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.point.X, childA.img.point.Y + t.point.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.Location.X, childA.img.point.Y + t.Location.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t2 as Txt;
-                                        if (childT.visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.point.X + childT.point.X, t.point.Y + childT.point.Y);
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.Location.X + childT.Location.X, t.Location.Y + childT.Location.Y);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t2 as Rec;
-                                        if (childR.visible)
-                                            e.Graphics.FillRectangle(childR.brush, new Rectangle(t.point.X + childR.point.X, t.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
+                                        if (childR.Visible)
+                                            e.Graphics.FillRectangle(childR.brush, new Rectangle(t.Location.X + childR.point.X, t.Location.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -406,7 +405,7 @@ namespace MELHARFI
                             {
                                 Rec r = t1 as Rec;
                                 r.Child.Sort(0, r.Child.Count, zi);
-                                if (!r.visible) continue;
+                                if (!r.Visible) continue;
 
                                 #region parent
                                 e.Graphics.FillRectangle(r.brush, new Rectangle(r.point, r.size));
@@ -418,7 +417,7 @@ namespace MELHARFI
                                     if (t != null && t.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t as Bmp;
-                                        if (childB.bmp == null || !childB.visible) continue;
+                                        if (childB.bmp == null || !childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
@@ -427,7 +426,7 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t as Anim;
-                                        if (childA.img.bmp == null || !childA.img.visible) continue;
+                                        if (childA.img.bmp == null || !childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
@@ -436,13 +435,13 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t as Txt;
-                                        if (childT.visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.point.X, r.point.Y + childT.point.Y);
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.Location.X, r.point.Y + childT.Location.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t as Rec;
-                                        if (childR.visible)
+                                        if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(r.point.X + childR.point.X, r.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
@@ -456,7 +455,7 @@ namespace MELHARFI
                 // affichage de la 3eme couche qui contiens les Assets 
                 #region GfxTop
                 lock ((gfxTopList as ICollection).SyncRoot)
-                    if (!_hideGfxTop)
+                    if (!hideTopLayer)
                     {
                         foreach (IGfx t1 in gfxTopList)
                         {
@@ -464,7 +463,7 @@ namespace MELHARFI
                             {
                                 Bmp b = t1 as Bmp;
                                 b.Child.Sort(0, b.Child.Count, zi);
-                                if (b.bmp == null || !b.visible) continue;
+                                if (b.bmp == null || !b.Visible) continue;
 
                                 #region parent
                                 ImageAttributes imageAttrParent = new ImageAttributes();
@@ -479,7 +478,7 @@ namespace MELHARFI
                                     if (t != null && t.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t as Bmp;
-                                        if (childB.bmp == null || !childB.visible) continue;
+                                        if (childB.bmp == null || !childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
@@ -488,7 +487,7 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t as Anim;
-                                        if (childA.img.bmp == null || !childA.img.visible) continue;
+                                        if (childA.img.bmp == null || !childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
@@ -497,13 +496,13 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t as Txt;
-                                        if (childT.visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.point.X, b.point.Y + childT.point.Y);
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.Location.X, b.point.Y + childT.Location.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t as Rec;
-                                        if (childR.visible)
+                                        if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(b.point.X + childR.point.X, b.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
@@ -514,7 +513,7 @@ namespace MELHARFI
                             {
                                 Anim a = t1 as Anim;
                                 a.Child.Sort(0, a.Child.Count, zi);
-                                if (a.img.bmp == null || !a.img.visible) continue;
+                                if (a.img.bmp == null || !a.img.Visible) continue;
 
                                 #region parent
                                 ImageAttributes imageAttrParent = new ImageAttributes();
@@ -529,7 +528,7 @@ namespace MELHARFI
                                     if (t != null && t.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t as Bmp;
-                                        if (childB.bmp == null || !childB.visible) continue;
+                                        if (childB.bmp == null || !childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
@@ -538,7 +537,7 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t as Anim;
-                                        if (childA.img.bmp == null || !childA.img.visible) continue;
+                                        if (childA.img.bmp == null || !childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
@@ -547,13 +546,13 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t as Txt;
-                                        if (childT.visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.point.X, a.img.point.Y + childT.point.Y);
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.Location.X, a.img.point.Y + childT.Location.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t as Rec;
-                                        if (childR.visible)
+                                        if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(a.img.point.X + childR.point.X, a.img.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
@@ -564,10 +563,10 @@ namespace MELHARFI
                             {
                                 Txt t = t1 as Txt;
                                 t.Child.Sort(0, t.Child.Count, zi);
-                                if (!t.visible) continue;
+                                if (!t.Visible) continue;
 
                                 #region parent
-                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.point);
+                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.Location);
                                 #endregion
                                 #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
@@ -576,32 +575,32 @@ namespace MELHARFI
                                     if (t2 != null && t2.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t2 as Bmp;
-                                        if (childB.bmp == null || !childB.visible) continue;
+                                        if (childB.bmp == null || !childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
-                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.point.X, childB.point.Y + t.point.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.Location.X, childB.point.Y + t.Location.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t2 as Anim;
-                                        if (childA.img.bmp == null || !childA.img.visible) continue;
+                                        if (childA.img.bmp == null || !childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
-                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.point.X, childA.img.point.Y + t.point.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.Location.X, childA.img.point.Y + t.Location.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t2 as Txt;
-                                        if (childT.visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.point.X + childT.point.X, t.point.Y + childT.point.Y);
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.Location.X + childT.Location.X, t.Location.Y + childT.Location.Y);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t2 as Rec;
-                                        if (childR.visible)
-                                            e.Graphics.FillRectangle(childR.brush, new Rectangle(childR.point.X + t.point.X, childR.point.Y + t.point.Y, childR.size.Width, childR.size.Height));
+                                        if (childR.Visible)
+                                            e.Graphics.FillRectangle(childR.brush, new Rectangle(childR.point.X + t.Location.X, childR.point.Y + t.Location.Y, childR.size.Width, childR.size.Height));
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -611,7 +610,7 @@ namespace MELHARFI
                             {
                                 Rec r = t1 as Rec;
                                 r.Child.Sort(0, r.Child.Count, zi);
-                                if (!r.visible) continue;
+                                if (!r.Visible) continue;
 
                                 #region parent
                                 e.Graphics.FillRectangle(r.brush, new Rectangle(r.point, r.size));
@@ -623,7 +622,7 @@ namespace MELHARFI
                                     if (t != null && t.GetType() == typeof(Bmp))
                                     {
                                         Bmp childB = t as Bmp;
-                                        if (childB.bmp == null || !childB.visible) continue;
+                                        if (childB.bmp == null || !childB.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
@@ -632,7 +631,7 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Anim))
                                     {
                                         Anim childA = t as Anim;
-                                        if (childA.img.bmp == null || !childA.img.visible) continue;
+                                        if (childA.img.bmp == null || !childA.img.Visible) continue;
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
@@ -641,13 +640,13 @@ namespace MELHARFI
                                     else if (t != null && t.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t as Txt;
-                                        if (childT.visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.point.X, r.point.Y + childT.point.Y);
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.Location.X, r.point.Y + childT.Location.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t as Rec;
-                                        if (childR.visible)
+                                        if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(new Point(childR.point.X + r.point.X, childR.point.Y + r.point.Y), childR.size));
                                     }
                                 }
