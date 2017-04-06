@@ -7,3 +7,8 @@ E:\project\MELHARFI\MELHARFI\bin\Release\MELHARFI.pdb
 E:\project\MELHARFI\MELHARFI\obj\Release\MELHARFI.csprojResolveAssemblyReference.cache
 E:\project\MELHARFI\MELHARFI\obj\Release\MELHARFI.dll
 E:\project\MELHARFI\MELHARFI\obj\Release\MELHARFI.pdb
+D:\mohssine\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\bin\Release\MELHARFI.dll
+D:\mohssine\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\bin\Release\MELHARFI.pdb
+D:\mohssine\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\obj\Release\MELHARFI.csprojResolveAssemblyReference.cache
+D:\mohssine\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\obj\Release\MELHARFI.dll
+D:\mohssine\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\obj\Release\MELHARFI.pdb

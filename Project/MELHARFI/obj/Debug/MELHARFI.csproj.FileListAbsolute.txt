@@ -50,3 +50,12 @@ E:\project\MELHARFI\MELHARFI\bin\Debug\MELHARFI.dll
 E:\project\MELHARFI\MELHARFI\bin\Debug\MELHARFI.pdb
 E:\project\MELHARFI\MELHARFI\obj\Debug\MELHARFI.dll
 E:\project\MELHARFI\MELHARFI\obj\Debug\MELHARFI.pdb
+E:\project\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\obj\Debug\MELHARFI.dll
+E:\project\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\obj\Debug\MELHARFI.pdb
+E:\project\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\bin\Debug\MELHARFI.dll
+E:\project\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\bin\Debug\MELHARFI.pdb
+D:\mohssine\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\obj\Debug\MELHARFI.dll
+D:\mohssine\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\obj\Debug\MELHARFI.pdb
+D:\mohssine\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\bin\Debug\MELHARFI.dll
+D:\mohssine\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\bin\Debug\MELHARFI.pdb
+D:\mohssine\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\obj\Debug\MELHARFI.csprojResolveAssemblyReference.cache
