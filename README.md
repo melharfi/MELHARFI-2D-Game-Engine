@@ -140,14 +140,15 @@ What is the disadvantage of MELHARFI 2D Game Engine ?
 
 ### Response 6
 The first problem come about resizing the form, you would like to make your game a bit bigger or smaller ?, but such thing is not supported because of a pixel handling, you still can do it but all mouse event will not work.
-the issue come when you resize a picture, its pixels inside becomes different than the original, you know degradation or scale ..., and when you use an event like mouse click on an image, it compare the pixel taken on the screen with one of the original formats of image, not the one stretched. So the condition will never be true.
+
+The issue come when you resize a picture, its pixels inside becomes different than the original, you know degradation or scale ..., and when you use an event like mouse click on an image, it compare the pixel taken on the screen with one of the original formats of image, not the one stretched. So the condition will never be true.
 
 No special effect in animation like particle animation unless you add another library. No rotation of image unless you create many instances of images in different situation and use it like animation by showing them one by one (purpose of Anim class)
 
-It work only in windows form, so no cross-platform
+It work only in windows form, no cross-platform
 
 I apologize if I say a mistake about something,
-My code may look not optimized for some as I am not a professional programmer I have to say.
+My code may look not optimized for some.
 
 Here is 2 links about one game I design to let you get an idea how is powerful, sorry if it's in French
 https://www.youtube.com/watch?v=D6VQARWxfvs
