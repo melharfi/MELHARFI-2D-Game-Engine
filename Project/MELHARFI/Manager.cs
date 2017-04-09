@@ -184,7 +184,6 @@ namespace MELHARFI
         void control_MouseClick(object sender, MouseEventArgs e)
         {
             this.MouseClicHandleEvents(e);
-            //manager.MouseClicHandleEvents(e);
         }
         void control_Paint(object sender, PaintEventArgs e)
         {
@@ -453,7 +452,7 @@ namespace MELHARFI
         /// </summary>
         public enum TypeGfx
         {
-            Bgr, Obj, Top
+            Background, Object, Top
             // bgr=Background, obj=objet, top= sur le devant
         }
 

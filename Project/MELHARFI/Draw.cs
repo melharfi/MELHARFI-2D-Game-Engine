@@ -61,7 +61,7 @@ namespace MELHARFI
                                     imageAttrParent.SetRemapTable(b.newColorMap);
                                 e.Graphics.DrawImage(b.bmp, new Rectangle(b.point, b.rectangle.Size), b.rectangle.X, b.rectangle.Y, b.rectangle.Width, b.rectangle.Height, GraphicsUnit.Pixel, imageAttrParent);
                                 #endregion
-                                #region Childs
+                                #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
                                 foreach (IGfx t in b.Child)
                                 {
@@ -95,6 +95,12 @@ namespace MELHARFI
                                         if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(b.point.X + childR.point.X, b.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (childF.Visible)
+                                            e.Graphics.FillPolygon(childF.brush, childF.point, childF.fillMode);
+                                    }
                                 }
                                 //////////////////////////////////////////////////
                                 #endregion
@@ -111,7 +117,7 @@ namespace MELHARFI
                                     imageAttrParent.SetRemapTable(a.img.newColorMap);
                                 e.Graphics.DrawImage(a.img.bmp, new Rectangle(a.img.point, a.img.rectangle.Size), a.img.rectangle.X, a.img.rectangle.Y, a.img.rectangle.Width, a.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrParent);
                                 #endregion
-                                #region Childs
+                                #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
                                 foreach (IGfx t in a.Child)
                                 {
@@ -144,6 +150,18 @@ namespace MELHARFI
                                         Rec childR = t as Rec;
                                         if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(a.img.point.X + childR.point.X, a.img.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
+                                    }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = a.img.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = a.img.point.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -192,6 +210,18 @@ namespace MELHARFI
                                         if (!childR.Visible) continue;
                                         e.Graphics.FillRectangle(childR.brush, new Rectangle(t.Location.X + childR.point.X, t.Location.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
+                                    else if (t2 != null && t2.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t2 as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = t.Location.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = t.Location.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                    }
                                 }
                                 //////////////////////////////////////////////////
                                 #endregion
@@ -238,6 +268,77 @@ namespace MELHARFI
                                         Rec childR = t as Rec;
                                         if (!childR.Visible) continue;
                                         e.Graphics.FillRectangle(childR.brush, new Rectangle(r.point.X + childR.point.X, r.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
+                                    }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = r.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = r.point.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                    }
+                                }
+                                //////////////////////////////////////////////////
+                                #endregion//ok
+                            }
+                            else if (t1 != null && t1.GetType() == typeof(FillPolygon))
+                            {
+                                FillPolygon f = t1 as FillPolygon;
+                                f.Child.Sort(0, f.Child.Count, zi);
+                                if (!f.Visible) continue;
+
+                                #region parent
+                                e.Graphics.FillPolygon(f.brush, f.point, f.fillMode);
+                                #endregion
+                                #region childs
+                                ////////// affichage des elements enfants de l'objet Bmp
+                                foreach (IGfx t in f.Child)
+                                {
+                                    if (t != null && t.GetType() == typeof(Bmp))
+                                    {
+                                        Bmp childB = t as Bmp;
+                                        if (!childB.Visible) continue;
+                                        ImageAttributes imageAttrChild = new ImageAttributes();
+                                        if (childB.newColorMap != null)
+                                            imageAttrChild.SetRemapTable(childB.newColorMap);
+                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + f.rectangle.X, childB.point.Y + f.rectangle.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                    }
+                                    else if (t != null && t.GetType() == typeof(Anim))
+                                    {
+                                        Anim childA = t as Anim;
+                                        if (!childA.img.Visible) continue;
+                                        ImageAttributes imageAttrChild = new ImageAttributes();
+                                        if (childA.img.newColorMap != null)
+                                            imageAttrChild.SetRemapTable(childA.img.newColorMap);
+                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + f.rectangle.X, childA.img.point.Y + f.rectangle.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                    }
+                                    else if (t != null && t.GetType() == typeof(Txt))
+                                    {
+                                        Txt childT = t as Txt;
+                                        if (!childT.Visible) continue;
+                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, f.rectangle.X + childT.Location.X, f.rectangle.Y + childT.Location.Y);
+                                    }
+                                    else if (t != null && t.GetType() == typeof(Rec))
+                                    {
+                                        Rec childR = t as Rec;
+                                        if (!childR.Visible) continue;
+                                        e.Graphics.FillRectangle(childR.brush, new Rectangle(f.rectangle.X + childR.point.X, f.rectangle.Y + childR.point.Y, childR.size.Width, childR.size.Height));
+                                    }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = f.rectangle.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = f.rectangle.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -300,6 +401,18 @@ namespace MELHARFI
                                         if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(b.point.X + childR.point.X, b.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = b.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = b.point.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                    }
                                 }
                                 //////////////////////////////////////////////////
                                 #endregion
@@ -350,6 +463,18 @@ namespace MELHARFI
                                         if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(a.img.point.X + childR.point.X, a.img.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = a.img.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = a.img.point.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                    }
                                 }
                                 //////////////////////////////////////////////////
                                 #endregion
@@ -397,6 +522,18 @@ namespace MELHARFI
                                         if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(t.Location.X + childR.point.X, t.Location.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
+                                    else if (t2 != null && t2.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t2 as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = t.Location.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = t.Location.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                    }
                                 }
                                 //////////////////////////////////////////////////
                                 #endregion
@@ -443,6 +580,18 @@ namespace MELHARFI
                                         Rec childR = t as Rec;
                                         if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(r.point.X + childR.point.X, r.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
+                                    }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = r.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = r.point.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -505,6 +654,18 @@ namespace MELHARFI
                                         if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(b.point.X + childR.point.X, b.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = b.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = b.point.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                    }
                                 }
                                 //////////////////////////////////////////////////
                                 #endregion
@@ -555,6 +716,18 @@ namespace MELHARFI
                                         if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(a.img.point.X + childR.point.X, a.img.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = a.img.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = a.img.point.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                    }
                                 }
                                 //////////////////////////////////////////////////
                                 #endregion
@@ -602,6 +775,18 @@ namespace MELHARFI
                                         if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(childR.point.X + t.Location.X, childR.point.Y + t.Location.Y, childR.size.Width, childR.size.Height));
                                     }
+                                    else if (t2 != null && t2.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t2 as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = t.Location.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = t.Location.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                    }
                                 }
                                 //////////////////////////////////////////////////
                                 #endregion
@@ -648,6 +833,18 @@ namespace MELHARFI
                                         Rec childR = t as Rec;
                                         if (childR.Visible)
                                             e.Graphics.FillRectangle(childR.brush, new Rectangle(new Point(childR.point.X + r.point.X, childR.point.Y + r.point.Y), childR.size));
+                                    }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = r.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = r.point.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
                                     }
                                 }
                                 //////////////////////////////////////////////////
