@@ -61,21 +61,21 @@
         /// <summary>
         /// Make the index of the selected layer equal to 0
         /// </summary>
-        /// <param name="listObj">String value if equal to "bgr" then the Bgr layer is reseted, if equal to "obj" then Obj layer is reseted, if equal to ctrl then "Ctrl" layer is reseted, if equal to "top" then Top layer is reseted</param>
-        public static void Clear(string listObj)
+        /// <param name="layer">String value if equal to "bgr" then the Bgr layer is reseted, if equal to "obj" then Obj layer is reseted, if equal to ctrl then "Ctrl" layer is reseted, if equal to "top" then Top layer is reseted</param>
+        public static void Clear(Manager.Layers layer)
         {
-            switch (listObj)
+            switch (layer)
             {
-                case "bgr":
+                case Manager.Layers.Background:
                     bgr = 0;
                     break;
-                case "obj":
+                case Manager.Layers.Object:
                     obj = 0;
                     break;
-                case "ctrl":
+                case Manager.Layers.Control:
                     ctrl = 0;
                     break;
-                case "top":
+                case Manager.Layers.Top:
                     top = 0;
                     break;
             }

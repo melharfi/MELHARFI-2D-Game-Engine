@@ -36,6 +36,11 @@ namespace MELHARFI
                 MELHARFI.Manager.Txt t = x as MELHARFI.Manager.Txt;
                 tmpX = t.Zindex;
             }
+            else if (x.GetType() == typeof(MELHARFI.Manager.FillPolygon))
+            {
+                MELHARFI.Manager.FillPolygon f = x as MELHARFI.Manager.FillPolygon;
+                tmpX = f.Zindex;
+            }
             else
             {
                 // MELHARFI.Manager.Rec
@@ -57,6 +62,12 @@ namespace MELHARFI
             {
                 MELHARFI.Manager.Txt t = y as MELHARFI.Manager.Txt;
                 tmpY = t.Zindex;
+            }
+            else if (y.GetType() == typeof(MELHARFI.Manager.FillPolygon))
+            {
+                // MELHARFI.Manager.Rec
+                MELHARFI.Manager.FillPolygon f = y as MELHARFI.Manager.FillPolygon;
+                tmpY = f.Zindex;
             }
             else
             {
