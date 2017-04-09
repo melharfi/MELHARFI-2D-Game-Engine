@@ -286,13 +286,13 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();

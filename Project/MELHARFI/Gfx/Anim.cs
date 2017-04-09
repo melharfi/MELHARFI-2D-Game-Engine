@@ -246,14 +246,14 @@ namespace MELHARFI
             {
                 switch (typeGfx)
                 {
-                    case TypeGfx.Bgr:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Bgr, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Bgr, true, parentManager);
+                    case TypeGfx.Background:
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, parentManager);
 
-                        img.TypeGfx = TypeGfx.Bgr;
+                        img.TypeGfx = TypeGfx.Background;
                         break;
-                    case TypeGfx.Obj:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Obj, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Obj, true, parentManager);
-                        img.TypeGfx = TypeGfx.Obj;
+                    case TypeGfx.Object:
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, parentManager);
+                        img.TypeGfx = TypeGfx.Object;
                         break;
                     case TypeGfx.Top:
                         img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, parentManager);
@@ -274,16 +274,16 @@ namespace MELHARFI
             {
                 switch (typeGfx)
                 {
-                    case TypeGfx.Bgr:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Bgr, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Bgr, true, parentManager);
-                        img.TypeGfx = TypeGfx.Bgr;
+                    case TypeGfx.Background:
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, parentManager);
+                        img.TypeGfx = TypeGfx.Background;
                         break;
-                    case TypeGfx.Obj:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Obj, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Bgr, true, parentManager);
-                        img.TypeGfx = TypeGfx.Obj;
+                    case TypeGfx.Object:
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Object, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, parentManager);
+                        img.TypeGfx = TypeGfx.Object;
                         break;
                     case TypeGfx.Top:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Top, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Bgr, true, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Top, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, parentManager);
                         img.TypeGfx = TypeGfx.Top;
                         img.rectangle = cellList[Counter].rec;
                         break;
@@ -305,15 +305,15 @@ namespace MELHARFI
             {
                 switch (typeGfx)
                 {
-                    case TypeGfx.Bgr:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Bgr, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Bgr, true, rectangle, parentManager);
+                    case TypeGfx.Background:
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, rectangle, parentManager);
                         img.rectangle = cellList[0].rec;
-                        img.TypeGfx = TypeGfx.Bgr;
+                        img.TypeGfx = TypeGfx.Background;
                         break;
-                    case TypeGfx.Obj:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Obj, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Obj, true, rectangle, parentManager);
+                    case TypeGfx.Object:
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, rectangle, parentManager);
                         img.rectangle = cellList[0].rec;
-                        img.TypeGfx = TypeGfx.Obj;
+                        img.TypeGfx = TypeGfx.Object;
                         break;
                     case TypeGfx.Top:
                         img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, rectangle, parentManager);
@@ -336,15 +336,15 @@ namespace MELHARFI
             {
                 switch (typeGfx)
                 {
-                    case TypeGfx.Bgr:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Bgr, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Bgr, true, rectangle, parentManager);
+                    case TypeGfx.Background:
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, rectangle, parentManager);
                         img.rectangle = cellList[0].rec;
-                        img.TypeGfx = TypeGfx.Bgr;
+                        img.TypeGfx = TypeGfx.Background;
                         break;
-                    case TypeGfx.Obj:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Obj, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Obj, true, rectangle, parentManager);
+                    case TypeGfx.Object:
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Object, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Object, true, rectangle, parentManager);
                         img.rectangle = cellList[0].rec;
-                        img.TypeGfx = TypeGfx.Obj;
+                        img.TypeGfx = TypeGfx.Object;
                         break;
                     case TypeGfx.Top:
                         img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Top, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Top, true, rectangle, parentManager);

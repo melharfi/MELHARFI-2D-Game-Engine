@@ -61,7 +61,7 @@ namespace MELHARFI
             public event bmpMouseEventHandler MouseOver;
 
             /// <summary>
-            /// useless, not yet implemented
+            /// void raise mouse event if true
             /// </summary>
             public bool EscapeGfxWhileMouseDoubleClic = false;
             public bool EscapeGfxWhileMouseClic = false;
@@ -194,7 +194,7 @@ namespace MELHARFI
             /// <summary>
             /// Hold which layer the object is stored
             /// </summary>
-            public TypeGfx TypeGfx = TypeGfx.Bgr;
+            public TypeGfx TypeGfx = TypeGfx.Background;
 
             /// <summary>
             /// tag object to assigne to whatever you want
@@ -307,12 +307,8 @@ namespace MELHARFI
                 path = _bmp;
                 point = _point;
                 bmp = new Bitmap(path);
-                using (Bitmap tmp = new Bitmap(path))
-                    if (tmp.RawFormat.Equals(ImageFormat.Gif))
-                    {
-                        bmp = new Bitmap(new Bitmap(path), tmp.Width, tmp.Height);
-                        ImageAnimator.Animate(bmp, null);
-                    }
+                if (bmp.RawFormat.Equals(ImageFormat.Gif))
+                    ImageAnimator.Animate(bmp, null);
 
                 rectangle = _rectangle;
                 IsSpriteSheet = true;
@@ -332,12 +328,13 @@ namespace MELHARFI
                 point = _point;
                 Crypted = true;
                 Crypt = crypt;
-
+                
                 using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
                 {
                     Bitmap tmp = new Bitmap(m);
+
                     if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                        bmp = new Bitmap(new Bitmap(m), tmp.Width, tmp.Height);
+                        bmp = tmp;
                     else
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                     tmp.Dispose();
@@ -362,12 +359,9 @@ namespace MELHARFI
 
                 using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
                 {
-                    Bitmap tmp = new Bitmap(m);
-                    if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                        bmp = new Bitmap(new Bitmap(m), tmp.Width, tmp.Height);
-                    else
+                    Bitmap bmp = new Bitmap(m);
+                    if (bmp.RawFormat.Equals(ImageFormat.Gif))
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
-                    tmp.Dispose();
                 }
 
                 rectangle = _rectangle;
@@ -387,16 +381,18 @@ namespace MELHARFI
                 path = _bmp;
                 point = _point;
                 using (Bitmap tmp = new Bitmap(path))
+                {
+                    bmp = new Bitmap(new Bitmap(path), _size);
                     if (tmp.RawFormat.Equals(ImageFormat.Gif))
                     {
                         // si ce constructeur n'affiche pas une image gif avec just le rectangle défini il faut utiliser juste bmp = new Bitmap(path); qui ne prend pas le rectangle en considération
                         //bmp = new Bitmap(path);
-                        bmp = new Bitmap(new Bitmap(path), _size);
+                        
                         ImageAnimator.Animate(bmp, null);
                     }
-                    else
-                        bmp = new Bitmap(new Bitmap(path), _size);
-                rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                }
+                    
+                rectangle = new Rectangle(new Point(0, 0), _size);
                 parentManager = manager;
             }
 
@@ -411,14 +407,10 @@ namespace MELHARFI
             {
                 // generalement utilisé pour redimentionner une image pris depuis un spritesheet
                 point = _point;
+                bmp = new Bitmap(_bmp, _size);
                 if (bmp.RawFormat.Equals(ImageFormat.Gif))
-                {
-                    bmp = new Bitmap(_bmp, _size);
                     ImageAnimator.Animate(bmp, null);
-                }
-                else
-                    bmp = new Bitmap(_bmp, _size);
-                rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                rectangle = new Rectangle(new Point(0, 0), _size);
                 parentManager = manager;
             }
 
@@ -435,7 +427,7 @@ namespace MELHARFI
                 Crypted = true;
                 Crypt = crypt;
                 point = _point;
-
+                
                 using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
                 {
                     Bitmap tmp = new Bitmap(m);
@@ -445,7 +437,7 @@ namespace MELHARFI
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                     tmp.Dispose();
                 }
-                rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                rectangle = new Rectangle(new Point(0, 0), _size);
                 parentManager = manager;
             }
 
@@ -467,13 +459,13 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();
@@ -484,14 +476,11 @@ namespace MELHARFI
                 }
 
                 using (Bitmap tmp = new Bitmap(path))
-                    if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                        bmp = new Bitmap(tmp, tmp.Width, tmp.Height);
-                    else
-                    {
-                        bmp = new Bitmap(path);
+                {
+                    bmp = new Bitmap(path);
+                    if (tmp.RawFormat.Equals(ImageFormat.Gif))
                         ImageAnimator.Animate(bmp, null);
-                    }
-
+                }
                 rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
                 parentManager = manager;
             }
@@ -517,13 +506,13 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();
@@ -534,14 +523,11 @@ namespace MELHARFI
                 }
 
                 using (Bitmap tmp = new Bitmap(path))
-                    if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                        bmp = new Bitmap(tmp, tmp.Width, tmp.Height);
-                    else
-                    {
-                        bmp = new Bitmap(path);
+                {
+                    bmp = new Bitmap(path);
+                    if (tmp.RawFormat.Equals(ImageFormat.Gif))
                         ImageAnimator.Animate(bmp, null);
-                    }
-
+                }
                 parentManager = manager;
             }
 
@@ -566,13 +552,13 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();
@@ -584,14 +570,12 @@ namespace MELHARFI
 
                 using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
                 {
-                    Bitmap tmp = new Bitmap(m);
-                    if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                        bmp = new Bitmap(new Bitmap(m), tmp.Width, tmp.Height);
-                    else
+                    bmp = new Bitmap(m);
+                    if (bmp.RawFormat.Equals(ImageFormat.Gif))
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                 }
 
-                rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                rectangle = new Rectangle(new Point(0, 0), bmp.Size);
                 parentManager = manager;
             }
 
@@ -618,13 +602,13 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();
@@ -636,12 +620,9 @@ namespace MELHARFI
 
                 using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
                 {
-                    Bitmap tmp = new Bitmap(m);
-                    if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                        bmp = new Bitmap(new Bitmap(m), tmp.Width, tmp.Height);
-                    else
+                    bmp = new Bitmap(m);
+                    if (bmp.RawFormat.Equals(ImageFormat.Gif))
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
-                    tmp.Dispose();
                 }
                 parentManager = manager;
             }
@@ -665,13 +646,13 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();
@@ -683,12 +664,11 @@ namespace MELHARFI
 
                 using (Bitmap tmp = new Bitmap(path))
                 {
-                    if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                        bmp = new Bitmap(new Bitmap(path), _size);
-                    else
+                    bmp = new Bitmap(new Bitmap(path), _size);
+                    if (tmp.RawFormat.Equals(ImageFormat.Gif))
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                 }
-                rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                rectangle = new Rectangle(new Point(0, 0), _size);
                 parentManager = manager;
             }
 
@@ -713,13 +693,13 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();
@@ -739,7 +719,7 @@ namespace MELHARFI
                     tmp.Dispose();
                 }
 
-                rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                rectangle = new Rectangle(new Point(0, 0), _size);
                 parentManager = manager;
             }
 
@@ -764,13 +744,13 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();
@@ -781,15 +761,12 @@ namespace MELHARFI
                 }
 
                 using (Bitmap tmp = new Bitmap(path))
+                {
+                    bmp = Opacity(new Bitmap(tmp, _size), opacity);
                     if (tmp.RawFormat.Equals(ImageFormat.Gif))
-                    {
-                        bmp = new Bitmap(path);
                         ImageAnimator.Animate(bmp, null);
-                    }
-                    else
-                        bmp = Opacity(new Bitmap(new Bitmap(path), _size), opacity);
-
-                rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                }
+                rectangle = new Rectangle(new Point(0, 0), bmp.Size);
                 parentManager = manager;
             }
 
@@ -815,13 +792,13 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();
@@ -834,12 +811,12 @@ namespace MELHARFI
                 using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, crypt))))
                 {
                     if (tmp.RawFormat.Equals(ImageFormat.Gif))
-                        bmp = MELHARFI.Manager.Opacity(new Bitmap(new Bitmap(tmp, tmp.Width, tmp.Height), _size), opacity);
+                        bmp = MELHARFI.Manager.Opacity(new Bitmap(tmp, _size), opacity);
                     else
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                 }
 
-                rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                rectangle = new Rectangle(new Point(0, 0), _size);
                 parentManager = manager;
             }
 
@@ -856,7 +833,6 @@ namespace MELHARFI
             public Bmp(string _bmp, Point _point, string _name, TypeGfx _typeGfx, bool _visible, float opacity, Manager manager)
             {
                 path = _bmp;
-                Bitmap tmp = new Bitmap(path);
                 point = _point;
                 name = _name;
                 visible = _visible;
@@ -864,13 +840,13 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();
@@ -880,16 +856,11 @@ namespace MELHARFI
                         throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
                 }
 
-                if (tmp.RawFormat.Equals(ImageFormat.Gif))
-                {
-                    bmp = new Bitmap(path);
+                bmp = Opacity(new Bitmap(path), opacity);
+                if (bmp.RawFormat.Equals(ImageFormat.Gif))
                     ImageAnimator.Animate(bmp, null);
-                }
-                else
-                    bmp = Opacity(new Bitmap(new Bitmap(path), tmp.Width, tmp.Height), opacity);
 
-                tmp.Dispose();
-                rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                rectangle = new Rectangle(new Point(0, 0), bmp.Size);
                 parentManager = manager;
             }
 
@@ -907,21 +878,20 @@ namespace MELHARFI
             public Bmp(string _bmp, Point _point, string _name, TypeGfx _typeGfx, bool _visible, float opacity, Rectangle _rectangle, Manager manager)
             {
                 path = _bmp;
-                Bitmap tmp = new Bitmap(path);
                 point = _point;
                 name = _name;
                 visible = _visible;
                 Opacity = opacity;
-
+                
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case MELHARFI.Manager.TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case MELHARFI.Manager.TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
                         break;
                     case MELHARFI.Manager.TypeGfx.Top:
                         zindex = ZOrder.Top();
@@ -931,15 +901,10 @@ namespace MELHARFI
                         throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
                 }
 
-                if (tmp.RawFormat.Equals(ImageFormat.Gif))
-                {
-                    bmp = new Bitmap(path);
+                bmp = Opacity(new Bitmap(_bmp), opacity);
+                if (bmp.RawFormat.Equals(ImageFormat.Gif))
                     ImageAnimator.Animate(bmp, null);
-                }
-                else
-                    bmp = Opacity(new Bitmap(new Bitmap(path), tmp.Width, tmp.Height), opacity);
 
-                tmp.Dispose();
                 rectangle = _rectangle;
                 IsSpriteSheet = true;
                 parentManager = manager;
@@ -967,17 +932,17 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = TypeGfx.Object;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Top:
+                    case TypeGfx.Top:
                         zindex = ZOrder.Top();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Top;
+                        TypeGfx = TypeGfx.Top;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
@@ -985,16 +950,11 @@ namespace MELHARFI
 
                 using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
                 {
-                    Bitmap tmp = new Bitmap(m);
-                    if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                    {
-                        bmp = MELHARFI.Manager.Opacity(new Bitmap(tmp, tmp.Width, tmp.Height), opacity);
-                        tmp.Dispose();
-                    }
-                    else
+                    bmp = Opacity(new Bitmap(new Bitmap(m)), opacity);
+                    if (bmp.RawFormat.Equals(ImageFormat.Gif))
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                 }
-                rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                rectangle = new Rectangle(new Point(0, 0), bmp.Size);
                 parentManager = manager;
             }
 
@@ -1020,17 +980,17 @@ namespace MELHARFI
 
                 switch (_typeGfx)
                 {
-                    case MELHARFI.Manager.TypeGfx.Bgr:
+                    case TypeGfx.Background:
                         zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Bgr;
+                        TypeGfx = TypeGfx.Background;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Obj:
+                    case TypeGfx.Object:
                         zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Obj;
+                        TypeGfx = TypeGfx.Object;
                         break;
-                    case MELHARFI.Manager.TypeGfx.Top:
+                    case TypeGfx.Top:
                         zindex = ZOrder.Top();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Top;
+                        TypeGfx = TypeGfx.Top;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
@@ -1038,13 +998,9 @@ namespace MELHARFI
 
                 using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
                 {
-                    Bitmap tmp = new Bitmap(m);
-                    if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                        bmp = MELHARFI.Manager.Opacity(new Bitmap(tmp, tmp.Width, tmp.Height), opacity);
-                    else
+                    bmp = Opacity(new Bitmap(m), opacity);
+                    if (bmp.RawFormat.Equals(ImageFormat.Gif))
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
-
-                    tmp.Dispose();
                 }
                 IsSpriteSheet = true;
                 rectangle = _rectangle;
@@ -1063,17 +1019,17 @@ namespace MELHARFI
                 {
                     path = _bmp;
                     Opacity = 1;
-                    Bitmap bmp2;    // clone pour eviter un probleme "lobjet est actuelement utilisé ailleur"
+                    Bitmap bmp2;    // clone pour eviter un probleme "l'objet est actuelement utilisé ailleur"
                     if (Crypted)
                         using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, Crypt))))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                                bmp2 = new Bitmap(new Bitmap(tmp), tmp.Width, tmp.Height);
+                                bmp2 = new Bitmap(new Bitmap(tmp), bmp.Size);
                             else
                                 throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                     else
                         using (Bitmap tmp = new Bitmap(path))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                                bmp2 = new Bitmap(new Bitmap(tmp), tmp.Width, tmp.Height);
+                                bmp2 = new Bitmap(new Bitmap(tmp), bmp.Size);
                             else
                             {
                                 bmp2 = new Bitmap(path);
@@ -1081,15 +1037,12 @@ namespace MELHARFI
                             }
 
                     bmp = bmp2;
-                    rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                    rectangle = new Rectangle(new Point(0, 0), bmp.Size);
                     IsSpriteSheet = false;
                 }
                 catch (Exception ex)
                 {
-                    if (MELHARFI.Manager.OutputErrorCallBack != null)
-                        MELHARFI.Manager.OutputErrorCallBack("Error Changing Bitmap \n" + ex);
-                    else if (MELHARFI.Manager.ShowErrorsInMessageBox)
-                        MessageBox.Show("error Changing Bitmap \n" + ex);
+                    ExceptionHandler(ex);
                 }
             }
 
@@ -1119,15 +1072,12 @@ namespace MELHARFI
                                 bmp = new Bitmap(path);
                                 ImageAnimator.Animate(bmp, null);
                             }
-                    rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                    rectangle = new Rectangle(new Point(0, 0), new Size(_size.Width, _size.Height));
                     IsSpriteSheet = false;
                 }
                 catch (Exception ex)
                 {
-                    if (MELHARFI.Manager.OutputErrorCallBack != null)
-                        MELHARFI.Manager.OutputErrorCallBack("Error Changing Bitmap \n" + ex);
-                    else if (MELHARFI.Manager.ShowErrorsInMessageBox)
-                        MessageBox.Show("error Changing Bitmap \n" + ex);
+                    ExceptionHandler(ex);
                 }
             }
 
@@ -1145,13 +1095,13 @@ namespace MELHARFI
                     if (Crypted)
                         using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, Crypt))))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                                bmp = new Bitmap(new Bitmap(tmp), tmp.Width, tmp.Height);
+                                bmp = new Bitmap(new Bitmap(tmp), bmp.Size);
                             else
                                 throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                     else
                         using (Bitmap tmp = new Bitmap(path))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                                bmp = new Bitmap(new Bitmap(tmp), tmp.Width, tmp.Height);
+                                bmp = new Bitmap(new Bitmap(tmp), bmp.Size);
                             else
                             {
                                 bmp = new Bitmap(path);
@@ -1162,10 +1112,7 @@ namespace MELHARFI
                 }
                 catch (Exception ex)
                 {
-                    if (MELHARFI.Manager.OutputErrorCallBack != null)
-                        MELHARFI.Manager.OutputErrorCallBack("Error Changing Bitmap \n" + ex);
-                    else if (MELHARFI.Manager.ShowErrorsInMessageBox)
-                        MessageBox.Show("error Changing Bitmap \n" + ex);
+                    ExceptionHandler(ex);
                 }
             }
 
@@ -1183,27 +1130,24 @@ namespace MELHARFI
                     if (Crypted)
                         using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, Crypt))))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                                bmp = MELHARFI.Manager.Opacity(new Bitmap(tmp, tmp.Width, tmp.Height), opacity);
+                                bmp = Opacity(new Bitmap(tmp, bmp.Size), opacity);
                             else
                                 throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                     else
                         using (Bitmap tmp = new Bitmap(path))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                                bmp = MELHARFI.Manager.Opacity(new Bitmap(tmp, tmp.Width, tmp.Height), opacity);
+                                bmp = Opacity(new Bitmap(tmp, bmp.Size), opacity);
                             else
                             {
                                 bmp = new Bitmap(path);
                                 ImageAnimator.Animate(bmp, null);
                             }
-                    rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+                    rectangle = new Rectangle(new Point(0, 0), bmp.Size);
                     IsSpriteSheet = false;
                 }
                 catch (Exception ex)
                 {
-                    if (MELHARFI.Manager.OutputErrorCallBack != null)
-                        MELHARFI.Manager.OutputErrorCallBack("Error Changing Bitmap \n" + ex);
-                    else if (MELHARFI.Manager.ShowErrorsInMessageBox)
-                        MessageBox.Show("error Changing Bitmap \n" + ex);
+                    ExceptionHandler(ex);
                 }
             }
 
@@ -1222,13 +1166,13 @@ namespace MELHARFI
                     if (Crypted)
                         using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, Crypt))))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                                bmp = MELHARFI.Manager.Opacity(new Bitmap(tmp, tmp.Width, tmp.Height), opacity);
+                                bmp = Opacity(new Bitmap(tmp, bmp.Size), opacity);
                             else
                                 throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                     else
                         using (Bitmap tmp = new Bitmap(path))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
-                                bmp = MELHARFI.Manager.Opacity(new Bitmap(tmp, tmp.Width, tmp.Height), opacity);
+                                bmp = Opacity(new Bitmap(tmp, bmp.Size), opacity);
                             else
                             {
                                 bmp = new Bitmap(path);
@@ -1239,13 +1183,18 @@ namespace MELHARFI
                 }
                 catch (Exception ex)
                 {
-                    if (MELHARFI.Manager.OutputErrorCallBack != null)
-                        MELHARFI.Manager.OutputErrorCallBack("Error Changing Bitmap \n" + ex);
-                    else if (MELHARFI.Manager.ShowErrorsInMessageBox)
-                        MessageBox.Show("error Changing Bitmap \n" + ex);
+                    ExceptionHandler(ex);
                 }
             }
             #endregion
+
+            private void ExceptionHandler(Exception ex)
+            {
+                if (OutputErrorCallBack != null)
+                    OutputErrorCallBack(ex.ToString());
+                else if (ShowErrorsInMessageBox)
+                    MessageBox.Show(ex.ToString());
+            }
 
             /// <summary>
             /// Create a perfect duplication of the Bmp object
