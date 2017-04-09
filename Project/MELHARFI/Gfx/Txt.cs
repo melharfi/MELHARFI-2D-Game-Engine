@@ -165,7 +165,7 @@ namespace MELHARFI
             /// <summary>
             /// point where the text will be drawn on the form, Default is X = 0, Y = 0;
             /// </summary>
-            public Point Location = Point.Empty;
+            public Point point = Point.Empty;
 
             private string name;
 
@@ -261,7 +261,7 @@ namespace MELHARFI
             public Txt(string _txt, Point _point, Manager manager)
             {
                 Text = _txt;
-                Location = _point;
+                point = _point;
                 parentManager = manager;
             }
 
@@ -278,7 +278,7 @@ namespace MELHARFI
             public Txt(string _txt, Point _point, string _name, MELHARFI.Manager.TypeGfx _typeGfx, bool _visible, Font _font, Brush _brush, Manager manager)
             {
                 Text = _txt;
-                Location = new Point(_point.X, _point.Y);
+                point = new Point(_point.X, _point.Y);
                 name = _name;
                 visible = _visible;
                 font = _font;
