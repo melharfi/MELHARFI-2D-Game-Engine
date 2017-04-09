@@ -27,7 +27,7 @@ https://github.com/melharfi/MELHARFI-2D-Game-Engine/wiki
 *animation method:
  You can create animation, with parameters, with timer, a number of shapes, reversed or not, movement or stable...
 
-*draw text, image, rectangle, animation on the screen.
+*draw text, image, rectangle, Shapes (Polygone), animation on the screen.
 
 *handle events* :
  MouseDoubleClic,
