@@ -53,7 +53,6 @@ namespace MELHARFI
 
                     if (gfxTopList[cnt - 1] != null && gfxTopList[cnt - 1].GetType() == typeof(Bmp))
                     {
-
                         #region childs
                         Bmp b = gfxTopList[cnt - 1] as Bmp;
                         b.Child.Sort(0, b.Child.Count, rzi);
@@ -161,6 +160,32 @@ namespace MELHARFI
                                     MouseOverRecorder.Clear();
                                     MouseOverRecorder.Add(childR);
                                     childR.FireMouseOver(e);
+                                }
+                                break;
+                            }
+                            else if (t != null && t.GetType() == typeof(FillPolygon))
+                            {
+                                FillPolygon childF = t as FillPolygon;
+                                if (!b.Visible || !childF.Visible ||
+                                    !new Rectangle(childF.rectangle.X + b.point.X, childF.rectangle.Y + b.point.Y,
+                                        childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
+                                    continue;
+                                SolidBrush sb = childF.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() && !childF.EscapeGfxWhileMouseMove)
+                                    continue;
+                                childF.FireMouseMove(e);
+                                found = true;
+
+                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                if (MouseOutRecorder.IndexOf(childF) == -1)
+                                    MouseOutRecorder.Add(childF);
+
+                                // inscription dans la liste GfxMouseOver
+                                if (MouseOverRecorder.IndexOf(childF) == -1)
+                                {
+                                    MouseOverRecorder.Clear();
+                                    MouseOverRecorder.Add(childF);
+                                    childF.FireMouseOver(e);
                                 }
                                 break;
                             }
@@ -343,6 +368,32 @@ namespace MELHARFI
                                     MouseOverRecorder.Clear();
                                     MouseOverRecorder.Add(childR);
                                     childR.FireMouseOver(e);
+                                }
+                                break;
+                            }
+                            else if (t != null && t.GetType() == typeof(FillPolygon))
+                            {
+                                FillPolygon childF = t as FillPolygon;
+                                if (!a.img.Visible || !childF.Visible ||
+                                    !new Rectangle(childF.rectangle.X + a.img.point.X, childF.rectangle.Y + a.img.point.Y,
+                                        childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
+                                    continue;
+                                SolidBrush sb = childF.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() && !childF.EscapeGfxWhileMouseMove)
+                                    continue;
+                                childF.FireMouseMove(e);
+                                found = true;
+
+                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                if (MouseOutRecorder.IndexOf(childF) == -1)
+                                    MouseOutRecorder.Add(childF);
+
+                                // inscription dans la liste GfxMouseOver
+                                if (MouseOverRecorder.IndexOf(childF) == -1)
+                                {
+                                    MouseOverRecorder.Clear();
+                                    MouseOverRecorder.Add(childF);
+                                    childF.FireMouseOver(e);
                                 }
                                 break;
                             }
@@ -534,6 +585,32 @@ namespace MELHARFI
                                 }
                                 break;
                             }
+                            else if (t != null && t.GetType() == typeof(FillPolygon))
+                            {
+                                FillPolygon childF = t as FillPolygon;
+                                if (!r.Visible || !childF.Visible ||
+                                    !new Rectangle(childF.rectangle.X + r.point.X, childF.rectangle.Y + r.point.Y,
+                                        childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
+                                    continue;
+                                SolidBrush sb = childF.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() && !childF.EscapeGfxWhileMouseMove)
+                                    continue;
+                                childF.FireMouseMove(e);
+                                found = true;
+
+                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                if (MouseOutRecorder.IndexOf(childF) == -1)
+                                    MouseOutRecorder.Add(childF);
+
+                                // inscription dans la liste GfxMouseOver
+                                if (MouseOverRecorder.IndexOf(childF) == -1)
+                                {
+                                    MouseOverRecorder.Clear();
+                                    MouseOverRecorder.Add(childF);
+                                    childF.FireMouseOver(e);
+                                }
+                                break;
+                            }
                             else if (t != null && t.GetType() == typeof(Txt))
                             {
                                 Txt childR = t as Txt;
@@ -584,6 +661,200 @@ namespace MELHARFI
                                 MouseOverRecorder.Clear();
                                 MouseOverRecorder.Add(r);
                                 r.FireMouseOver(e);
+                            }
+                            break;
+                        }
+
+                        #endregion
+                    }
+                    else if (gfxTopList[cnt - 1] != null && gfxTopList[cnt - 1].GetType() == typeof(FillPolygon))
+                    {
+                        #region childs
+                        FillPolygon f = gfxTopList[cnt - 1] as FillPolygon;
+                        f.Child.Sort(0, f.Child.Count, rzi);
+                        foreach (IGfx t in f.Child)
+                        {
+                            if (t != null && t.GetType() == typeof(Bmp))
+                            {
+                                Bmp childB = t as Bmp;
+                                if (f.Visible && childB.Visible && childB.bmp != null && new Rectangle(childB.point.X + f.rectangle.X, childB.point.Y + f.rectangle.Y, (childB.isSpriteSheet) ? childB.rectangle.Width : childB.bmp.Width, (childB.isSpriteSheet) ? childB.rectangle.Height : childB.bmp.Height).Contains(e.Location))
+                                {
+                                    if (childB.Opacity == 1)
+                                    {
+                                        if (
+                                            childB.bmp.GetPixel(e.X - f.rectangle.X - childB.point.X + childB.rectangle.X,
+                                                e.Y - f.rectangle.Y - childB.point.Y + childB.rectangle.Y) !=
+                                            GetPixel(e.X, e.Y) && !childB.EscapeGfxWhileMouseMove) continue;
+                                        childB.FireMouseMove(e);
+                                        found = true;
+
+                                        // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                        if (MouseOutRecorder.IndexOf(childB) == -1)
+                                            MouseOutRecorder.Add(childB);
+
+                                        // inscription dans la liste GfxMouseOver
+                                        if (MouseOverRecorder.IndexOf(childB) == -1)
+                                        {
+                                            MouseOverRecorder.Clear();
+                                            MouseOverRecorder.Add(childB);
+                                            childB.FireMouseOver(e);
+                                        }
+                                        break;
+                                    }
+                                    if (!(childB.Opacity < 1) || !(childB.Opacity > 0)) continue;
+                                    OpacityMouseMoveRecorder.Add(new OldDataMouseMove(childB, childB.Opacity));
+                                    childB.ChangeBmp(childB.path);
+                                    break;
+                                }
+                                for (int cnt1 = 0; cnt1 < OpacityMouseMoveRecorder.Count; cnt1++)
+                                {
+                                    if (childB != OpacityMouseMoveRecorder[cnt1].bmp) continue;
+                                    childB.ChangeBmp(OpacityMouseMoveRecorder[cnt1].bmp.path, OpacityMouseMoveRecorder[cnt1].opacity);
+                                    OpacityMouseMoveRecorder.RemoveAt(cnt1);
+                                }
+                            }
+                            else if (t != null && t.GetType() == typeof(Anim))
+                            {
+                                Anim childA = t as Anim;
+                                if (f.Visible && childA.img.Visible && childA.img.bmp != null && new Rectangle(childA.img.point.X + f.rectangle.X, childA.img.point.Y + f.rectangle.Y, (childA.img.isSpriteSheet) ? childA.img.rectangle.Width : childA.img.bmp.Width, (childA.img.isSpriteSheet) ? childA.img.rectangle.Height : childA.img.bmp.Height).Contains(e.Location))
+                                {
+                                    if (childA.img.Opacity == 1)
+                                    {
+                                        if (
+                                            childA.img.bmp.GetPixel(
+                                                e.X - f.rectangle.X - childA.img.point.X + childA.img.rectangle.X,
+                                                e.Y - f.rectangle.Y - childA.img.point.Y + childA.img.rectangle.Y) !=
+                                            GetPixel(e.X, e.Y) && !childA.img.EscapeGfxWhileMouseMove) continue;
+                                        childA.img.FireMouseMove(e);
+                                        found = true;
+
+                                        // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                        if (MouseOutRecorder.IndexOf(childA) == -1)
+                                            MouseOutRecorder.Add(childA);
+
+                                        // inscription dans la liste GfxMouseOver
+                                        if (MouseOverRecorder.IndexOf(childA) == -1)
+                                        {
+                                            MouseOverRecorder.Clear();
+                                            MouseOverRecorder.Add(childA);
+                                            childA.img.FireMouseOver(e);
+                                        }
+                                        break;
+                                    }
+                                    if (!(childA.img.Opacity < 1) || !(childA.img.Opacity > 0)) continue;
+                                    OpacityMouseMoveRecorder.Add(new OldDataMouseMove(childA.img, childA.img.Opacity));
+                                    childA.img.ChangeBmp(childA.img.path);
+                                    break;
+                                }
+                                for (int cnt1 = 0; cnt1 < OpacityMouseMoveRecorder.Count; cnt1++)
+                                {
+                                    if (childA.img != OpacityMouseMoveRecorder[cnt1].bmp) continue;
+                                    childA.img.ChangeBmp(OpacityMouseMoveRecorder[cnt1].bmp.path, OpacityMouseMoveRecorder[cnt1].opacity);
+                                    OpacityMouseMoveRecorder.RemoveAt(cnt1);
+                                }
+                            }
+                            else if (t != null && t.GetType() == typeof(Rec))
+                            {
+                                Rec childR = t as Rec;
+                                if (!f.Visible || !childR.Visible ||
+                                    !new Rectangle(childR.point.X + f.rectangle.X, childR.point.Y + f.rectangle.Y,
+                                        childR.size.Width, childR.size.Height).Contains(e.Location))
+                                    continue;
+                                SolidBrush sb = childR.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() && !childR.EscapeGfxWhileMouseMove)
+                                    continue;
+                                childR.FireMouseMove(e);
+                                found = true;
+
+                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                if (MouseOutRecorder.IndexOf(childR) == -1)
+                                    MouseOutRecorder.Add(childR);
+
+                                // inscription dans la liste GfxMouseOver
+                                if (MouseOverRecorder.IndexOf(childR) == -1)
+                                {
+                                    MouseOverRecorder.Clear();
+                                    MouseOverRecorder.Add(childR);
+                                    childR.FireMouseOver(e);
+                                }
+                                break;
+                            }
+                            else if (t != null && t.GetType() == typeof(FillPolygon))
+                            {
+                                FillPolygon childF = t as FillPolygon;
+                                if (!f.Visible || !childF.Visible ||
+                                    !new Rectangle(childF.rectangle.X + f.rectangle.X, childF.rectangle.Y + f.rectangle.Y,
+                                        childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
+                                    continue;
+                                SolidBrush sb = childF.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() && !childF.EscapeGfxWhileMouseMove)
+                                    continue;
+                                childF.FireMouseMove(e);
+                                found = true;
+
+                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                if (MouseOutRecorder.IndexOf(childF) == -1)
+                                    MouseOutRecorder.Add(childF);
+
+                                // inscription dans la liste GfxMouseOver
+                                if (MouseOverRecorder.IndexOf(childF) == -1)
+                                {
+                                    MouseOverRecorder.Clear();
+                                    MouseOverRecorder.Add(childF);
+                                    childF.FireMouseOver(e);
+                                }
+                                break;
+                            }
+                            else if (t != null && t.GetType() == typeof(Txt))
+                            {
+                                Txt childR = t as Txt;
+                                if (!f.Visible || !childR.Visible ||
+                                    !new Rectangle(childR.Location.X + f.rectangle.X, childR.Location.Y + f.rectangle.Y,
+                                        TextRenderer.MeasureText(childR.Text, childR.font).Width,
+                                        TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(e.Location) ||
+                                    !childR.Visible) continue;
+                                SolidBrush sb = childR.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() && !childR.EscapeGfxWhileMouseMove)
+                                    continue;
+                                childR.FireMouseMove(e);
+                                found = true;
+
+                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                if (MouseOutRecorder.IndexOf(childR) == -1)
+                                    MouseOutRecorder.Add(childR);
+
+                                // inscription dans la liste GfxMouseOver
+                                if (MouseOverRecorder.IndexOf(childR) == -1)
+                                {
+                                    MouseOverRecorder.Clear();
+                                    MouseOverRecorder.Add(childR);
+                                    childR.FireMouseOver(e);
+                                }
+                                break;
+                            }
+                        }
+                        //////////////////////////////////////////////////
+                        #endregion
+                        #region parent
+
+                        if (found || !f.Visible || !f.rectangle.Contains(e.Location) || !f.Visible)
+                            continue;
+                        {
+                            SolidBrush sb = f.brush as SolidBrush;
+                            if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() && !f.EscapeGfxWhileMouseMove)
+                                continue;
+                            f.FireMouseMove(e);
+                            found = true;
+                            // inscription dans la liste GfxMouseOut pour activer cette evenement
+                            if (MouseOutRecorder.IndexOf(f) == -1)
+                                MouseOutRecorder.Add(f);
+
+                            // inscription dans la liste GfxMouseOver
+                            if (MouseOverRecorder.IndexOf(f) == -1)
+                            {
+                                MouseOverRecorder.Clear();
+                                MouseOverRecorder.Add(f);
+                                f.FireMouseOver(e);
                             }
                             break;
                         }
@@ -699,6 +970,32 @@ namespace MELHARFI
                                     MouseOverRecorder.Clear();
                                     MouseOverRecorder.Add(childR);
                                     childR.FireMouseOver(e);
+                                }
+                                break;
+                            }
+                            else if (t1 != null && t1.GetType() == typeof(FillPolygon))
+                            {
+                                FillPolygon childF = t1 as FillPolygon;
+                                if (!t.Visible || !childF.Visible ||
+                                    !new Rectangle(childF.rectangle.X + t.Location.X, childF.rectangle.Y + t.Location.Y,
+                                        childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
+                                    continue;
+                                SolidBrush sb = childF.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() && !childF.EscapeGfxWhileMouseMove)
+                                    continue;
+                                childF.FireMouseMove(e);
+                                found = true;
+
+                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                if (MouseOutRecorder.IndexOf(childF) == -1)
+                                    MouseOutRecorder.Add(childF);
+
+                                // inscription dans la liste GfxMouseOver
+                                if (MouseOverRecorder.IndexOf(childF) == -1)
+                                {
+                                    MouseOverRecorder.Clear();
+                                    MouseOverRecorder.Add(childF);
+                                    childF.FireMouseOver(e);
                                 }
                                 break;
                             }
@@ -879,6 +1176,32 @@ namespace MELHARFI
                                         MouseOverRecorder.Clear();
                                         MouseOverRecorder.Add(childR);
                                         childR.FireMouseOver(e);
+                                    }
+                                    break;
+                                }
+                                else if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (!b.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + b.point.X, childF.rectangle.Y + b.point.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location) ||
+                                        !childF.Visible) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseMove) continue;
+                                    childF.FireMouseMove(e);
+                                    found = true;
+
+                                    // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                    if (MouseOutRecorder.IndexOf(childF) == -1)
+                                        MouseOutRecorder.Add(childF);
+
+                                    // inscription dans la liste GfxMouseOver
+                                    if (MouseOverRecorder.IndexOf(childF) == -1)
+                                    {
+                                        MouseOverRecorder.Clear();
+                                        MouseOverRecorder.Add(childF);
+                                        childF.FireMouseOver(e);
                                     }
                                     break;
                                 }
@@ -1065,6 +1388,31 @@ namespace MELHARFI
                                         MouseOverRecorder.Clear();
                                         MouseOverRecorder.Add(childR);
                                         childR.FireMouseOver(e);
+                                    }
+                                    break;
+                                }
+                                else if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (!a.img.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + a.img.point.X, childF.rectangle.Y + a.img.point.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseMove) continue;
+                                    childF.FireMouseMove(e);
+                                    found = true;
+
+                                    // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                    if (MouseOutRecorder.IndexOf(childF) == -1)
+                                        MouseOutRecorder.Add(childF);
+
+                                    // inscription dans la liste GfxMouseOver
+                                    if (MouseOverRecorder.IndexOf(childF) == -1)
+                                    {
+                                        MouseOverRecorder.Clear();
+                                        MouseOverRecorder.Add(childF);
+                                        childF.FireMouseOver(e);
                                     }
                                     break;
                                 }
@@ -1256,6 +1604,31 @@ namespace MELHARFI
                                     }
                                     break;
                                 }
+                                else if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (!r.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + r.point.X, childF.rectangle.Y + r.point.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseMove) continue;
+                                    childF.FireMouseMove(e);
+                                    found = true;
+
+                                    // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                    if (MouseOutRecorder.IndexOf(childF) == -1)
+                                        MouseOutRecorder.Add(childF);
+
+                                    // inscription dans la liste GfxMouseOver
+                                    if (MouseOverRecorder.IndexOf(childF) == -1)
+                                    {
+                                        MouseOverRecorder.Clear();
+                                        MouseOverRecorder.Add(childF);
+                                        childF.FireMouseOver(e);
+                                    }
+                                    break;
+                                }
                                 else if (t != null && t.GetType() == typeof(Txt))
                                 {
                                     Txt childR = t as Txt;
@@ -1305,6 +1678,198 @@ namespace MELHARFI
                                     MouseOverRecorder.Clear();
                                     MouseOverRecorder.Add(r);
                                     r.FireMouseOver(e);
+                                }
+                                break;
+                            }
+
+                            #endregion
+                        }
+                        else if (gfxObjList[cnt - 1] != null && gfxObjList[cnt - 1].GetType() == typeof(FillPolygon))
+                        {
+                            #region childs
+                            FillPolygon f = gfxObjList[cnt - 1] as FillPolygon;
+                            f.Child.Sort(0, f.Child.Count, rzi);
+                            foreach (IGfx t in f.Child)
+                            {
+                                if (t != null && t.GetType() == typeof(Bmp))
+                                {
+                                    Bmp childB = t as Bmp;
+                                    if (f.Visible && childB.Visible && childB.bmp != null && new Rectangle(childB.point.X + f.rectangle.X, childB.point.Y + f.rectangle.Y, (childB.isSpriteSheet) ? childB.rectangle.Width : childB.bmp.Width, (childB.isSpriteSheet) ? childB.rectangle.Height : childB.bmp.Height).Contains(e.Location))
+                                    {
+                                        if (childB.Opacity == 1)
+                                        {
+                                            if (
+                                                childB.bmp.GetPixel(
+                                                    e.X - f.rectangle.X - childB.point.X + childB.rectangle.X,
+                                                    e.Y - f.rectangle.Y - childB.point.Y + childB.rectangle.Y) !=
+                                                GetPixel(e.X, e.Y) && !childB.EscapeGfxWhileMouseMove) continue;
+                                            childB.FireMouseMove(e);
+                                            found = true;
+
+                                            // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                            if (MouseOutRecorder.IndexOf(childB) == -1)
+                                                MouseOutRecorder.Add(childB);
+
+                                            // inscription dans la liste GfxMouseOver
+                                            if (MouseOverRecorder.IndexOf(childB) == -1)
+                                            {
+                                                MouseOverRecorder.Clear();
+                                                MouseOverRecorder.Add(childB);
+                                                childB.FireMouseOver(e);
+                                            }
+                                            break;
+                                        }
+                                        if (!(childB.Opacity < 1) || !(childB.Opacity > 0)) continue;
+                                        OpacityMouseMoveRecorder.Add(new OldDataMouseMove(childB, childB.Opacity));
+                                        childB.ChangeBmp(childB.path);
+                                        break;
+                                    }
+                                    for (int cnt1 = 0; cnt1 < OpacityMouseMoveRecorder.Count; cnt1++)
+                                    {
+                                        if (childB != OpacityMouseMoveRecorder[cnt1].bmp) continue;
+                                        childB.ChangeBmp(OpacityMouseMoveRecorder[cnt1].bmp.path, OpacityMouseMoveRecorder[cnt1].opacity);
+                                        OpacityMouseMoveRecorder.RemoveAt(cnt1);
+                                    }
+                                }
+                                else if (t != null && t.GetType() == typeof(Anim))
+                                {
+                                    Anim childA = t as Anim;
+                                    if (f.Visible && childA.img.Visible && childA.img.bmp != null && new Rectangle(childA.img.point.X + f.rectangle.X, childA.img.point.Y + f.rectangle.Y, (childA.img.isSpriteSheet) ? childA.img.rectangle.Width : childA.img.bmp.Width, (childA.img.isSpriteSheet) ? childA.img.rectangle.Height : childA.img.bmp.Height).Contains(e.Location))
+                                    {
+                                        if (childA.img.Opacity == 1)
+                                        {
+                                            if (
+                                                childA.img.bmp.GetPixel(
+                                                    e.X - f.rectangle.X - childA.img.point.X + childA.img.rectangle.X,
+                                                    e.Y - f.rectangle.Y - childA.img.point.Y + childA.img.rectangle.Y) !=
+                                                GetPixel(e.X, e.Y) && !childA.img.EscapeGfxWhileMouseMove) continue;
+                                            childA.img.FireMouseMove(e);
+                                            found = true;
+
+                                            // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                            if (MouseOutRecorder.IndexOf(childA) == -1)
+                                                MouseOutRecorder.Add(childA);
+
+                                            // inscription dans la liste GfxMouseOver
+                                            if (MouseOverRecorder.IndexOf(childA) == -1)
+                                            {
+                                                MouseOverRecorder.Clear();
+                                                MouseOverRecorder.Add(childA);
+                                                childA.img.FireMouseOver(e);
+                                            }
+                                            break;
+                                        }
+                                        if (!(childA.img.Opacity < 1) || !(childA.img.Opacity > 0)) continue;
+                                        OpacityMouseMoveRecorder.Add(new OldDataMouseMove(childA.img, childA.img.Opacity));
+                                        childA.img.ChangeBmp(childA.img.path);
+                                        break;
+                                    }
+                                    for (int cnt1 = 0; cnt1 < OpacityMouseMoveRecorder.Count; cnt1++)
+                                    {
+                                        if (childA.img != OpacityMouseMoveRecorder[cnt1].bmp) continue;
+                                        childA.img.ChangeBmp(OpacityMouseMoveRecorder[cnt1].bmp.path, OpacityMouseMoveRecorder[cnt1].opacity);
+                                        OpacityMouseMoveRecorder.RemoveAt(cnt1);
+                                    }
+                                }
+                                else if (t != null && t.GetType() == typeof(Rec))
+                                {
+                                    Rec childR = t as Rec;
+                                    if (!f.Visible || !childR.Visible ||
+                                        !new Rectangle(childR.point.X + f.rectangle.X, childR.point.Y + f.rectangle.Y,
+                                            childR.size.Width, childR.size.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childR.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childR.EscapeGfxWhileMouseMove) continue;
+                                    childR.FireMouseMove(e);
+                                    found = true;
+
+                                    // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                    if (MouseOutRecorder.IndexOf(childR) == -1)
+                                        MouseOutRecorder.Add(childR);
+
+                                    // inscription dans la liste GfxMouseOver
+                                    if (MouseOverRecorder.IndexOf(childR) == -1)
+                                    {
+                                        MouseOverRecorder.Clear();
+                                        MouseOverRecorder.Add(childR);
+                                        childR.FireMouseOver(e);
+                                    }
+                                    break;
+                                }
+                                else if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (!f.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + f.rectangle.X, childF.rectangle.Y + f.rectangle.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseMove) continue;
+                                    childF.FireMouseMove(e);
+                                    found = true;
+
+                                    // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                    if (MouseOutRecorder.IndexOf(childF) == -1)
+                                        MouseOutRecorder.Add(childF);
+
+                                    // inscription dans la liste GfxMouseOver
+                                    if (MouseOverRecorder.IndexOf(childF) == -1)
+                                    {
+                                        MouseOverRecorder.Clear();
+                                        MouseOverRecorder.Add(childF);
+                                        childF.FireMouseOver(e);
+                                    }
+                                    break;
+                                }
+                                else if (t != null && t.GetType() == typeof(Txt))
+                                {
+                                    Txt childR = t as Txt;
+                                    if (!f.Visible || !childR.Visible ||
+                                        !new Rectangle(childR.Location.X + f.rectangle.X, childR.Location.Y + f.rectangle.Y,
+                                            TextRenderer.MeasureText(childR.Text, childR.font).Width,
+                                            TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
+                                            e.Location)) continue;
+                                    SolidBrush sb = childR.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childR.EscapeGfxWhileMouseMove) continue;
+                                    childR.FireMouseMove(e);
+                                    found = true;
+
+                                    // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                    if (MouseOutRecorder.IndexOf(childR) == -1)
+                                        MouseOutRecorder.Add(childR);
+
+                                    // inscription dans la liste GfxMouseOver
+                                    if (MouseOverRecorder.IndexOf(childR) == -1)
+                                    {
+                                        MouseOverRecorder.Clear();
+                                        MouseOverRecorder.Add(childR);
+                                        childR.FireMouseOver(e);
+                                    }
+                                    break;
+                                }
+                            }
+                            //////////////////////////////////////////////////
+                            #endregion
+                            #region parent
+
+                            if (found || !f.Visible || !f.rectangle.Contains(e.Location)) continue;
+                            {
+                                SolidBrush sb = f.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() && !f.EscapeGfxWhileMouseMove)
+                                    continue;
+                                f.FireMouseMove(e);
+                                found = true;
+                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                if (MouseOutRecorder.IndexOf(f) == -1)
+                                    MouseOutRecorder.Add(f);
+
+                                // inscription dans la liste GfxMouseOver
+                                if (MouseOverRecorder.IndexOf(f) == -1)
+                                {
+                                    MouseOverRecorder.Clear();
+                                    MouseOverRecorder.Add(f);
+                                    f.FireMouseOver(e);
                                 }
                                 break;
                             }
@@ -1420,6 +1985,31 @@ namespace MELHARFI
                                         MouseOverRecorder.Clear();
                                         MouseOverRecorder.Add(childR);
                                         childR.FireMouseOver(e);
+                                    }
+                                    break;
+                                }
+                                else if (t1 != null && t1.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t1 as FillPolygon;
+                                    if (!t.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + t.Location.X, childF.rectangle.Y + t.Location.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseMove) continue;
+                                    childF.FireMouseMove(e);
+                                    found = true;
+
+                                    // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                    if (MouseOutRecorder.IndexOf(childF) == -1)
+                                        MouseOutRecorder.Add(childF);
+
+                                    // inscription dans la liste GfxMouseOver
+                                    if (MouseOverRecorder.IndexOf(childF) == -1)
+                                    {
+                                        MouseOverRecorder.Clear();
+                                        MouseOverRecorder.Add(childF);
+                                        childF.FireMouseOver(e);
                                     }
                                     break;
                                 }
@@ -1604,6 +2194,32 @@ namespace MELHARFI
                                     }
                                     break;
                                 }
+                                else if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (!b.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + b.point.X, childF.rectangle.Y + b.point.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location) ||
+                                        !childF.Visible) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseMove) continue;
+                                    childF.FireMouseMove(e);
+                                    found = true;
+
+                                    // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                    if (MouseOutRecorder.IndexOf(childF) == -1)
+                                        MouseOutRecorder.Add(childF);
+
+                                    // inscription dans la liste GfxMouseOver
+                                    if (MouseOverRecorder.IndexOf(childF) == -1)
+                                    {
+                                        MouseOverRecorder.Clear();
+                                        MouseOverRecorder.Add(childF);
+                                        childF.FireMouseOver(e);
+                                    }
+                                    break;
+                                }
                                 else if (t != null && t.GetType() == typeof(Txt))
                                 {
                                     Txt childT = t as Txt;
@@ -1769,6 +2385,32 @@ namespace MELHARFI
                                         MouseOverRecorder.Clear();
                                         MouseOverRecorder.Add(childR);
                                         childR.FireMouseOver(e);
+                                    }
+                                    break;
+                                }
+                                else if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (!a.img.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + a.img.point.X, childF.rectangle.Y + a.img.point.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location) ||
+                                        !childF.Visible) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseMove) continue;
+                                    childF.FireMouseMove(e);
+                                    found = true;
+
+                                    // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                    if (MouseOutRecorder.IndexOf(childF) == -1)
+                                        MouseOutRecorder.Add(childF);
+
+                                    // inscription dans la liste GfxMouseOver
+                                    if (MouseOverRecorder.IndexOf(childF) == -1)
+                                    {
+                                        MouseOverRecorder.Clear();
+                                        MouseOverRecorder.Add(childF);
+                                        childF.FireMouseOver(e);
                                     }
                                     break;
                                 }
@@ -1954,6 +2596,35 @@ namespace MELHARFI
                                         }
                                     }
                                 }
+                                else if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childR = t as FillPolygon;
+                                    if (r.Visible && childR.Visible && new Rectangle(childR.rectangle.X + r.point.X, childR.rectangle.Y + r.point.Y, childR.rectangle.Width, childR.rectangle.Height).Contains(e.Location))
+                                    {
+                                        if (childR.Visible)
+                                        {
+                                            SolidBrush sb = childR.brush as SolidBrush;
+                                            if (sb.Color.ToArgb() == GetPixel(e.X, e.Y).ToArgb() || childR.EscapeGfxWhileMouseMove)
+                                            {
+                                                childR.FireMouseMove(e);
+                                                found = true;
+
+                                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                                if (MouseOutRecorder.IndexOf(childR) == -1)
+                                                    MouseOutRecorder.Add(childR);
+
+                                                // inscription dans la liste GfxMouseOver
+                                                if (MouseOverRecorder.IndexOf(childR) == -1)
+                                                {
+                                                    MouseOverRecorder.Clear();
+                                                    MouseOverRecorder.Add(childR);
+                                                    childR.FireMouseOver(e);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
                                 else if (t != null && t.GetType() == typeof(Txt))
                                 {
                                     Txt childR = t as Txt;
@@ -2004,6 +2675,214 @@ namespace MELHARFI
                                     MouseOverRecorder.Clear();
                                     MouseOverRecorder.Add(r);
                                     r.FireMouseOver(e);
+                                }
+                                break;
+                            }
+
+                            #endregion
+                        }
+                        if (gfxBgrList[cnt - 1] != null && gfxBgrList[cnt - 1].GetType() == typeof(FillPolygon))
+                        {
+                            #region childs
+                            FillPolygon f = gfxBgrList[cnt - 1] as FillPolygon;
+                            f.Child.Sort(0, f.Child.Count, rzi);
+                            ////////// affichage des elements enfants de l'objet Bmp
+                            foreach (IGfx t in f.Child)
+                            {
+                                if (t != null && t.GetType() == typeof(Bmp))
+                                {
+                                    Bmp childB = t as Bmp;
+                                    if (f.Visible && childB.Visible && childB.bmp != null && new Rectangle(childB.point.X + f.rectangle.X, childB.point.Y + f.rectangle.Y, (childB.isSpriteSheet) ? childB.rectangle.Width : childB.bmp.Width, (childB.isSpriteSheet) ? childB.rectangle.Height : childB.bmp.Height).Contains(e.Location))
+                                    {
+                                        if (childB.Opacity == 1)
+                                        {
+                                            if (
+                                                childB.bmp.GetPixel(
+                                                    e.X - f.rectangle.X - childB.point.X + childB.rectangle.X,
+                                                    e.Y - f.rectangle.Y - childB.point.Y + childB.rectangle.Y) !=
+                                                GetPixel(e.X, e.Y) && !childB.EscapeGfxWhileMouseMove) continue;
+                                            childB.FireMouseMove(e);
+                                            found = true;
+
+                                            // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                            if (MouseOutRecorder.IndexOf(childB) == -1)
+                                                MouseOutRecorder.Add(childB);
+
+                                            // inscription dans la liste GfxMouseOver
+                                            if (MouseOverRecorder.IndexOf(childB) == -1)
+                                            {
+                                                MouseOverRecorder.Clear();
+                                                MouseOverRecorder.Add(childB);
+                                                childB.FireMouseOver(e);
+                                            }
+                                            break;
+                                        }
+                                        if (!(childB.Opacity < 1) || !(childB.Opacity > 0)) continue;
+                                        OpacityMouseMoveRecorder.Add(new OldDataMouseMove(childB, childB.Opacity));
+                                        childB.ChangeBmp(childB.path);
+                                        break;
+                                    }
+                                    for (int cnt1 = 0; cnt1 < OpacityMouseMoveRecorder.Count; cnt1++)
+                                    {
+                                        if (childB != OpacityMouseMoveRecorder[cnt1].bmp) continue;
+                                        childB.ChangeBmp(OpacityMouseMoveRecorder[cnt1].bmp.path, OpacityMouseMoveRecorder[cnt1].opacity);
+                                        OpacityMouseMoveRecorder.RemoveAt(cnt1);
+                                    }
+                                }
+                                else if (t != null && t.GetType() == typeof(Anim))
+                                {
+                                    Anim childA = t as Anim;
+                                    if (f.Visible && childA.img.Visible && childA.img.bmp != null && new Rectangle(childA.img.point.X + f.rectangle.X, childA.img.point.Y + f.rectangle.Y, (childA.img.isSpriteSheet) ? childA.img.rectangle.Width : childA.img.bmp.Width, (childA.img.isSpriteSheet) ? childA.img.rectangle.Height : childA.img.bmp.Height).Contains(e.Location))
+                                    {
+                                        if (childA.img.Opacity == 1)
+                                        {
+                                            if (
+                                                childA.img.bmp.GetPixel(
+                                                    e.X - f.rectangle.X - childA.img.point.X + childA.img.rectangle.X,
+                                                    e.Y - f.rectangle.Y - childA.img.point.Y + childA.img.rectangle.Y) !=
+                                                GetPixel(e.X, e.Y) && !childA.img.EscapeGfxWhileMouseMove) continue;
+                                            childA.img.FireMouseMove(e);
+                                            found = true;
+
+                                            // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                            if (MouseOutRecorder.IndexOf(childA) == -1)
+                                                MouseOutRecorder.Add(childA);
+
+                                            // inscription dans la liste GfxMouseOver
+                                            if (MouseOverRecorder.IndexOf(childA) == -1)
+                                            {
+                                                MouseOverRecorder.Clear();
+                                                MouseOverRecorder.Add(childA);
+                                                childA.img.FireMouseOver(e);
+                                            }
+                                            break;
+                                        }
+                                        else if (childA.img.Opacity < 1 && childA.img.Opacity > 0)
+                                        {
+                                            OpacityMouseMoveRecorder.Add(new OldDataMouseMove(childA.img, childA.img.Opacity));
+                                            childA.img.ChangeBmp(childA.img.path);
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for (int cnt1 = 0; cnt1 < OpacityMouseMoveRecorder.Count; cnt1++)
+                                        {
+                                            if (childA.img == OpacityMouseMoveRecorder[cnt1].bmp)
+                                            {
+                                                childA.img.ChangeBmp(OpacityMouseMoveRecorder[cnt1].bmp.path, OpacityMouseMoveRecorder[cnt1].opacity);
+                                                OpacityMouseMoveRecorder.RemoveAt(cnt1);
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (t != null && t.GetType() == typeof(Rec))
+                                {
+                                    Rec childR = t as Rec;
+                                    if (f.Visible && childR.Visible && new Rectangle(childR.point.X + f.rectangle.X, childR.point.Y + f.rectangle.Y, childR.size.Width, childR.size.Height).Contains(e.Location))
+                                    {
+                                        if (childR.Visible)
+                                        {
+                                            SolidBrush sb = childR.brush as SolidBrush;
+                                            if (sb.Color.ToArgb() == GetPixel(e.X, e.Y).ToArgb() || childR.EscapeGfxWhileMouseMove)
+                                            {
+                                                childR.FireMouseMove(e);
+                                                found = true;
+
+                                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                                if (MouseOutRecorder.IndexOf(childR) == -1)
+                                                    MouseOutRecorder.Add(childR);
+
+                                                // inscription dans la liste GfxMouseOver
+                                                if (MouseOverRecorder.IndexOf(childR) == -1)
+                                                {
+                                                    MouseOverRecorder.Clear();
+                                                    MouseOverRecorder.Add(childR);
+                                                    childR.FireMouseOver(e);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childR = t as FillPolygon;
+                                    if (f.Visible && childR.Visible && new Rectangle(childR.rectangle.X + f.rectangle.X, childR.rectangle.Y + f.rectangle.Y, childR.rectangle.Width, childR.rectangle.Height).Contains(e.Location))
+                                    {
+                                        if (childR.Visible)
+                                        {
+                                            SolidBrush sb = childR.brush as SolidBrush;
+                                            if (sb.Color.ToArgb() == GetPixel(e.X, e.Y).ToArgb() || childR.EscapeGfxWhileMouseMove)
+                                            {
+                                                childR.FireMouseMove(e);
+                                                found = true;
+
+                                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                                if (MouseOutRecorder.IndexOf(childR) == -1)
+                                                    MouseOutRecorder.Add(childR);
+
+                                                // inscription dans la liste GfxMouseOver
+                                                if (MouseOverRecorder.IndexOf(childR) == -1)
+                                                {
+                                                    MouseOverRecorder.Clear();
+                                                    MouseOverRecorder.Add(childR);
+                                                    childR.FireMouseOver(e);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (t != null && t.GetType() == typeof(Txt))
+                                {
+                                    Txt childR = t as Txt;
+                                    if (f.Visible && childR.Visible && new Rectangle(childR.Location.X + f.rectangle.X, childR.Location.Y + f.rectangle.Y, TextRenderer.MeasureText(childR.Text, childR.font).Width, TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(e.Location))
+                                    {
+                                        if (childR.Visible)
+                                        {
+                                            SolidBrush sb = childR.brush as SolidBrush;
+                                            if (sb.Color.ToArgb() == GetPixel(e.X, e.Y).ToArgb() || childR.EscapeGfxWhileMouseMove)
+                                            {
+                                                childR.FireMouseMove(e);
+                                                found = true;
+
+                                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                                if (MouseOutRecorder.IndexOf(childR) == -1)
+                                                    MouseOutRecorder.Add(childR);
+
+                                                // inscription dans la liste GfxMouseOver
+                                                if (MouseOverRecorder.IndexOf(childR) == -1)
+                                                {
+                                                    MouseOverRecorder.Clear();
+                                                    MouseOverRecorder.Add(childR);
+                                                    childR.FireMouseOver(e);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            //////////////////////////////////////////////////
+                            #endregion
+                            #region parent
+                            if (found || !f.Visible || !f.rectangle.Contains(e.Location)) continue;
+                            {
+                                SolidBrush sb = f.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() && !f.EscapeGfxWhileMouseMove)
+                                    continue;
+                                f.FireMouseMove(e);
+                                // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                if (MouseOutRecorder.IndexOf(f) == -1)
+                                    MouseOutRecorder.Add(f);
+
+                                // inscription dans la liste GfxMouseOver
+                                if (MouseOverRecorder.IndexOf(f) == -1)
+                                {
+                                    MouseOverRecorder.Clear();
+                                    MouseOverRecorder.Add(f);
+                                    f.FireMouseOver(e);
                                 }
                                 break;
                             }
@@ -2104,6 +2983,32 @@ namespace MELHARFI
                                     if (!t.Visible || !childR.Visible ||
                                         !new Rectangle(childR.point.X + t.Location.X, childR.point.Y + t.Location.Y,
                                             childR.size.Width, childR.size.Height).Contains(e.Location) ||
+                                        !childR.Visible) continue;
+                                    SolidBrush sb = childR.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childR.EscapeGfxWhileMouseMove) continue;
+                                    childR.FireMouseMove(e);
+                                    found = true;
+
+                                    // inscription dans la liste GfxMouseOut pour activer cette evenement
+                                    if (MouseOutRecorder.IndexOf(childR) == -1)
+                                        MouseOutRecorder.Add(childR);
+
+                                    // inscription dans la liste GfxMouseOver
+                                    if (MouseOverRecorder.IndexOf(childR) == -1)
+                                    {
+                                        MouseOverRecorder.Clear();
+                                        MouseOverRecorder.Add(childR);
+                                        childR.FireMouseOver(e);
+                                    }
+                                    break;
+                                }
+                                else if (t1 != null && t1.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childR = t1 as FillPolygon;
+                                    if (!t.Visible || !childR.Visible ||
+                                        !new Rectangle(childR.rectangle.X + t.Location.X, childR.rectangle.Y + t.Location.Y,
+                                            childR.rectangle.Width, childR.rectangle.Height).Contains(e.Location) ||
                                         !childR.Visible) continue;
                                     SolidBrush sb = childR.brush as SolidBrush;
                                     if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
@@ -2256,6 +3161,19 @@ namespace MELHARFI
                                     found = true;
                                     break;
                                 }
+                                if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (MouseOutRecorder.IndexOf(childF) == -1 ||
+                                        (new Rectangle(childF.rectangle.X + b.point.X, childF.rectangle.Y + b.point.Y,
+                                             childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location) &&
+                                         (MouseOverRecorder.Count <= 0 || MouseOverRecorder.IndexOf(childF) != -1)))
+                                        continue;
+                                    childF.FireMouseOut(e);
+                                    MouseOutRecorder.Remove(childF);
+                                    found = true;
+                                    break;
+                                }
                                 if (t == null || t.GetType() != typeof(Txt)) continue;
                                 {
                                     Txt childR = t as Txt;
@@ -2338,6 +3256,19 @@ namespace MELHARFI
                                     found = true;
                                     break;
                                 }
+                                if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (MouseOutRecorder.IndexOf(childF) == -1 ||
+                                        (new Rectangle(childF.rectangle.X + a.img.point.X, childF.rectangle.Y + a.img.point.Y,
+                                             childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location) &&
+                                         (MouseOverRecorder.Count <= 0 || MouseOverRecorder.IndexOf(childF) != -1)))
+                                        continue;
+                                    childF.FireMouseOut(e);
+                                    MouseOutRecorder.Remove(childF);
+                                    found = true;
+                                    break;
+                                }
                                 if (t == null || t.GetType() != typeof(Txt)) continue;
                                 {
                                     Txt childR = t as Txt;
@@ -2416,6 +3347,19 @@ namespace MELHARFI
                                         continue;
                                     childR.FireMouseOut(e);
                                     MouseOutRecorder.Remove(childR);
+                                    found = true;
+                                    break;
+                                }
+                                if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (MouseOutRecorder.IndexOf(childF) == -1 ||
+                                        (new Rectangle(childF.rectangle.X + r.point.X, childF.rectangle.Y + r.point.Y,
+                                             childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location) &&
+                                         (MouseOverRecorder.Count <= 0 || MouseOverRecorder.IndexOf(childF) != -1)))
+                                        continue;
+                                    childF.FireMouseOut(e);
+                                    MouseOutRecorder.Remove(childF);
                                     found = true;
                                     break;
                                 }
@@ -3023,7 +3967,7 @@ namespace MELHARFI
                         {
                             Rec r = gfxBgrList[cnt - 1] as Rec;
                             r.Child.Sort(0, r.Child.Count, rzi);
-                            #region
+                            #region parent
                             if (MouseOutRecorder.IndexOf(r) != -1 && (!new Rectangle(r.point, r.size).Contains(e.Location) || (MouseOverRecorder.Count > 0 && MouseOverRecorder.IndexOf(r) == -1)))
                             {
                                 r.FireMouseOut(e);
@@ -3103,7 +4047,7 @@ namespace MELHARFI
                         {
                             Txt t = gfxBgrList[cnt - 1] as Txt;
                             t.Child.Sort(0, t.Child.Count, rzi);
-                            #region
+                            #region parent
                             if (MouseOutRecorder.IndexOf(t) != -1 && (!new Rectangle(t.Location, TextRenderer.MeasureText(t.Text, t.font)).Contains(e.Location) || (MouseOverRecorder.Count > 0 && MouseOverRecorder.IndexOf(t) == -1)))
                             {
                                 t.FireMouseOut(e);
@@ -3157,6 +4101,19 @@ namespace MELHARFI
                                         continue;
                                     childR.FireMouseOut(e);
                                     MouseOutRecorder.Remove(childR);
+                                    found = true;
+                                    break;
+                                }
+                                if (t1 != null && t1.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t1 as FillPolygon;
+                                    if (MouseOutRecorder.IndexOf(childF) == -1 ||
+                                        (new Rectangle(childF.rectangle.X + t.Location.X, childF.rectangle.Y + t.Location.Y,
+                                             childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location) &&
+                                         (MouseOverRecorder.Count <= 0 || MouseOverRecorder.IndexOf(childF) != -1)))
+                                        continue;
+                                    childF.FireMouseOut(e);
+                                    MouseOutRecorder.Remove(childF);
                                     found = true;
                                     break;
                                 }

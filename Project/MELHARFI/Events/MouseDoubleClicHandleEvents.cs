@@ -53,7 +53,6 @@ namespace MELHARFI
                     if (gfxTopList[cnt - 1] != null && gfxTopList[cnt - 1].GetType() == typeof(Bmp))
                     {
                         #region childs
-
                         Bmp b = gfxTopList[cnt - 1] as Bmp;
                         b.Child.Sort(0, b.Child.Count, rzi);
                         foreach (IGfx t in b.Child)
@@ -105,6 +104,19 @@ namespace MELHARFI
                                 found = true;
                                 break;
                             }
+                            if (t != null && t.GetType() == typeof(FillPolygon))
+                            {
+                                FillPolygon childF = t as FillPolygon;
+                                if (!b.Visible || !childF.Visible ||
+                                    !new Rectangle(childF.rectangle.X + b.point.X, childF.rectangle.Y + b.point.Y,
+                                        childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                SolidBrush sb = childF.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                    !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                childF.FireMouseDoubleClic(e);
+                                found = true;
+                                break;
+                            }
                             if (t == null || t.GetType() != typeof(Txt)) continue;
                             {
                                 Txt childT = t as Txt;
@@ -124,7 +136,6 @@ namespace MELHARFI
                         //////////////////////////////////////////////////
 
                         #endregion
-
                         #region parent
 
                         if (found || !b.Visible || b.bmp == null ||
@@ -198,6 +209,19 @@ namespace MELHARFI
                                     found = true;
                                     break;
                                 }
+                                if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (!a.img.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + a.img.point.X, childF.rectangle.Y + a.img.point.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childF.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
                                 if (t == null || t.GetType() != typeof(Txt)) continue;
                                 {
                                     Txt childT = t as Txt;
@@ -217,7 +241,6 @@ namespace MELHARFI
                             //////////////////////////////////////////////////
 
                             #endregion
-
                             #region parent
 
                             if (found || !a.img.Visible || a.img.bmp == null ||
@@ -291,6 +314,19 @@ namespace MELHARFI
                                     found = true;
                                     break;
                                 }
+                                if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (!r.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + r.point.X, childF.rectangle.Y + r.point.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childF.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
                                 if (t == null || t.GetType() != typeof(Txt)) continue;
                                 {
                                     Txt childT = t as Txt;
@@ -310,7 +346,6 @@ namespace MELHARFI
                             //////////////////////////////////////////////////
 
                             #endregion
-
                             #region parent
 
                             if (!found != r.Visible || !new Rectangle(r.point, r.size).Contains(e.Location))
@@ -326,10 +361,111 @@ namespace MELHARFI
 
                             #endregion
                         }
+                        if (gfxTopList[cnt - 1] != null && gfxTopList[cnt - 1].GetType() == typeof(FillPolygon))
+                        {
+                            #region childs
+                            FillPolygon f = gfxTopList[cnt - 1] as FillPolygon;
+                            f.Child.Sort(0, f.Child.Count, rzi);
+                            foreach (IGfx t in f.Child)
+                            {
+                                if (t != null && t.GetType() == typeof(Bmp))
+                                {
+                                    Bmp childB = t as Bmp;
+                                    if (!f.Visible || !childB.Visible || childB.bmp == null ||
+                                        !new Rectangle(childB.point.X + f.rectangle.X, childB.point.Y + f.rectangle.Y,
+                                                (childB.isSpriteSheet) ? childB.rectangle.Width : childB.bmp.Width,
+                                                (childB.isSpriteSheet) ? childB.rectangle.Height : childB.bmp.Height)
+                                            .Contains(e.Location)) continue;
+                                    if (childB.bmp.GetPixel(e.X - childB.point.X - f.rectangle.X + childB.rectangle.X,
+                                            e.Y - childB.point.Y - f.rectangle.Y + childB.rectangle.Y) !=
+                                        GetPixel(e.X, e.Y) && !childB.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childB.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
+                                if (t != null && t.GetType() == typeof(Anim))
+                                {
+                                    Anim childA = t as Anim;
+                                    if (!f.Visible || !childA.img.Visible || childA.img.bmp == null ||
+                                        !new Rectangle(childA.img.point.X + f.rectangle.X,
+                                            childA.img.point.Y + f.rectangle.Y,
+                                            (childA.img.isSpriteSheet)
+                                                ? childA.img.rectangle.Width
+                                                : childA.img.bmp.Width,
+                                            (childA.img.isSpriteSheet)
+                                                ? childA.img.rectangle.Height
+                                                : childA.img.bmp.Height).Contains(e.Location)) continue;
+                                    if (childA.img.bmp.GetPixel(
+                                            e.X - childA.img.point.X - f.rectangle.X + childA.img.rectangle.X,
+                                            e.Y - childA.img.point.Y - f.rectangle.Y + childA.img.rectangle.X) !=
+                                        GetPixel(e.X, e.Y) && !childA.img.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childA.img.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
+                                if (t != null && t.GetType() == typeof(Rec))
+                                {
+                                    Rec childR = t as Rec;
+                                    if (!f.Visible || !childR.Visible ||
+                                        !new Rectangle(childR.point.X + f.rectangle.X, childR.point.Y + f.rectangle.Y,
+                                            childR.size.Width, childR.size.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childR.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childR.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childR.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
+                                if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (!f.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + f.rectangle.X, childF.rectangle.Y + f.rectangle.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childF.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
+                                if (t == null || t.GetType() != typeof(Txt)) continue;
+                                {
+                                    Txt childT = t as Txt;
+                                    if (!f.Visible || !childT.Visible ||
+                                        !new Rectangle(childT.Location.X + f.rectangle.X, childT.Location.Y + f.rectangle.Y,
+                                            TextRenderer.MeasureText(childT.Text, childT.font).Width,
+                                            TextRenderer.MeasureText(childT.Text, childT.font).Height).Contains(
+                                            e.Location)) continue;
+                                    SolidBrush sb = childT.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childT.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childT.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            //////////////////////////////////////////////////
+
+                            #endregion
+                            #region parent
+
+                            if (!found != f.Visible || !f.rectangle.Contains(e.Location))
+                                continue;
+                            {
+                                SolidBrush sb = f.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                    !f.EscapeGfxWhileMouseDoubleClic) continue;
+                                f.FireMouseDoubleClic(e);
+                                found = true;
+                                break;
+                            }
+
+                            #endregion
+                        }
                         if (gfxTopList[cnt - 1] == null || gfxTopList[cnt - 1].GetType() != typeof(Txt)) continue;
                         {
                             #region childs
-
                             Txt t = gfxTopList[cnt - 1] as Txt;
                             t.Child.Sort(0, t.Child.Count, rzi);
                             foreach (IGfx t1 in t.Child)
@@ -382,6 +518,19 @@ namespace MELHARFI
                                     found = true;
                                     break;
                                 }
+                                if (t1 != null && t1.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t1 as FillPolygon;
+                                    if (!t.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + t.Location.X, childF.rectangle.Y + t.Location.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childF.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
                                 if (t1 == null || t1.GetType() != typeof(Txt)) continue;
                                 {
                                     Txt childT = t1 as Txt;
@@ -401,9 +550,7 @@ namespace MELHARFI
                             //////////////////////////////////////////////////
 
                             #endregion
-
                             #region parent
-
                             if (!found != t.Visible ||
                                 !new Rectangle(t.Location, TextRenderer.MeasureText(t.Text, t.font)).Contains(
                                     e.Location)) continue;
@@ -431,7 +578,6 @@ namespace MELHARFI
                         if (gfxObjList[cnt - 1] != null && gfxObjList[cnt - 1].GetType() == typeof(Bmp))
                         {
                             #region childs
-
                             Bmp b = gfxObjList[cnt - 1] as Bmp;
                             b.Child.Sort(0, b.Child.Count, rzi);
                             foreach (IGfx t in b.Child)
@@ -485,6 +631,19 @@ namespace MELHARFI
                                     found = true;
                                     break;
                                 }
+                                if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childR = t as FillPolygon;
+                                    if (!b.Visible || !childR.Visible ||
+                                        !new Rectangle(childR.rectangle.X + b.point.X, childR.rectangle.Y + b.point.Y,
+                                            childR.rectangle.Width, childR.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childR.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childR.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childR.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
                                 if (t == null || t.GetType() != typeof(Txt)) continue;
                                 {
                                     Txt childT = t as Txt;
@@ -504,7 +663,6 @@ namespace MELHARFI
                             //////////////////////////////////////////////////
 
                             #endregion
-
                             #region parent
 
                             if (found || !b.Visible || b.bmp == null ||
@@ -521,7 +679,6 @@ namespace MELHARFI
                         if (gfxObjList[cnt - 1] != null && gfxObjList[cnt - 1].GetType() == typeof(Anim))
                         {
                             #region childs
-
                             Anim a = gfxObjList[cnt - 1] as Anim;
                             a.Child.Sort(0, a.Child.Count, rzi);
                             foreach (IGfx t in a.Child)
@@ -579,6 +736,19 @@ namespace MELHARFI
                                     found = true;
                                     break;
                                 }
+                                if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t as FillPolygon;
+                                    if (!a.img.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + a.img.point.X, childF.rectangle.Y + a.img.point.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childF.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
                                 if (t == null || t.GetType() != typeof(Txt)) continue;
                                 {
                                     Txt childT = t as Txt;
@@ -599,7 +769,6 @@ namespace MELHARFI
                             //////////////////////////////////////////////////
 
                             #endregion
-
                             #region parent
 
                             if (found || !a.img.Visible || a.img.bmp == null ||
@@ -622,7 +791,6 @@ namespace MELHARFI
                         if (gfxObjList[cnt - 1] != null && gfxObjList[cnt - 1].GetType() == typeof(Rec))
                         {
                             #region childs
-
                             Rec r = gfxObjList[cnt - 1] as Rec;
                             r.Child.Sort(0, r.Child.Count, rzi);
                             foreach (IGfx t in r.Child)
@@ -678,6 +846,19 @@ namespace MELHARFI
                                     found = true;
                                     break;
                                 }
+                                if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childR = t as FillPolygon;
+                                    if (!r.Visible || !childR.Visible ||
+                                        !new Rectangle(childR.rectangle.X + r.point.X, childR.rectangle.Y + r.point.Y,
+                                            childR.rectangle.Width, childR.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childR.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childR.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childR.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
                                 if (t == null || t.GetType() != typeof(Txt)) continue;
                                 {
                                     Txt childT = t as Txt;
@@ -697,9 +878,7 @@ namespace MELHARFI
                             //////////////////////////////////////////////////
 
                             #endregion
-
                             #region parent
-
                             if (found || !r.Visible || !new Rectangle(r.point, r.size).Contains(e.Location))
                                 continue;
                             {
@@ -710,13 +889,114 @@ namespace MELHARFI
                                 found = true;
                                 break;
                             }
+                            #endregion
+                        }
+                        if (gfxObjList[cnt - 1] != null && gfxObjList[cnt - 1].GetType() == typeof(FillPolygon))
+                        {
+                            #region childs
+                            FillPolygon f = gfxObjList[cnt - 1] as FillPolygon;
+                            f.Child.Sort(0, f.Child.Count, rzi);
+                            foreach (IGfx t in f.Child)
+                            {
+                                if (t != null && t.GetType() == typeof(Bmp))
+                                {
+                                    Bmp childB = t as Bmp;
+                                    if (!f.Visible || !childB.Visible || childB.bmp == null ||
+                                        !new Rectangle(childB.point.X + f.rectangle.X, childB.point.Y + f.rectangle.Y,
+                                                (childB.isSpriteSheet) ? childB.rectangle.Width : childB.bmp.Width,
+                                                (childB.isSpriteSheet) ? childB.rectangle.Height : childB.bmp.Height)
+                                            .Contains(e.Location) || (childB.bmp.GetPixel(
+                                                                            e.X - childB.point.X - f.rectangle.X +
+                                                                            childB.rectangle.X,
+                                                                            e.Y - childB.point.Y - f.rectangle.Y +
+                                                                            childB.rectangle.Y) != GetPixel(e.X, e.Y) &&
+                                                                        !childB.EscapeGfxWhileMouseDoubleClic))
+                                        continue;
+                                    childB.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
+                                if (t != null && t.GetType() == typeof(Anim))
+                                {
+                                    Anim childA = t as Anim;
+                                    if (!f.Visible || !childA.img.Visible || childA.img.bmp == null ||
+                                        !new Rectangle(childA.img.point.X + f.rectangle.X,
+                                            childA.img.point.Y + f.rectangle.Y,
+                                            (childA.img.isSpriteSheet)
+                                                ? childA.img.rectangle.Width
+                                                : childA.img.bmp.Width,
+                                            (childA.img.isSpriteSheet)
+                                                ? childA.img.rectangle.Height
+                                                : childA.img.bmp.Height).Contains(e.Location) ||
+                                        (childA.img.bmp.GetPixel(
+                                                e.X - childA.img.point.X - f.rectangle.X + childA.img.rectangle.X,
+                                                e.Y - childA.img.point.Y - f.rectangle.Y + childA.img.rectangle.Y) !=
+                                            GetPixel(e.X, e.Y) && !childA.img.EscapeGfxWhileMouseDoubleClic)) continue;
+                                    childA.img.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
+                                if (t != null && t.GetType() == typeof(Rec))
+                                {
+                                    Rec childR = t as Rec;
+                                    if (!f.Visible || !childR.Visible ||
+                                        !new Rectangle(childR.point.X + f.rectangle.X, childR.point.Y + f.rectangle.Y,
+                                            childR.size.Width, childR.size.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childR.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childR.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childR.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
+                                if (t != null && t.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childR = t as FillPolygon;
+                                    if (!f.Visible || !childR.Visible ||
+                                        !new Rectangle(childR.rectangle.X + f.rectangle.X, childR.rectangle.Y + f.rectangle.Y,
+                                            childR.rectangle.Width, childR.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childR.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childR.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childR.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
+                                if (t == null || t.GetType() != typeof(Txt)) continue;
+                                {
+                                    Txt childT = t as Txt;
+                                    if (!f.Visible || !childT.Visible ||
+                                        !new Rectangle(childT.Location.X + f.rectangle.X, childT.Location.Y + f.rectangle.Y,
+                                            TextRenderer.MeasureText(childT.Text, childT.font).Width,
+                                            TextRenderer.MeasureText(childT.Text, childT.font).Height).Contains(
+                                            e.Location)) continue;
+                                    SolidBrush sb = childT.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childT.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childT.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            //////////////////////////////////////////////////
 
+                            #endregion
+                            #region parent
+                            if (found || !f.Visible || !f.rectangle.Contains(e.Location))
+                                continue;
+                            {
+                                SolidBrush sb = f.brush as SolidBrush;
+                                if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                    !f.EscapeGfxWhileMouseDoubleClic) continue;
+                                f.FireMouseDoubleClic(e);
+                                found = true;
+                                break;
+                            }
                             #endregion
                         }
                         if (gfxObjList[cnt - 1] == null || gfxObjList[cnt - 1].GetType() != typeof(Txt)) continue;
                         {
                             #region childs
-
                             Txt t = gfxObjList[cnt - 1] as Txt;
                             t.Child.Sort(0, t.Child.Count, rzi);
                             foreach (IGfx t1 in t.Child)
@@ -772,6 +1052,19 @@ namespace MELHARFI
                                     found = true;
                                     break;
                                 }
+                                if (t1 != null && t1.GetType() == typeof(FillPolygon))
+                                {
+                                    FillPolygon childF = t1 as FillPolygon;
+                                    if (!t.Visible || !childF.Visible ||
+                                        !new Rectangle(childF.rectangle.X + t.Location.X, childF.rectangle.Y + t.Location.Y,
+                                            childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
+                                    SolidBrush sb = childF.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                    childF.FireMouseDoubleClic(e);
+                                    found = true;
+                                    break;
+                                }
                                 if (t1 == null || t1.GetType() != typeof(Txt)) continue;
                                 {
                                     Txt childT = t1 as Txt;
@@ -791,9 +1084,7 @@ namespace MELHARFI
                             //////////////////////////////////////////////////
 
                             #endregion
-
                             #region parent
-
                             if (found || !t.Visible ||
                                 !new Rectangle(t.Location, TextRenderer.MeasureText(t.Text, t.font)).Contains(
                                     e.Location)) continue;
@@ -822,7 +1113,6 @@ namespace MELHARFI
                             if (gfxBgrList[cnt - 1] != null && gfxBgrList[cnt - 1].GetType() == typeof(Bmp))
                             {
                                 #region childs
-
                                 Bmp b = gfxBgrList[cnt - 1] as Bmp;
                                 b.Child.Sort(0, b.Child.Count, rzi);
                                 foreach (IGfx t in b.Child)
@@ -885,6 +1175,20 @@ namespace MELHARFI
                                         found = true;
                                         break;
                                     }
+                                    if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!b.Visible || !childF.Visible ||
+                                            !new Rectangle(childF.rectangle.X + b.point.X, childF.rectangle.Y + b.point.Y,
+                                                childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
+                                            continue;
+                                        SolidBrush sb = childF.brush as SolidBrush;
+                                        if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                            !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                        childF.FireMouseDoubleClic(e);
+                                        found = true;
+                                        break;
+                                    }
                                     if (t == null || t.GetType() != typeof(Txt)) continue;
                                     {
                                         Txt childT = t as Txt;
@@ -904,7 +1208,6 @@ namespace MELHARFI
                                 //////////////////////////////////////////////////
 
                                 #endregion
-
                                 #region parent
 
                                 if (found || !b.Visible || b.bmp == null || !new Rectangle(b.point.X, b.point.Y,
@@ -921,7 +1224,6 @@ namespace MELHARFI
                             if (gfxBgrList[cnt - 1] != null && gfxBgrList[cnt - 1].GetType() == typeof(Anim))
                             {
                                 #region childs
-
                                 Anim a = gfxBgrList[cnt - 1] as Anim;
                                 a.Child.Sort(0, a.Child.Count, rzi);
                                 foreach (IGfx t in a.Child)
@@ -986,6 +1288,20 @@ namespace MELHARFI
                                         found = true;
                                         break;
                                     }
+                                    if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!a.img.Visible || !childF.Visible ||
+                                            !new Rectangle(childF.rectangle.X + a.img.point.X, childF.rectangle.Y + a.img.point.Y,
+                                                childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
+                                            continue;
+                                        SolidBrush sb = childF.brush as SolidBrush;
+                                        if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                            !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                        childF.FireMouseDoubleClic(e);
+                                        found = true;
+                                        break;
+                                    }
                                     if (t == null || t.GetType() != typeof(Txt)) continue;
                                     {
                                         Txt childT = t as Txt;
@@ -1006,7 +1322,6 @@ namespace MELHARFI
                                 //////////////////////////////////////////////////
 
                                 #endregion
-
                                 #region parent
 
                                 if (found || !a.img.Visible || a.img.bmp == null ||
@@ -1028,7 +1343,6 @@ namespace MELHARFI
                             if (gfxBgrList[cnt - 1] != null && gfxBgrList[cnt - 1].GetType() == typeof(Rec))
                             {
                                 #region childs
-
                                 Rec r = gfxBgrList[cnt - 1] as Rec;
                                 r.Child.Sort(0, r.Child.Count, rzi);
                                 foreach (IGfx t in r.Child)
@@ -1091,6 +1405,20 @@ namespace MELHARFI
                                         found = true;
                                         break;
                                     }
+                                    if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!r.Visible || !childF.Visible ||
+                                            !new Rectangle(childF.rectangle.X + r.point.X, childF.rectangle.Y + r.point.Y,
+                                                childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
+                                            continue;
+                                        SolidBrush sb = childF.brush as SolidBrush;
+                                        if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                            !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                        childF.FireMouseDoubleClic(e);
+                                        found = true;
+                                        break;
+                                    }
                                     if (t == null || t.GetType() != typeof(Txt)) continue;
                                     {
                                         Txt childT = t as Txt;
@@ -1110,9 +1438,7 @@ namespace MELHARFI
                                 //////////////////////////////////////////////////
 
                                 #endregion
-
                                 #region parent
-
                                 if (found || !r.Visible || !new Rectangle(r.point, r.size).Contains(e.Location))
                                     continue;
                                 {
@@ -1122,14 +1448,121 @@ namespace MELHARFI
                                     r.FireMouseDoubleClic(e);
                                     break;
                                 }
-
+                                #endregion
+                            }
+                            if (gfxBgrList[cnt - 1] != null && gfxBgrList[cnt - 1].GetType() == typeof(FillPolygon))
+                            {
+                                #region childs
+                                FillPolygon f = gfxBgrList[cnt - 1] as FillPolygon;
+                                f.Child.Sort(0, f.Child.Count, rzi);
+                                foreach (IGfx t in f.Child)
+                                {
+                                    if (t != null && t.GetType() == typeof(Bmp))
+                                    {
+                                        Bmp childB = t as Bmp;
+                                        if (!f.Visible || !childB.Visible || childB.bmp == null ||
+                                            !new Rectangle(childB.point.X + f.rectangle.X, childB.point.Y + f.rectangle.Y,
+                                                    (childB.isSpriteSheet)
+                                                        ? childB.rectangle.Width
+                                                        : childB.bmp.Width,
+                                                    (childB.isSpriteSheet)
+                                                        ? childB.rectangle.Height
+                                                        : childB.bmp.Height)
+                                                .Contains(e.Location) || (childB.bmp.GetPixel(
+                                                                                e.X - childB.point.X - f.rectangle.X +
+                                                                                childB.rectangle.X,
+                                                                                e.Y - childB.point.Y - f.rectangle.Y +
+                                                                                childB.rectangle.Y) !=
+                                                                            GetPixel(e.X, e.Y) &&
+                                                                            !childB.EscapeGfxWhileMouseDoubleClic))
+                                            continue;
+                                        childB.FireMouseDoubleClic(e);
+                                        found = true;
+                                        break;
+                                    }
+                                    if (t != null && t.GetType() == typeof(Anim))
+                                    {
+                                        Anim childA = t as Anim;
+                                        if (!f.Visible || !childA.img.Visible || childA.img.bmp == null ||
+                                            !new Rectangle(childA.img.point.X + f.rectangle.X,
+                                                childA.img.point.Y + f.rectangle.Y,
+                                                (childA.img.isSpriteSheet)
+                                                    ? childA.img.rectangle.Width
+                                                    : childA.img.bmp.Width,
+                                                (childA.img.isSpriteSheet)
+                                                    ? childA.img.rectangle.Height
+                                                    : childA.img.bmp.Height).Contains(e.Location) ||
+                                            (childA.img.bmp.GetPixel(
+                                                    e.X - childA.img.point.X - f.rectangle.X + childA.img.rectangle.X,
+                                                    e.Y - childA.img.point.Y - f.rectangle.Y + childA.img.rectangle.Y) !=
+                                                GetPixel(e.X, e.Y) && !childA.img.EscapeGfxWhileMouseDoubleClic))
+                                            continue;
+                                        childA.img.FireMouseDoubleClic(e);
+                                        found = true;
+                                        break;
+                                    }
+                                    if (t != null && t.GetType() == typeof(Rec))
+                                    {
+                                        Rec childR = t as Rec;
+                                        if (!f.Visible || !childR.Visible ||
+                                            !new Rectangle(childR.point.X + f.rectangle.X, childR.point.Y + f.rectangle.Y,
+                                                childR.size.Width, childR.size.Height).Contains(e.Location))
+                                            continue;
+                                        SolidBrush sb = childR.brush as SolidBrush;
+                                        if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                            !childR.EscapeGfxWhileMouseDoubleClic) continue;
+                                        childR.FireMouseDoubleClic(e);
+                                        found = true;
+                                        break;
+                                    }
+                                    if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!f.Visible || !childF.Visible ||
+                                            !new Rectangle(childF.rectangle.X + f.rectangle.X, childF.rectangle.Y + f.rectangle.Y,
+                                                childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
+                                            continue;
+                                        SolidBrush sb = childF.brush as SolidBrush;
+                                        if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                            !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                        childF.FireMouseDoubleClic(e);
+                                        found = true;
+                                        break;
+                                    }
+                                    if (t == null || t.GetType() != typeof(Txt)) continue;
+                                    {
+                                        Txt childT = t as Txt;
+                                        if (!f.Visible || !childT.Visible ||
+                                            !new Rectangle(childT.Location.X + f.rectangle.X, childT.Location.Y + f.rectangle.Y,
+                                                TextRenderer.MeasureText(childT.Text, childT.font).Width,
+                                                TextRenderer.MeasureText(childT.Text, childT.font).Height).Contains(
+                                                e.Location)) continue;
+                                        SolidBrush sb = childT.brush as SolidBrush;
+                                        if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                            !childT.EscapeGfxWhileMouseDoubleClic) continue;
+                                        childT.FireMouseDoubleClic(e);
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                //////////////////////////////////////////////////
+                                #endregion
+                                #region parent
+                                if (found || !f.Visible || !f.rectangle.Contains(e.Location))
+                                    continue;
+                                {
+                                    SolidBrush sb = f.brush as SolidBrush;
+                                    if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                        !f.EscapeGfxWhileMouseDoubleClic) continue;
+                                    f.FireMouseDoubleClic(e);
+                                    break;
+                                }
                                 #endregion
                             }
                             if (gfxBgrList[cnt - 1] == null || gfxBgrList[cnt - 1].GetType() != typeof(Txt))
                                 continue;
                             {
                                 #region childs
-
                                 Txt t = gfxBgrList[cnt - 1] as Txt;
                                 t.Child.Sort(0, t.Child.Count, rzi);
                                 foreach (IGfx t1 in t.Child)
@@ -1192,6 +1625,20 @@ namespace MELHARFI
                                         found = true;
                                         break;
                                     }
+                                    if (t1 != null && t1.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t1 as FillPolygon;
+                                        if (!t.Visible || !childF.Visible ||
+                                            !new Rectangle(childF.rectangle.X + t.Location.X, childF.rectangle.Y + t.Location.Y,
+                                                childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
+                                            continue;
+                                        SolidBrush sb = childF.brush as SolidBrush;
+                                        if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
+                                            !childF.EscapeGfxWhileMouseDoubleClic) continue;
+                                        childF.FireMouseDoubleClic(e);
+                                        found = true;
+                                        break;
+                                    }
                                     if (t1 == null || t1.GetType() != typeof(Txt)) continue;
                                     {
                                         Txt childT = t1 as Txt;
@@ -1211,9 +1658,7 @@ namespace MELHARFI
                                 //////////////////////////////////////////////////
 
                                 #endregion
-
                                 #region parent
-
                                 if (found || !t.Visible ||
                                     !new Rectangle(t.Location, TextRenderer.MeasureText(t.Text, t.font)).Contains(
                                         e.Location)) continue;
@@ -1224,7 +1669,6 @@ namespace MELHARFI
                                     t.FireMouseDoubleClic(e);
                                     break;
                                 }
-
                                 #endregion
                             }
                         }
