@@ -269,7 +269,7 @@ namespace MELHARFI
                         height = _point[cnt].Y;
                 }
 
-                return new Rectangle(x, y, width, height);
+                return new Rectangle(x, y, width - x, height - y);
             }
             /// <summary>
             /// Create a perfect duplication of the Bmp object
