@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MELHARFI
 {
@@ -36,11 +37,14 @@ namespace MELHARFI
                 MELHARFI.Manager.Txt t = x as MELHARFI.Manager.Txt;
                 tmpX = t.Zindex;
             }
+            else if (x.GetType() == typeof(MELHARFI.Manager.FillPolygon))
+            {
+                MELHARFI.Manager.FillPolygon f = x as MELHARFI.Manager.FillPolygon;
+                tmpX = f.Zindex;
+            }
             else
             {
-                // MELHARFI.Manager.Rec
-                MELHARFI.Manager.Rec r = x as MELHARFI.Manager.Rec;
-                tmpX = r.Zindex;
+                throw new NotImplementedException("object not found");
             }
 
             if (y.GetType() == typeof(MELHARFI.Manager.Bmp))
@@ -58,11 +62,15 @@ namespace MELHARFI
                 MELHARFI.Manager.Txt t = y as MELHARFI.Manager.Txt;
                 tmpY = t.Zindex;
             }
+            else if (y.GetType() == typeof(MELHARFI.Manager.FillPolygon))
+            {
+                MELHARFI.Manager.FillPolygon f = y as MELHARFI.Manager.FillPolygon;
+                tmpY = f.Zindex;
+            }
             else
             {
                 // MELHARFI.Manager.Rec
-                MELHARFI.Manager.Rec r = y as MELHARFI.Manager.Rec;
-                tmpY = r.Zindex;
+                throw new NotImplementedException("object not found");
             }
 
             if (tmpX > tmpY)
