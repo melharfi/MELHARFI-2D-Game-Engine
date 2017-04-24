@@ -120,7 +120,7 @@ namespace MELHARFI
                             {
                                 Txt childR = t as Txt;
                                 if (!b.Visible || !childR.Visible ||
-                                    !new Rectangle(childR.Location.X + b.point.X, childR.Location.Y + b.point.Y,
+                                    !new Rectangle(childR.point.X + b.point.X, childR.point.Y + b.point.Y,
                                         TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                         TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                         e.Location)) continue;
@@ -221,8 +221,8 @@ namespace MELHARFI
                             {
                                 Txt childR = t as Txt;
                                 if (!a.img.Visible || !childR.Visible ||
-                                    !new Rectangle(childR.Location.X + a.img.point.X,
-                                        childR.Location.Y + a.img.point.Y,
+                                    !new Rectangle(childR.point.X + a.img.point.X,
+                                        childR.point.Y + a.img.point.Y,
                                         TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                         TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                         e.Location)) continue;
@@ -323,7 +323,7 @@ namespace MELHARFI
                             {
                                 Txt childR = t as Txt;
                                 if (!r.Visible || !childR.Visible ||
-                                    !new Rectangle(childR.Location.X + r.point.X, childR.Location.Y + r.point.Y,
+                                    !new Rectangle(childR.point.X + r.point.X, childR.point.Y + r.point.Y,
                                         TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                         TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                         e.Location)) continue;
@@ -422,7 +422,7 @@ namespace MELHARFI
                             {
                                 Txt childR = t as Txt;
                                 if (!f.Visible || !childR.Visible ||
-                                    !new Rectangle(childR.Location.X + f.rectangle.X, childR.Location.Y + f.rectangle.Y,
+                                    !new Rectangle(childR.point.X + f.rectangle.X, childR.point.Y + f.rectangle.Y,
                                         TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                         TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                         e.Location)) continue;
@@ -461,12 +461,12 @@ namespace MELHARFI
                             {
                                 Bmp childB = t1 as Bmp;
                                 if (!t.Visible || !childB.Visible || childB.bmp == null ||
-                                    !new Rectangle(childB.point.X + t.Location.X, childB.point.Y + t.Location.Y,
+                                    !new Rectangle(childB.point.X + t.point.X, childB.point.Y + t.point.Y,
                                             (childB.isSpriteSheet) ? childB.rectangle.Width : childB.bmp.Width,
                                             (childB.isSpriteSheet) ? childB.rectangle.Height : childB.bmp.Height)
                                         .Contains(e.Location) ||
-                                    (childB.bmp.GetPixel(e.X - childB.point.X - t.Location.X + childB.rectangle.X,
-                                            e.Y - childB.point.Y - t.Location.Y + childB.rectangle.Y) !=
+                                    (childB.bmp.GetPixel(e.X - childB.point.X - t.point.X + childB.rectangle.X,
+                                            e.Y - childB.point.Y - t.point.Y + childB.rectangle.Y) !=
                                         GetPixel(e.X, e.Y) && !childB.EscapeGfxWhileMouseClic)) continue;
                                 childB.FireMouseClic(e);
                                 found = true;
@@ -476,7 +476,7 @@ namespace MELHARFI
                             {
                                 Anim childA = t1 as Anim;
                                 if (!t.Visible || !childA.img.Visible || childA.img.bmp == null ||
-                                    !new Rectangle(childA.img.point.X + t.Location.X, childA.img.point.Y + t.Location.Y,
+                                    !new Rectangle(childA.img.point.X + t.point.X, childA.img.point.Y + t.point.Y,
                                         (childA.img.isSpriteSheet)
                                             ? childA.img.rectangle.Width
                                             : childA.img.bmp.Width,
@@ -484,8 +484,8 @@ namespace MELHARFI
                                             ? childA.img.rectangle.Height
                                             : childA.img.bmp.Height).Contains(e.Location) ||
                                     (childA.img.bmp.GetPixel(
-                                            e.X - childA.img.point.X - t.Location.X + childA.img.rectangle.X,
-                                            e.Y - childA.img.point.Y - t.Location.Y + childA.img.rectangle.Y) !=
+                                            e.X - childA.img.point.X - t.point.X + childA.img.rectangle.X,
+                                            e.Y - childA.img.point.Y - t.point.Y + childA.img.rectangle.Y) !=
                                         GetPixel(e.X, e.Y) && !childA.img.EscapeGfxWhileMouseClic)) continue;
                                 childA.img.FireMouseClic(e);
                                 found = true;
@@ -495,7 +495,7 @@ namespace MELHARFI
                             {
                                 Rec childR = t1 as Rec;
                                 if (!t.Visible || !childR.Visible ||
-                                    !new Rectangle(childR.point.X + t.Location.X, childR.point.Y + t.Location.Y,
+                                    !new Rectangle(childR.point.X + t.point.X, childR.point.Y + t.point.Y,
                                         childR.size.Width, childR.size.Height).Contains(e.Location)) continue;
                                 SolidBrush sb = childR.brush as SolidBrush;
                                 if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
@@ -508,7 +508,7 @@ namespace MELHARFI
                             {
                                 FillPolygon childF = t1 as FillPolygon;
                                 if (!t.Visible || !childF.Visible ||
-                                    !new Rectangle(childF.rectangle.X + t.Location.X, childF.rectangle.Y + t.Location.Y,
+                                    !new Rectangle(childF.rectangle.X + t.point.X, childF.rectangle.Y + t.point.Y,
                                         childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location)) continue;
                                 SolidBrush sb = childF.brush as SolidBrush;
                                 if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
@@ -521,7 +521,7 @@ namespace MELHARFI
                             {
                                 Txt childR = t1 as Txt;
                                 if (!t.Visible || !childR.Visible ||
-                                    !new Rectangle(childR.Location.X + t.Location.X, childR.Location.Y + t.Location.Y,
+                                    !new Rectangle(childR.point.X + t.point.X, childR.point.Y + t.point.Y,
                                         TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                         TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                         e.Location)) continue;
@@ -538,7 +538,7 @@ namespace MELHARFI
                         #region parent
 
                         if (!found != t.Visible ||
-                            !new Rectangle(t.Location, TextRenderer.MeasureText(t.Text, t.font)).Contains(e.Location))
+                            !new Rectangle(t.point, TextRenderer.MeasureText(t.Text, t.font)).Contains(e.Location))
                             continue;
                         {
                             SolidBrush sb = t.brush as SolidBrush;
@@ -632,7 +632,7 @@ namespace MELHARFI
                                 {
                                     Txt childR = t as Txt;
                                     if (!b.Visible || !childR.Visible ||
-                                        !new Rectangle(childR.Location.X + b.point.X, childR.Location.Y + b.point.Y,
+                                        !new Rectangle(childR.point.X + b.point.X, childR.point.Y + b.point.Y,
                                             TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                             TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                             e.Location)) continue;
@@ -739,8 +739,8 @@ namespace MELHARFI
                                 {
                                     Txt childR = t as Txt;
                                     if (!a.img.Visible || !childR.Visible ||
-                                        !new Rectangle(childR.Location.X + a.img.point.X,
-                                            childR.Location.Y + a.img.point.Y,
+                                        !new Rectangle(childR.point.X + a.img.point.X,
+                                            childR.point.Y + a.img.point.Y,
                                             TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                             TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                             e.Location)) continue;
@@ -844,7 +844,7 @@ namespace MELHARFI
                                 {
                                     Txt childR = t as Txt;
                                     if (!r.Visible || !childR.Visible ||
-                                        !new Rectangle(childR.Location.X + r.point.X, childR.Location.Y + r.point.Y,
+                                        !new Rectangle(childR.point.X + r.point.X, childR.point.Y + r.point.Y,
                                             TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                             TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                             e.Location)) continue;
@@ -945,7 +945,7 @@ namespace MELHARFI
                                 {
                                     Txt childR = t as Txt;
                                     if (!f.Visible || !childR.Visible ||
-                                        !new Rectangle(childR.Location.X + f.rectangle.X, childR.Location.Y + f.rectangle.Y,
+                                        !new Rectangle(childR.point.X + f.rectangle.X, childR.point.Y + f.rectangle.Y,
                                             TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                             TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                             e.Location)) continue;
@@ -983,12 +983,12 @@ namespace MELHARFI
                                 {
                                     Bmp childB = t1 as Bmp;
                                     if (!t.Visible || !childB.Visible || childB.bmp == null ||
-                                        !new Rectangle(childB.point.X + t.Location.X, childB.point.Y + t.Location.Y,
+                                        !new Rectangle(childB.point.X + t.point.X, childB.point.Y + t.point.Y,
                                                 (childB.isSpriteSheet) ? childB.rectangle.Width : childB.bmp.Width,
                                                 (childB.isSpriteSheet) ? childB.rectangle.Height : childB.bmp.Height)
                                             .Contains(e.Location) ||
-                                        (childB.bmp.GetPixel(e.X - childB.point.X - t.Location.X + childB.rectangle.X,
-                                                e.Y - childB.point.Y - t.Location.Y + childB.rectangle.Y) !=
+                                        (childB.bmp.GetPixel(e.X - childB.point.X - t.point.X + childB.rectangle.X,
+                                                e.Y - childB.point.Y - t.point.Y + childB.rectangle.Y) !=
                                             GetPixel(e.X, e.Y) && !childB.EscapeGfxWhileMouseClic)) continue;
                                     childB.FireMouseClic(e);
                                     found = true;
@@ -998,8 +998,8 @@ namespace MELHARFI
                                 {
                                     Anim childA = t1 as Anim;
                                     if (!t.Visible || !childA.img.Visible || childA.img.bmp == null ||
-                                        !new Rectangle(childA.img.point.X + t.Location.X,
-                                            childA.img.point.Y + t.Location.Y,
+                                        !new Rectangle(childA.img.point.X + t.point.X,
+                                            childA.img.point.Y + t.point.Y,
                                             (childA.img.isSpriteSheet)
                                                 ? childA.img.rectangle.Width
                                                 : childA.img.bmp.Width,
@@ -1007,8 +1007,8 @@ namespace MELHARFI
                                                 ? childA.img.rectangle.Height
                                                 : childA.img.bmp.Height).Contains(e.Location) ||
                                         (childA.img.bmp.GetPixel(
-                                                e.X - childA.img.point.X - t.Location.X + childA.img.rectangle.X,
-                                                e.Y - childA.img.point.Y - t.Location.Y + childA.img.rectangle.Y) !=
+                                                e.X - childA.img.point.X - t.point.X + childA.img.rectangle.X,
+                                                e.Y - childA.img.point.Y - t.point.Y + childA.img.rectangle.Y) !=
                                             GetPixel(e.X, e.Y) && !childA.img.EscapeGfxWhileMouseClic)) continue;
                                     childA.img.FireMouseClic(e);
                                     found = true;
@@ -1018,7 +1018,7 @@ namespace MELHARFI
                                 {
                                     Rec childR = t1 as Rec;
                                     if (!t.Visible || !childR.Visible ||
-                                        !new Rectangle(childR.point.X + t.Location.X, childR.point.Y + t.Location.Y,
+                                        !new Rectangle(childR.point.X + t.point.X, childR.point.Y + t.point.Y,
                                             childR.size.Width, childR.size.Height).Contains(e.Location)) continue;
                                     SolidBrush sb = childR.brush as SolidBrush;
                                     if (sb.Color.ToArgb() != GetPixel(e.X, e.Y).ToArgb() &&
@@ -1031,7 +1031,7 @@ namespace MELHARFI
                                 {
                                     Txt childR = t1 as Txt;
                                     if (!t.Visible || !childR.Visible ||
-                                        !new Rectangle(childR.Location.X + t.Location.X, childR.Location.Y + t.Location.Y,
+                                        !new Rectangle(childR.point.X + t.point.X, childR.point.Y + t.point.Y,
                                             TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                             TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                             e.Location)) continue;
@@ -1048,7 +1048,7 @@ namespace MELHARFI
                             #region parent
 
                             if (found || !t.Visible ||
-                                !new Rectangle(t.Location, TextRenderer.MeasureText(t.Text, t.font)).Contains(
+                                !new Rectangle(t.point, TextRenderer.MeasureText(t.Text, t.font)).Contains(
                                     e.Location)) continue;
                             {
                                 SolidBrush sb = t.brush as SolidBrush;
@@ -1155,7 +1155,7 @@ namespace MELHARFI
                                     {
                                         Txt childR = t as Txt;
                                         if (!b.Visible || !childR.Visible ||
-                                            !new Rectangle(childR.Location.X + b.point.X, childR.Location.Y + b.point.Y,
+                                            !new Rectangle(childR.point.X + b.point.X, childR.point.Y + b.point.Y,
                                                 TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                                 TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                                 e.Location)) continue;
@@ -1265,8 +1265,8 @@ namespace MELHARFI
                                     {
                                         Txt childR = t as Txt;
                                         if (!a.img.Visible || !childR.Visible ||
-                                            !new Rectangle(childR.Location.X + a.img.point.X,
-                                                childR.Location.Y + a.img.point.Y,
+                                            !new Rectangle(childR.point.X + a.img.point.X,
+                                                childR.point.Y + a.img.point.Y,
                                                 TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                                 TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                                 e.Location)) continue;
@@ -1380,7 +1380,7 @@ namespace MELHARFI
                                     {
                                         Txt childR = t as Txt;
                                         if (!r.Visible || !childR.Visible ||
-                                            !new Rectangle(childR.Location.X + r.point.X, childR.Location.Y + r.point.Y,
+                                            !new Rectangle(childR.point.X + r.point.X, childR.point.Y + r.point.Y,
                                                 TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                                 TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                                 e.Location)) continue;
@@ -1490,7 +1490,7 @@ namespace MELHARFI
                                     {
                                         Txt childR = t as Txt;
                                         if (!f.Visible || !childR.Visible ||
-                                            !new Rectangle(childR.Location.X + f.rectangle.X, childR.Location.Y + f.rectangle.Y,
+                                            !new Rectangle(childR.point.X + f.rectangle.X, childR.point.Y + f.rectangle.Y,
                                                 TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                                 TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                                 e.Location)) continue;
@@ -1530,7 +1530,7 @@ namespace MELHARFI
                                     {
                                         Bmp childB = t1 as Bmp;
                                         if (!t.Visible || !childB.Visible || childB.bmp == null ||
-                                            !new Rectangle(childB.point.X + t.Location.X, childB.point.Y + t.Location.Y,
+                                            !new Rectangle(childB.point.X + t.point.X, childB.point.Y + t.point.Y,
                                                     (childB.isSpriteSheet)
                                                         ? childB.rectangle.Width
                                                         : childB.bmp.Width,
@@ -1538,9 +1538,9 @@ namespace MELHARFI
                                                         ? childB.rectangle.Height
                                                         : childB.bmp.Height)
                                                 .Contains(e.Location) || (childB.bmp.GetPixel(
-                                                                                e.X - childB.point.X - t.Location.X +
+                                                                                e.X - childB.point.X - t.point.X +
                                                                                 childB.rectangle.X,
-                                                                                e.Y - childB.point.Y - t.Location.Y +
+                                                                                e.Y - childB.point.Y - t.point.Y +
                                                                                 childB.rectangle.Y) !=
                                                                             GetPixel(e.X, e.Y) &&
                                                                             !childB.EscapeGfxWhileMouseClic))
@@ -1553,8 +1553,8 @@ namespace MELHARFI
                                     {
                                         Anim childA = t1 as Anim;
                                         if (!t.Visible || !childA.img.Visible || childA.img.bmp == null ||
-                                            !new Rectangle(childA.img.point.X + t.Location.X,
-                                                childA.img.point.Y + t.Location.Y,
+                                            !new Rectangle(childA.img.point.X + t.point.X,
+                                                childA.img.point.Y + t.point.Y,
                                                 (childA.img.isSpriteSheet)
                                                     ? childA.img.rectangle.Width
                                                     : childA.img.bmp.Width,
@@ -1562,8 +1562,8 @@ namespace MELHARFI
                                                     ? childA.img.rectangle.Height
                                                     : childA.img.bmp.Height).Contains(e.Location) ||
                                             (childA.img.bmp.GetPixel(
-                                                    e.X - childA.img.point.X - t.Location.X + childA.img.rectangle.X,
-                                                    e.Y - childA.img.point.Y - t.Location.Y + childA.img.rectangle.Y) !=
+                                                    e.X - childA.img.point.X - t.point.X + childA.img.rectangle.X,
+                                                    e.Y - childA.img.point.Y - t.point.Y + childA.img.rectangle.Y) !=
                                                 GetPixel(e.X, e.Y) && !childA.img.EscapeGfxWhileMouseClic)) continue;
                                         childA.img.FireMouseClic(e);
                                         found = true;
@@ -1573,7 +1573,7 @@ namespace MELHARFI
                                     {
                                         Rec childR = t1 as Rec;
                                         if (!t.Visible || !childR.Visible ||
-                                            !new Rectangle(childR.point.X + t.Location.X, childR.point.Y + t.Location.Y,
+                                            !new Rectangle(childR.point.X + t.point.X, childR.point.Y + t.point.Y,
                                                 childR.size.Width, childR.size.Height).Contains(e.Location))
                                             continue;
                                         SolidBrush sb = childR.brush as SolidBrush;
@@ -1587,7 +1587,7 @@ namespace MELHARFI
                                     {
                                         FillPolygon childF = t1 as FillPolygon;
                                         if (!t.Visible || !childF.Visible ||
-                                            !new Rectangle(childF.rectangle.X + t.Location.X, childF.rectangle.Y + t.Location.Y,
+                                            !new Rectangle(childF.rectangle.X + t.point.X, childF.rectangle.Y + t.point.Y,
                                                 childF.rectangle.Width, childF.rectangle.Height).Contains(e.Location))
                                             continue;
                                         SolidBrush sb = childF.brush as SolidBrush;
@@ -1601,7 +1601,7 @@ namespace MELHARFI
                                     {
                                         Txt childR = t1 as Txt;
                                         if (!t.Visible || !childR.Visible ||
-                                            !new Rectangle(childR.Location.X + t.Location.X, childR.Location.Y + t.Location.Y,
+                                            !new Rectangle(childR.point.X + t.point.X, childR.point.Y + t.point.Y,
                                                 TextRenderer.MeasureText(childR.Text, childR.font).Width,
                                                 TextRenderer.MeasureText(childR.Text, childR.font).Height).Contains(
                                                 e.Location)) continue;
@@ -1618,7 +1618,7 @@ namespace MELHARFI
                                 #region parent
 
                                 if (found || !t.Visible ||
-                                    !new Rectangle(t.Location, TextRenderer.MeasureText(t.Text, t.font)).Contains(
+                                    !new Rectangle(t.point, TextRenderer.MeasureText(t.Text, t.font)).Contains(
                                         e.Location)) continue;
                                 {
                                     SolidBrush sb = t.brush as SolidBrush;

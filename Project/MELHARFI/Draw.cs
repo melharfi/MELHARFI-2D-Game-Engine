@@ -87,7 +87,7 @@ namespace MELHARFI
                                     {
                                         Txt childT = t as Txt;
                                         if (childT.Visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.Location.X, b.point.Y + childT.Location.Y);
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.point.X, b.point.Y + childT.point.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
@@ -143,7 +143,7 @@ namespace MELHARFI
                                     {
                                         Txt childT = t as Txt;
                                         if (childT.Visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.Location.X, a.img.point.Y + childT.Location.Y);
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.point.X, a.img.point.Y + childT.point.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
@@ -174,7 +174,7 @@ namespace MELHARFI
                                 if (!t.Visible) continue;
 
                                 #region parent
-                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.Location);
+                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.point);
                                 #endregion
                                 #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
@@ -187,7 +187,7 @@ namespace MELHARFI
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
-                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.Location.X, childB.point.Y + t.Location.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.point.X, childB.point.Y + t.point.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Anim))
                                     {
@@ -196,19 +196,19 @@ namespace MELHARFI
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
-                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.Location.X, childA.img.point.Y + t.Location.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.point.X, childA.img.point.Y + t.point.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t2 as Txt;
                                         if (!childT.Visible) continue;
-                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.Location.X + childT.Location.X, t.Location.Y + childT.Location.Y);
+                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.point.X + childT.point.X, t.point.Y + childT.point.Y);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t2 as Rec;
                                         if (!childR.Visible) continue;
-                                        e.Graphics.FillRectangle(childR.brush, new Rectangle(t.Location.X + childR.point.X, t.Location.Y + childR.point.Y, childR.size.Width, childR.size.Height));
+                                        e.Graphics.FillRectangle(childR.brush, new Rectangle(t.point.X + childR.point.X, t.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(FillPolygon))
                                     {
@@ -217,8 +217,8 @@ namespace MELHARFI
                                         Point[] newPoint = new Point[childF.point.Length];
                                         for (int cnt = 0; cnt < childF.point.Length; cnt++)
                                         {
-                                            newPoint[cnt].X = t.Location.X + childF.point[cnt].X;
-                                            newPoint[cnt].Y = t.Location.Y + childF.point[cnt].Y;
+                                            newPoint[cnt].X = t.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = t.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
                                     }
@@ -261,7 +261,7 @@ namespace MELHARFI
                                     {
                                         Txt childT = t as Txt;
                                         if (!childT.Visible) continue;
-                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.Location.X, r.point.Y + childT.Location.Y);
+                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.point.X, r.point.Y + childT.point.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
@@ -320,7 +320,7 @@ namespace MELHARFI
                                     {
                                         Txt childT = t as Txt;
                                         if (!childT.Visible) continue;
-                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, f.rectangle.X + childT.Location.X, f.rectangle.Y + childT.Location.Y);
+                                        e.Graphics.DrawString(childT.Text, childT.font, childT.brush, f.rectangle.X + childT.point.X, f.rectangle.Y + childT.point.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
@@ -393,7 +393,7 @@ namespace MELHARFI
                                     {
                                         Txt childT = t as Txt;
                                         if (childT.Visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.Location.X, b.point.Y + childT.Location.Y);
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.point.X, b.point.Y + childT.point.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
@@ -455,7 +455,7 @@ namespace MELHARFI
                                     {
                                         Txt childT = t as Txt;
                                         if (childT.Visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.Location.X, a.img.point.Y + childT.Location.Y);
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.point.X, a.img.point.Y + childT.point.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
@@ -486,7 +486,7 @@ namespace MELHARFI
                                 if (!t.Visible) continue;
 
                                 #region parent
-                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.Location);
+                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.point);
                                 #endregion
                                 #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
@@ -499,7 +499,7 @@ namespace MELHARFI
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
-                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.Location.X, childB.point.Y + t.Location.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.point.X, childB.point.Y + t.point.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Anim))
                                     {
@@ -508,19 +508,19 @@ namespace MELHARFI
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
-                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.Location.X, childA.img.point.Y + t.Location.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.point.X, childA.img.point.Y + t.point.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t2 as Txt;
                                         if (childT.Visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.Location.X + childT.Location.X, t.Location.Y + childT.Location.Y);
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.point.X + childT.point.X, t.point.Y + childT.point.Y);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t2 as Rec;
                                         if (childR.Visible)
-                                            e.Graphics.FillRectangle(childR.brush, new Rectangle(t.Location.X + childR.point.X, t.Location.Y + childR.point.Y, childR.size.Width, childR.size.Height));
+                                            e.Graphics.FillRectangle(childR.brush, new Rectangle(t.point.X + childR.point.X, t.point.Y + childR.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(FillPolygon))
                                     {
@@ -529,8 +529,8 @@ namespace MELHARFI
                                         Point[] newPoint = new Point[childF.point.Length];
                                         for (int cnt = 0; cnt < childF.point.Length; cnt++)
                                         {
-                                            newPoint[cnt].X = t.Location.X + childF.point[cnt].X;
-                                            newPoint[cnt].Y = t.Location.Y + childF.point[cnt].Y;
+                                            newPoint[cnt].X = t.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = t.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
                                     }
@@ -573,7 +573,7 @@ namespace MELHARFI
                                     {
                                         Txt childT = t as Txt;
                                         if (childT.Visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.Location.X, r.point.Y + childT.Location.Y);
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.point.X, r.point.Y + childT.point.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
@@ -590,6 +590,65 @@ namespace MELHARFI
                                         {
                                             newPoint[cnt].X = r.point.X + childF.point[cnt].X;
                                             newPoint[cnt].Y = r.point.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                    }
+                                }
+                                //////////////////////////////////////////////////
+                                #endregion
+                            }
+                            else if (t1 != null && t1.GetType() == typeof(FillPolygon))
+                            {
+                                FillPolygon f = t1 as FillPolygon;
+                                f.Child.Sort(0, f.Child.Count, zi);
+                                if (!f.Visible) continue;
+
+                                #region parent
+                                e.Graphics.FillPolygon(f.brush, f.point, f.fillMode);
+                                #endregion
+                                #region childs
+                                ////////// affichage des elements enfants de l'objet Bmp
+                                foreach (IGfx t in f.Child)
+                                {
+                                    if (t != null && t.GetType() == typeof(Bmp))
+                                    {
+                                        Bmp childB = t as Bmp;
+                                        if (childB.bmp == null || !childB.Visible) continue;
+                                        ImageAttributes imageAttrChild = new ImageAttributes();
+                                        if (childB.newColorMap != null)
+                                            imageAttrChild.SetRemapTable(childB.newColorMap);
+                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + f.rectangle.X, childB.point.Y + f.rectangle.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                    }
+                                    else if (t != null && t.GetType() == typeof(Anim))
+                                    {
+                                        Anim childA = t as Anim;
+                                        if (childA.img.bmp == null || !childA.img.Visible) continue;
+                                        ImageAttributes imageAttrChild = new ImageAttributes();
+                                        if (childA.img.newColorMap != null)
+                                            imageAttrChild.SetRemapTable(childA.img.newColorMap);
+                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + f.rectangle.X, childA.img.point.Y + f.rectangle.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                    }
+                                    else if (t != null && t.GetType() == typeof(Txt))
+                                    {
+                                        Txt childT = t as Txt;
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, f.rectangle.X + childT.point.X, f.rectangle.Y + childT.point.Y);
+                                    }
+                                    else if (t != null && t.GetType() == typeof(Rec))
+                                    {
+                                        Rec childR = t as Rec;
+                                        if (childR.Visible)
+                                            e.Graphics.FillRectangle(childR.brush, new Rectangle(f.rectangle.X + childR.point.X, f.rectangle.Y + childR.point.Y, childR.size.Width, childR.size.Height));
+                                    }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = f.rectangle.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = f.rectangle.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
                                     }
@@ -646,7 +705,7 @@ namespace MELHARFI
                                     {
                                         Txt childT = t as Txt;
                                         if (childT.Visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.Location.X, b.point.Y + childT.Location.Y);
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, b.point.X + childT.point.X, b.point.Y + childT.point.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
@@ -708,7 +767,7 @@ namespace MELHARFI
                                     {
                                         Txt childT = t as Txt;
                                         if (childT.Visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.Location.X, a.img.point.Y + childT.Location.Y);
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, a.img.point.X + childT.point.X, a.img.point.Y + childT.point.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
@@ -739,7 +798,7 @@ namespace MELHARFI
                                 if (!t.Visible) continue;
 
                                 #region parent
-                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.Location);
+                                e.Graphics.DrawString(t.Text, t.font, t.brush, t.point);
                                 #endregion
                                 #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
@@ -752,7 +811,7 @@ namespace MELHARFI
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childB.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childB.newColorMap);
-                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.Location.X, childB.point.Y + t.Location.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + t.point.X, childB.point.Y + t.point.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Anim))
                                     {
@@ -761,19 +820,19 @@ namespace MELHARFI
                                         ImageAttributes imageAttrChild = new ImageAttributes();
                                         if (childA.img.newColorMap != null)
                                             imageAttrChild.SetRemapTable(childA.img.newColorMap);
-                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.Location.X, childA.img.point.Y + t.Location.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + t.point.X, childA.img.point.Y + t.point.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Txt))
                                     {
                                         Txt childT = t2 as Txt;
                                         if (childT.Visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.Location.X + childT.Location.X, t.Location.Y + childT.Location.Y);
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, t.point.X + childT.point.X, t.point.Y + childT.point.Y);
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(Rec))
                                     {
                                         Rec childR = t2 as Rec;
                                         if (childR.Visible)
-                                            e.Graphics.FillRectangle(childR.brush, new Rectangle(childR.point.X + t.Location.X, childR.point.Y + t.Location.Y, childR.size.Width, childR.size.Height));
+                                            e.Graphics.FillRectangle(childR.brush, new Rectangle(childR.point.X + t.point.X, childR.point.Y + t.point.Y, childR.size.Width, childR.size.Height));
                                     }
                                     else if (t2 != null && t2.GetType() == typeof(FillPolygon))
                                     {
@@ -782,8 +841,8 @@ namespace MELHARFI
                                         Point[] newPoint = new Point[childF.point.Length];
                                         for (int cnt = 0; cnt < childF.point.Length; cnt++)
                                         {
-                                            newPoint[cnt].X = t.Location.X + childF.point[cnt].X;
-                                            newPoint[cnt].Y = t.Location.Y + childF.point[cnt].Y;
+                                            newPoint[cnt].X = t.point.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = t.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
                                     }
@@ -826,7 +885,7 @@ namespace MELHARFI
                                     {
                                         Txt childT = t as Txt;
                                         if (childT.Visible)
-                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.Location.X, r.point.Y + childT.Location.Y);
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, r.point.X + childT.point.X, r.point.Y + childT.point.Y);
                                     }
                                     else if (t != null && t.GetType() == typeof(Rec))
                                     {
@@ -843,6 +902,65 @@ namespace MELHARFI
                                         {
                                             newPoint[cnt].X = r.point.X + childF.point[cnt].X;
                                             newPoint[cnt].Y = r.point.Y + childF.point[cnt].Y;
+                                        }
+                                        e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                    }
+                                }
+                                //////////////////////////////////////////////////
+                                #endregion
+                            }
+                            else if (t1 != null && t1.GetType() == typeof(FillPolygon))
+                            {
+                                FillPolygon f = t1 as FillPolygon;
+                                f.Child.Sort(0, f.Child.Count, zi);
+                                if (!f.Visible) continue;
+
+                                #region parent
+                                e.Graphics.FillPolygon(f.brush, f.point, f.fillMode);
+                                #endregion
+                                #region childs
+                                ////////// affichage des elements enfants de l'objet Bmp
+                                foreach (IGfx t in f.Child)
+                                {
+                                    if (t != null && t.GetType() == typeof(Bmp))
+                                    {
+                                        Bmp childB = t as Bmp;
+                                        if (childB.bmp == null || !childB.Visible) continue;
+                                        ImageAttributes imageAttrChild = new ImageAttributes();
+                                        if (childB.newColorMap != null)
+                                            imageAttrChild.SetRemapTable(childB.newColorMap);
+                                        e.Graphics.DrawImage(childB.bmp, new Rectangle(new Point(childB.point.X + f.rectangle.X, childB.point.Y + f.rectangle.Y), childB.rectangle.Size), childB.rectangle.X, childB.rectangle.Y, childB.rectangle.Width, childB.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                    }
+                                    else if (t != null && t.GetType() == typeof(Anim))
+                                    {
+                                        Anim childA = t as Anim;
+                                        if (childA.img.bmp == null || !childA.img.Visible) continue;
+                                        ImageAttributes imageAttrChild = new ImageAttributes();
+                                        if (childA.img.newColorMap != null)
+                                            imageAttrChild.SetRemapTable(childA.img.newColorMap);
+                                        e.Graphics.DrawImage(childA.img.bmp, new Rectangle(new Point(childA.img.point.X + f.rectangle.X, childA.img.point.Y + f.rectangle.Y), childA.img.rectangle.Size), childA.img.rectangle.X, childA.img.rectangle.Y, childA.img.rectangle.Width, childA.img.rectangle.Height, GraphicsUnit.Pixel, imageAttrChild);
+                                    }
+                                    else if (t != null && t.GetType() == typeof(Txt))
+                                    {
+                                        Txt childT = t as Txt;
+                                        if (childT.Visible)
+                                            e.Graphics.DrawString(childT.Text, childT.font, childT.brush, f.rectangle.X + childT.point.X, f.rectangle.Y + childT.point.Y);
+                                    }
+                                    else if (t != null && t.GetType() == typeof(Rec))
+                                    {
+                                        Rec childR = t as Rec;
+                                        if (childR.Visible)
+                                            e.Graphics.FillRectangle(childR.brush, new Rectangle(new Point(childR.point.X + f.rectangle.X, childR.point.Y + f.rectangle.Y), childR.size));
+                                    }
+                                    else if (t != null && t.GetType() == typeof(FillPolygon))
+                                    {
+                                        FillPolygon childF = t as FillPolygon;
+                                        if (!childF.Visible) continue;
+                                        Point[] newPoint = new Point[childF.point.Length];
+                                        for (int cnt = 0; cnt < childF.point.Length; cnt++)
+                                        {
+                                            newPoint[cnt].X = f.rectangle.X + childF.point[cnt].X;
+                                            newPoint[cnt].Y = f.rectangle.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
                                     }

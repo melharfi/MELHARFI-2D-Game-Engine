@@ -227,9 +227,14 @@ namespace MELHARFI
             public ColorMap[] newColorMap;
 
             /// <summary>
-            /// Byte value between 0 until 255, it's the value of encrypting algorithme
+            /// key is string of 8 characters (first key) for Rijndael AES encryption
             /// </summary>
-            public byte Crypt;
+            public string key;
+
+            /// <summary>
+            /// iv is string of 8 characters called Initializing Vector (second key) for Rijndael AES encryption
+            /// </summary>
+            public string iv;
 
             /// <summary>
             /// Rectangle is an area of an image, used to show only a part of image, a Rectangle need a Point value defined by a X position and Y position, and Size value defined by a Width and Height
@@ -320,16 +325,18 @@ namespace MELHARFI
             /// </summary>
             /// <param name="_bmp">Path of the bitmap as string</param>
             /// <param name="_point">Point were the picture will be drawn on the form</param>
-            /// <param name="crypt">Byte value must be between 0 until 255 represent a value for decrypting the picture </param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="manager">Reference to the manager instance that hold this object</param>
-            public Bmp(string _bmp, Point _point, byte crypt, Manager manager)
+            public Bmp(string _bmp, Point _point, string Key, string IV, Manager manager)
             {
                 path = _bmp;
                 point = _point;
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
                 
-                using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
+                using (Stream m = Cryptography.DecryptFile(path, Key, IV))
                 {
                     Bitmap tmp = new Bitmap(m);
 
@@ -337,7 +344,6 @@ namespace MELHARFI
                         bmp = tmp;
                     else
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
-                    tmp.Dispose();
                 }
                 rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
                 parentManager = manager;
@@ -348,16 +354,19 @@ namespace MELHARFI
             /// </summary>
             /// <param name="_bmp">Path of the bitmap as string</param>
             /// <param name="_point">Point were the picture will be drawn on the form</param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="_rectangle">Rectangle is a square area defined by its point (X, Y) and its size (width, height) </param>
             /// <param name="manager">Reference to the manager instance that hold this object</param>
-            public Bmp(string _bmp, Point _point, byte crypt, Rectangle _rectangle, Manager manager)
+            public Bmp(string _bmp, Point _point, string Key, string IV, Rectangle _rectangle, Manager manager)
             {
                 path = _bmp;
                 point = _point;
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
 
-                using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
+                using (Stream m = Cryptography.DecryptFile(path, Key, IV))
                 {
                     Bitmap bmp = new Bitmap(m);
                     if (bmp.RawFormat.Equals(ImageFormat.Gif))
@@ -420,22 +429,24 @@ namespace MELHARFI
             /// <param name="_bmp">Path of the bitmap as string</param>
             /// <param name="_point">Point were the picture will be drawn on the form</param>
             /// <param name="_size">_size is defined by it's width value and height value, making a image expanded</param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="manager">Reference to the manager instance that hold this object</param>
-            public Bmp(string _bmp, Point _point, Size _size, byte crypt, Manager manager)
+            public Bmp(string _bmp, Point _point, Size _size, string Key, string IV, Manager manager)
             {
                 path = _bmp;
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
                 point = _point;
-                
-                using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
+
+                using (Stream m = Cryptography.DecryptFile(path, Key, IV))
                 {
                     Bitmap tmp = new Bitmap(m);
                     if (!tmp.RawFormat.Equals(ImageFormat.Gif))
                         bmp = new Bitmap(new Bitmap(m), _size);
                     else
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
-                    tmp.Dispose();
                 }
                 rectangle = new Rectangle(new Point(0, 0), _size);
                 parentManager = manager;
@@ -539,8 +550,10 @@ namespace MELHARFI
             /// <param name="_name">String value as a name of the object</param>
             /// <param name="_typeGfx">To record the type of the object, useful if you need to now in which layer is stored</param>
             /// <param name="_visible">Boolean value, if true the object is visible, if false the object is invisible</param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="manager">Reference to the manager instance that hold this object</param>
-            public Bmp(string _bmp, Point _point, string _name, TypeGfx _typeGfx, bool _visible, byte crypt, Manager manager)
+            public Bmp(string _bmp, Point _point, string _name, TypeGfx _typeGfx, bool _visible, string Key, string IV, Manager manager)
             {
                 // instancier sans spésification de la taille, (taille d'origine de l'image)
                 path = _bmp;
@@ -548,7 +561,8 @@ namespace MELHARFI
                 name = _name;
                 visible = _visible;
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
 
                 switch (_typeGfx)
                 {
@@ -568,7 +582,7 @@ namespace MELHARFI
                         throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
                 }
 
-                using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
+                using (Stream m = Cryptography.DecryptFile(path, Key, IV))
                 {
                     bmp = new Bitmap(m);
                     if (bmp.RawFormat.Equals(ImageFormat.Gif))
@@ -587,8 +601,10 @@ namespace MELHARFI
             /// <param name="_name">String value as a name of the object</param>
             /// <param name="_typeGfx">To record the type of the object, useful if you need to now in which layer is stored</param>
             /// <param name="_visible">Boolean value, if true the object is visible, if false the object is invisible</param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="manager">Reference to the manager instance that hold this object</param>
-            public Bmp(string _bmp, Point _point, string _name, TypeGfx _typeGfx, bool _visible, byte crypt, Rectangle _rectangle, Manager manager)
+            public Bmp(string _bmp, Point _point, string _name, TypeGfx _typeGfx, bool _visible, string Key, string IV, Rectangle _rectangle, Manager manager)
             {
                 // instancier sans spésification de la taille, (taille d'origine de l'image)
                 path = _bmp;
@@ -596,7 +612,8 @@ namespace MELHARFI
                 name = _name;
                 visible = _visible;
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
                 rectangle = _rectangle;
                 IsSpriteSheet = true;
 
@@ -618,7 +635,7 @@ namespace MELHARFI
                         throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
                 }
 
-                using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
+                using (Stream m = Cryptography.DecryptFile(path, Key, IV))
                 {
                     bmp = new Bitmap(m);
                     if (bmp.RawFormat.Equals(ImageFormat.Gif))
@@ -681,12 +698,15 @@ namespace MELHARFI
             /// <param name="_name">String value as a name of the object</param>
             /// <param name="_typeGfx">To record the type of the object, useful if you need to now in which layer is stored</param>
             /// <param name="_visible">Boolean value, if true the object is visible, if false the object is invisible</param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="manager">Reference to the manager instance that hold this object</param>
-            public Bmp(string _bmp, Point _point, Size _size, string _name, TypeGfx _typeGfx, bool _visible, byte crypt, Manager manager)
+            public Bmp(string _bmp, Point _point, Size _size, string _name, TypeGfx _typeGfx, bool _visible, string Key, string IV, Manager manager)
             {
                 path = _bmp;
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
                 point = _point;
                 name = _name;
                 visible = _visible;
@@ -709,7 +729,7 @@ namespace MELHARFI
                         throw new ArgumentOutOfRangeException(nameof(_typeGfx) + " type is not supported", _typeGfx, null);
                 }
 
-                using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
+                using (Stream m = Cryptography.DecryptFile(path, Key, IV))
                 {
                     Bitmap tmp = new Bitmap(m);
                     if (!tmp.RawFormat.Equals(ImageFormat.Gif))
@@ -779,8 +799,11 @@ namespace MELHARFI
             /// <param name="_name">String value as a name of the object</param>
             /// <param name="_typeGfx">To record the type of the object, useful if you need to now in which layer is stored</param>
             /// <param name="_visible">Boolean value, if true the object is visible, if false the object is invisible</param>
+            /// <param name="opacity">Float value indicating the transparency of the object, ex if value equal 0F then the object is invisible, if equal to 0.5F the transparent by 50%, if equal to 1F then completly opaque</param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="manager">Reference to the manager instance that hold this object</param>
-            public Bmp(string _bmp, Point _point, Size _size, string _name, TypeGfx _typeGfx, bool _visible, float opacity, byte crypt, Manager manager)
+            public Bmp(string _bmp, Point _point, Size _size, string _name, TypeGfx _typeGfx, bool _visible, float opacity, string Key, string IV, Manager manager)
             {
                 path = _bmp;
                 point = _point;
@@ -788,7 +811,8 @@ namespace MELHARFI
                 visible = _visible;
                 Opacity = opacity;
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
 
                 switch (_typeGfx)
                 {
@@ -808,7 +832,7 @@ namespace MELHARFI
                         throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
                 }
 
-                using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, crypt))))
+                using (Bitmap tmp = new Bitmap(Cryptography.DecryptFile(path, Key, IV)))
                 {
                     if (tmp.RawFormat.Equals(ImageFormat.Gif))
                         bmp = MELHARFI.Manager.Opacity(new Bitmap(tmp, _size), opacity);
@@ -919,8 +943,10 @@ namespace MELHARFI
             /// <param name="_typeGfx">To record the type of the object, useful if you need to now in which layer is stored</param>
             /// <param name="_visible">Boolean value, if true the object is visible, if false the object is invisible</param>
             /// <param name="opacity">Float value indicating the transparency of the object, ex if value equal 0F then the object is invisible, if equal to 0.5F the transparent by 50%, if equal to 1F then completly opaque</param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="manager">Reference to the manager instance that hold this object</param>
-            public Bmp(string _bmp, Point _point, string _name, TypeGfx _typeGfx, bool _visible, float opacity, byte crypt, Manager manager)
+            public Bmp(string _bmp, Point _point, string _name, TypeGfx _typeGfx, bool _visible, float opacity, string Key, string IV, Manager manager)
             {
                 path = _bmp;
                 name = _name;
@@ -928,7 +954,8 @@ namespace MELHARFI
                 Opacity = opacity;
                 point = _point;
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
 
                 switch (_typeGfx)
                 {
@@ -948,7 +975,7 @@ namespace MELHARFI
                         throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
                 }
 
-                using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
+                using (Stream m = Cryptography.DecryptFile(path, Key, IV))
                 {
                     bmp = Opacity(new Bitmap(new Bitmap(m)), opacity);
                     if (bmp.RawFormat.Equals(ImageFormat.Gif))
@@ -967,8 +994,10 @@ namespace MELHARFI
             /// <param name="_typeGfx">To record the type of the object, useful if you need to now in which layer is stored</param>
             /// <param name="_visible">Boolean value, if true the object is visible, if false the object is invisible</param>
             /// <param name="opacity">Float value indicating the transparency of the object, ex if value equal 0F then the object is invisible, if equal to 0.5F the transparent by 50%, if equal to 1F then completly opaque</param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="manager">Reference to the manager instance that hold this object</param>
-            public Bmp(string _bmp, Point _point, string _name, TypeGfx _typeGfx, bool _visible, float opacity, byte crypt, Rectangle _rectangle, Manager manager)
+            public Bmp(string _bmp, Point _point, string _name, TypeGfx _typeGfx, bool _visible, float opacity, string Key, string IV, Rectangle _rectangle, Manager manager)
             {
                 path = _bmp;
                 name = _name;
@@ -976,7 +1005,8 @@ namespace MELHARFI
                 Opacity = opacity;
                 point = _point;
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
 
                 switch (_typeGfx)
                 {
@@ -996,7 +1026,7 @@ namespace MELHARFI
                         throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
                 }
 
-                using (MemoryStream m = new MemoryStream(Cryptography.DecryptFile(path, crypt)))
+                using (Stream m = Cryptography.DecryptFile(path, Key, IV))
                 {
                     bmp = Opacity(new Bitmap(m), opacity);
                     if (bmp.RawFormat.Equals(ImageFormat.Gif))
@@ -1021,7 +1051,7 @@ namespace MELHARFI
                     Opacity = 1;
                     Bitmap bmp2;    // clone pour eviter un probleme "l'objet est actuelement utilisé ailleur"
                     if (Crypted)
-                        using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, Crypt))))
+                        using (Bitmap tmp = new Bitmap(Cryptography.DecryptFile(path, key, iv)))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
                                 bmp2 = new Bitmap(new Bitmap(tmp), bmp.Size);
                             else
@@ -1058,7 +1088,7 @@ namespace MELHARFI
                     path = _bmp;
                     Opacity = 1;
                     if (Crypted)
-                        using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, Crypt))))
+                        using (Bitmap tmp = new Bitmap(Cryptography.DecryptFile(path, key, iv)))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
                                 bmp = new Bitmap(new Bitmap(tmp), _size.Width, _size.Height);
                             else
@@ -1093,7 +1123,7 @@ namespace MELHARFI
                     path = _bmp;
                     Opacity = 1;
                     if (Crypted)
-                        using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, Crypt))))
+                        using (Bitmap tmp = new Bitmap(Cryptography.DecryptFile(path, key, iv)))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
                                 bmp = new Bitmap(new Bitmap(tmp), bmp.Size);
                             else
@@ -1128,7 +1158,7 @@ namespace MELHARFI
                     path = _bmp;
                     Opacity = opacity;
                     if (Crypted)
-                        using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, Crypt))))
+                        using (Bitmap tmp = new Bitmap(Cryptography.DecryptFile(path, key, iv)))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
                                 bmp = Opacity(new Bitmap(tmp, bmp.Size), opacity);
                             else
@@ -1164,7 +1194,7 @@ namespace MELHARFI
                     path = _bmp;
                     Opacity = opacity;
                     if (Crypted)
-                        using (Bitmap tmp = new Bitmap(new MemoryStream(Cryptography.DecryptFile(path, Crypt))))
+                        using (Bitmap tmp = new Bitmap(Cryptography.DecryptFile(path, key, iv)))
                             if (!tmp.RawFormat.Equals(ImageFormat.Gif))
                                 bmp = Opacity(new Bitmap(tmp, bmp.Size), opacity);
                             else

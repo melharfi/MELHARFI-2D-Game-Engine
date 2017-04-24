@@ -48,9 +48,14 @@ namespace MELHARFI
             public bool Crypted;
 
             /// <summary>
-            /// Byte value between 0 until 255, it's the value of encrypting algorithme
+            /// key is string of 8 characters (first key) for Rijndael AES encryption
             /// </summary>
-            public byte Crypt;
+            public string key;
+
+            /// <summary>
+            /// iv is string of 8 characters called Initializing Vector (second key) for Rijndael AES encryption
+            /// </summary>
+            public string iv;
 
             /// <summary>
             /// Layer holding sub graphics that is shown in the front of the parent, and its position is relative to parent
@@ -137,12 +142,14 @@ namespace MELHARFI
             /// Anim constructor
             /// </summary>
             /// <param name="interval">Int value indicating time between each frame</param>
-            /// <param name="crypt">Byte value betwwen 0 until 255 for decrypting the frame</param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="manager">Reference of Manager instance that hold this object</param>
-            public Anim(int interval, byte crypt, Manager manager)
+            public Anim(int interval, string Key, string IV, Manager manager)
             {
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
                 _interval = interval;
 
                 aTimer = new Timer(interval) { AutoReset = true };
@@ -170,16 +177,18 @@ namespace MELHARFI
             /// <summary>
             /// Anim constructor
             /// </summary>
-            /// <param name="crypt">Byte value betwwen 0 until 255 for decrypting the frame</param>
+            /// <param name="Key">string value of 8 character, it's the first key of Rijndael AES encryption</param>
+            /// <param name="IV">string value of 8 character, it's the second key of Rijndael AES encryption called Initializing Vector</param>
             /// <param name="manager">Reference of Manager instance that hold this object</param>
-            public Anim(byte crypt, Manager manager)
+            public Anim(string Key, string IV, Manager manager)
             {
                 // quand on aimerai attribuer un timer a chaque frame
                 // a combiner avec un constructeur qui contiens le variable Interval :
                 // public void AddCell(string asset, int id, int posX, int posY,int Interval)
 
                 Crypted = true;
-                Crypt = crypt;
+                key = Key;
+                iv = IV;
                 _interval = 50;
 
                 aTimer = new Timer(50) { AutoReset = true };
@@ -247,16 +256,16 @@ namespace MELHARFI
                 switch (typeGfx)
                 {
                     case TypeGfx.Background:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, key, iv, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, parentManager);
 
                         img.TypeGfx = TypeGfx.Background;
                         break;
                     case TypeGfx.Object:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, key, iv, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, parentManager);
                         img.TypeGfx = TypeGfx.Object;
                         break;
                     case TypeGfx.Top:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, key, iv, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, parentManager);
                         img.TypeGfx = TypeGfx.Top;
                         break;
                     default:
@@ -275,15 +284,15 @@ namespace MELHARFI
                 switch (typeGfx)
                 {
                     case TypeGfx.Background:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, key, iv, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, parentManager);
                         img.TypeGfx = TypeGfx.Background;
                         break;
                     case TypeGfx.Object:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Object, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Object, true, key, iv, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, parentManager);
                         img.TypeGfx = TypeGfx.Object;
                         break;
                     case TypeGfx.Top:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Top, true, Crypt, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Top, true, key, iv, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, parentManager);
                         img.TypeGfx = TypeGfx.Top;
                         img.rectangle = cellList[Counter].rec;
                         break;
@@ -306,17 +315,17 @@ namespace MELHARFI
                 switch (typeGfx)
                 {
                     case TypeGfx.Background:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, rectangle, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, key, iv, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Background, true, rectangle, parentManager);
                         img.rectangle = cellList[0].rec;
                         img.TypeGfx = TypeGfx.Background;
                         break;
                     case TypeGfx.Object:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, rectangle, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, key, iv, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Object, true, rectangle, parentManager);
                         img.rectangle = cellList[0].rec;
                         img.TypeGfx = TypeGfx.Object;
                         break;
                     case TypeGfx.Top:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, rectangle, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, key, iv, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), "unamedAnim", TypeGfx.Top, true, rectangle, parentManager);
                         img.rectangle = cellList[0].rec;
                         img.TypeGfx = TypeGfx.Top;
                         break;
@@ -337,17 +346,17 @@ namespace MELHARFI
                 switch (typeGfx)
                 {
                     case TypeGfx.Background:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, rectangle, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, key, iv, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Background, true, rectangle, parentManager);
                         img.rectangle = cellList[0].rec;
                         img.TypeGfx = TypeGfx.Background;
                         break;
                     case TypeGfx.Object:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Object, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Object, true, rectangle, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Object, true, key, iv, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Object, true, rectangle, parentManager);
                         img.rectangle = cellList[0].rec;
                         img.TypeGfx = TypeGfx.Object;
                         break;
                     case TypeGfx.Top:
-                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Top, true, Crypt, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Top, true, rectangle, parentManager);
+                        img = crypted ? new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Top, true, key, iv, rectangle, parentManager) : new Bmp(cellList[0].cell, new Point(cellList[Counter].posX, cellList[Counter].posY), Name, TypeGfx.Top, true, rectangle, parentManager);
                         img.rectangle = cellList[0].rec;
                         img.TypeGfx = TypeGfx.Top;
                         break;
@@ -477,7 +486,7 @@ namespace MELHARFI
 
                 if (Crypted)
                 {
-                    Bitmap uncryptedBitmap = new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt)));
+                    Bitmap uncryptedBitmap = new Bitmap(Cryptography.DecryptFile(asset, key, iv));
                     Bitmap resizedBitmap = new Bitmap(uncryptedBitmap, new Size(width, height));
                     cell.bitmap = resizedBitmap;
                 }
@@ -513,7 +522,7 @@ namespace MELHARFI
                 };
                 if (Crypted)
                 {
-                    Bitmap uncryptedBitmap = new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt)));
+                    Bitmap uncryptedBitmap = new Bitmap(Cryptography.DecryptFile(asset, key, iv));
                     Bitmap resizedBitmap = new Bitmap(uncryptedBitmap, new Size(width, height));
                     cell.bitmap = resizedBitmap;
                 }
@@ -548,7 +557,7 @@ namespace MELHARFI
                 };
                 if (Crypted)
                 {
-                    Bitmap uncryptedBitmap = new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt)));
+                    Bitmap uncryptedBitmap = new Bitmap(Cryptography.DecryptFile(asset, key, iv));
                     Bitmap resizedBitmap = new Bitmap(uncryptedBitmap, new Size(width, height));
                     cell.bitmap = resizedBitmap;
                 }
@@ -584,7 +593,7 @@ namespace MELHARFI
 
                 if (Crypted)
                 {
-                    Bitmap uncryptedBitmap = new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt)));
+                    Bitmap uncryptedBitmap = new Bitmap(Cryptography.DecryptFile(asset, key, iv));
                     Bitmap resizedBitmap = new Bitmap(uncryptedBitmap, new Size(width, height));
                     cell.bitmap = resizedBitmap;
                 }
@@ -623,7 +632,7 @@ namespace MELHARFI
 
                 if (Crypted)
                 {
-                    Bitmap uncryptedBitmap = new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt)));
+                    Bitmap uncryptedBitmap = new Bitmap(Cryptography.DecryptFile(asset, key, iv));
                     Bitmap resizedBitmap = new Bitmap(uncryptedBitmap, new Size(width, height));
                     cell.bitmap = resizedBitmap;
                 }
@@ -656,7 +665,7 @@ namespace MELHARFI
                     Opacity = 1,
                     interval = _interval,
                     bitmap =
-                        Crypted ? new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt))) : new Bitmap(asset)
+                        Crypted ? new Bitmap(Cryptography.DecryptFile(asset, key, iv)) : new Bitmap(asset)
                 };
 
                 cellList.Add(cell);
@@ -682,7 +691,7 @@ namespace MELHARFI
                     interval = _interval,
                     rec = rec,
                     bitmap =
-                        Crypted ? new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt))) : new Bitmap(asset)
+                        Crypted ? new Bitmap(Cryptography.DecryptFile(asset, key, iv)) : new Bitmap(asset)
                 };
 
                 cellList.Add(cell);
@@ -707,7 +716,7 @@ namespace MELHARFI
                     Opacity = 1,
                     interval = Interval,
                     bitmap =
-                        Crypted ? new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt))) : new Bitmap(asset)
+                        Crypted ? new Bitmap(Cryptography.DecryptFile(asset, key, iv)) : new Bitmap(asset)
                 };
 
                 cellList.Add(cell);
@@ -736,7 +745,7 @@ namespace MELHARFI
                 };
                 cell.interval = Interval;
 
-                cell.bitmap = Crypted ? new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt))) : new Bitmap(asset);
+                cell.bitmap = Crypted ? new Bitmap(Cryptography.DecryptFile(asset, key, iv)) : new Bitmap(asset);
 
                 cellList.Add(cell);
             }
@@ -761,7 +770,7 @@ namespace MELHARFI
                     interval = _interval
                 };
 
-                var tmp = Crypted ? new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt))) : new Bitmap(asset);
+                var tmp = Crypted ? new Bitmap(Cryptography.DecryptFile(asset, key, iv)) : new Bitmap(asset);
 
                 cell.bitmap = MELHARFI.Manager.Opacity(tmp, opacity);
                 cellList.Add(cell);
@@ -789,7 +798,7 @@ namespace MELHARFI
                     rec = rec
                 };
 
-                var tmp = Crypted ? new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt))) : new Bitmap(asset);
+                var tmp = Crypted ? new Bitmap(Cryptography.DecryptFile(asset, key, iv)) : new Bitmap(asset);
 
                 cell.bitmap = MELHARFI.Manager.Opacity(tmp, opacity);
                 cellList.Add(cell);
@@ -816,7 +825,7 @@ namespace MELHARFI
                     interval = Interval
                 };
 
-                var tmp = Crypted ? new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt))) : new Bitmap(asset);
+                var tmp = Crypted ? new Bitmap(Cryptography.DecryptFile(asset, key, iv)) : new Bitmap(asset);
 
                 cell.bitmap = MELHARFI.Manager.Opacity(tmp, opacity);
                 cellList.Add(cell);
@@ -845,7 +854,7 @@ namespace MELHARFI
                     rec = rec
                 };
 
-                var tmp = Crypted ? new Bitmap(new MemoryStream(Cryptography.DecryptFile(asset, Crypt))) : new Bitmap(asset);
+                var tmp = Crypted ? new Bitmap(Cryptography.DecryptFile(asset, key, iv)) : new Bitmap(asset);
 
                 cell.bitmap = MELHARFI.Manager.Opacity(tmp, opacity);
                 cellList.Add(cell);
