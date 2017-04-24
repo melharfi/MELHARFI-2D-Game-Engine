@@ -1,5 +1,3 @@
-# UPDATE IN PROGRESS, WAIT UNTIL FINISHING PLEASE
-
 # MELHARFI 2D Game Engine 1.4
 2D Game Engine + Network Library + Pathfinding + Windows GUI + Mouse Event handler "ALL-IN-ONE"
 
@@ -147,7 +145,7 @@ The issue come when you resize a picture, its pixels inside becomes different th
 
 No special effect in animation like particle animation unless you add another library. No rotation of image unless you create many instances of images in different situation and use it like animation by showing them one by one (purpose of Anim class)
 
-It work only in windows form, no cross-platform
+It work only in windows form, no cross-platform "Linux / Mac"
 
 I apologize if I say a mistake about something,
 My code may look not optimized for some.
