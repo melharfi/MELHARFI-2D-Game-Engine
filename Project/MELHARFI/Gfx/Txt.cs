@@ -262,6 +262,9 @@ namespace MELHARFI
             {
                 Text = _txt;
                 point = _point;
+                zindex = ZOrder.Bgr();
+                TypeGfx = MELHARFI.Manager.TypeGfx.Background;
+
                 parentManager = manager;
             }
 

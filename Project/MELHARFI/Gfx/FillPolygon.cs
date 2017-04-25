@@ -236,7 +236,25 @@ namespace MELHARFI
                 name = _name;
                 visible = _visible;
                 fillMode = _fillMode;
-                rectangle = GetRectangle(_point); 
+                rectangle = GetRectangle(_point);
+
+                switch (_typeGfx)
+                {
+                    case MELHARFI.Manager.TypeGfx.Background:
+                        zindex = ZOrder.Bgr();
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
+                        break;
+                    case MELHARFI.Manager.TypeGfx.Object:
+                        zindex = ZOrder.Obj();
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
+                        break;
+                    case MELHARFI.Manager.TypeGfx.Top:
+                        zindex = ZOrder.Top();
+                        TypeGfx = MELHARFI.Manager.TypeGfx.Top;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
+                }
             }
             #endregion
 
