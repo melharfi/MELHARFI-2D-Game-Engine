@@ -3,7 +3,7 @@
 
 ## *Description*
 
-MELHARFI.dll is a standalone DLL that lets you create 2D games in a simple way or add an animated graphics on a you application.
+MELHARFI.dll is a standalone DLL that to create 2D games easily or add an animated graphics on a you application.
 Don't worry about many details in the usual way or adding a complex third party application, only to make some dynamic graphics in your form.
 
 It's commonly useful for beginners and for advanced people, as I’ll show you my own game that I build with it (at the end of that topic).
@@ -41,7 +41,6 @@ https://github.com/melharfi/MELHARFI-2D-Game-Engine/wiki
  
 *AStar* algorithm to find the way path between point A to point B in a Map with obstacles to make a movement of a player.
 
-
 *Network library to create an awesome Client / Server application for networking games
 
  Its LidgrenNetwork library inside my library, all thanks goes to him
@@ -62,35 +61,38 @@ The library is divided into 3 pieces:
 What is 2D Game Engine?
 
 ### Response 1
-The 2D game engine is a library that you can integrate into your existing project and lets you build games or graphics representations. The engine already handles many details about initializing game parameters, screens, and events. You won't have to get bored with the gritty details and then create a game in some few lines of code.
+The 2D game engine is a library you can integrate into your existing project and lets you build games or graphics representations.
+The engine already handles many details about initializing game parameters, screens, and events. You won't have to get bored with the gritty details and then create a game in some few lines of code.
 
 ### Question 2
 Why another 2D game engine while there are dozens of them?
 
 ### Response 2 :
-In reality, I have a passion for creating games it was some couple of years. I just wanted to create a game like you right now.
+In reality, I have a passion for creating games it was some couple of years.
+I just wanted to create a game like you right now.
 
-my favorite games were always 2D especially RPG/MMORPGs. you'll soon see that there's not a lot of 2D MMORPG games (good ones), nor 2D games engines, maybe some old ones, but they are no longer supported, like SDL or XNA(reported to MONO by now).
-You'll soon get stuck and no one can help you as i already try them.
+My favorite games were always 2D especially RPG/MMORPGs.
+You'll soon see that there's not a lot of 2D MMORPG games (good ones), nor 2D games engines, maybe some old ones, but they are no longer supported, like SDL or XNA(reported to MONO by now).
+You'll soon get stuck and no one can help you as i already try them and documentation is poor.
 In the other hand, I was only familiar with C# language and the .NET technology, so most of the engines was in C++.
 
 ### Question 3
 What distinguishes it from the others 2D Game Engines
 
 ### Response 3:
-create a game is not that hard using any library/engine you want with some peace of code given to help you to start, BUT the big problem I found is when I need to create some GUI (Graphic User Interface "controls") to interact with user, as a Chat Box, Text Input, Buttons, copy/paste / click i didn't find any clue
+create a game is not that hard using any library/engine you want with some peace of code given to help you to start, BUT the big problem I found is when I need to create some GUI (Graphic User Interface "controls") to interact with user, as a Chat Box, Text Input, Buttons, copy/paste / click ... i didn't find any clue
 
-So you have to create all of them programmatically and design them and I know that create a game is easier than creating a controls itself because it needs to handle some windows events like click/Keyboard on the shape and so many other stuff ... you know it's really complicated.
+So you have to create all of them programmatically and design them and I know that create a game is easier than creating a controls itself because it needs to handle some advanced windows events like click/Keyboard on the shape and so many other stuff ... you know it's really complicated.
 
-In fact, there are some GUI Engines but it was ugly as far as i know, or not in the same language (C++) or it needs special configuration, working only with DirectX or not free ... oh my god.
+In fact, there are some GUI Engines but i found them ugly as far as i know, or not in the same language (C++) or it needs special configuration, working only with DirectX or not free ... oh my god.
 
-So I just wanted to use the same controls that all we know, those of Windows, pretty good and perfect.
+I just wanted to use the same controls that all we know, those of Windows, pretty good and perfect.
 
 I soon get frustrated by that obstacle, and I found NO game engine that integrates some GUI inside.
 
 All the engine use the DirectX technology to create games, and if you've done some try in programming with that technology you should know how it's hard to interact with the DirectX, so complicated FOR ME, so I wanted something simple,
 
-Another problem was the handling of Mouse Event because you should program yourself and I didn't find it already supported in any engines.
+Another problem was the interaction between object drawn and mouse handling Event because you should program it yourself and I didn't find it already supported in any engines.
 
 Another problem was to integrate a network library to make my game multiplayer.
 
@@ -112,31 +114,35 @@ After some search I found NOTHING that I can appreciate, so here is the deal
 
 Searching google ...> nothing dud lol
 
-What a good challenge if I write it myself and include all that in ALL-In-One !!
+What a good challenge if I write it myself and include all that in ALL-In-One and be Standlone !!
 and job done for you, don't worry anymore ^^
 
 ### Question 4
 Why GDI+? DirectX is more powerful that GDI+
 
 ### Response 4
-Windows use GDI+ to draw some stuff on the Forms of its applications, and it was not created for gaming purpose, even it's not supposed to support so many stuff on the same form, BUT nothing stops you from using it.
+Windows use GDI+ to draw some stuff on the Forms of its applications, it was not created for gaming purpose, even it's not supposed to support so many stuff on the same form, BUT nothing stops you from using it.
 
-in fact, GDI+ is slower because it was not designed for such thing BUT only in the really old and slow computers like Pentium 3 or earlier with the old windows version, all of us use minimum a Core processor that is sufficient to handle it.
+In fact, GDI+ is slower because it was not designed for such thing BUT only in the really old and slow computers like Pentium 3 or earlier with the old windows version, all of us use minimum a Core processor that is sufficient to handle it.
 
 DirectX uses many technologies that let it pretty fast but if you are not a master of programming you can't achieve what you want.
 
 Another thing is, that lib is not only made for gaming purpose, it's a way to animate your application or a representation.
-Showing a tutorial in the first starting of your application for example, or a lot of stuff you can do liek graphic representation ...
+Showing a tutorial in the first starting of your application for example, or a lot of stuff you can do like graphic representation ...
 
 ### Question 5
 Does this library need me to know programming 
 
 ### Response 5
-Yes, the library only cares about creating a context of gaming, like initializing the GDI+, parameters of the screen, double buffering and encapsulation of method that let you draw things on the screen instead of the original stuff a bit hard to figure out.
+Yes, the library only cares about creating a context of gaming, parameters of the screen, double buffering and encapsulation of methods that let you draw things on the screen instead of the original methods not obvious.
 
-Make the network interaction, generating waypoint for a player, handling mouse event, I could add other stuff but my engine was created in the context of what my game needed until now, (well I had stopped to continue my game because of less time I have and other personal stuff)
+There is a code to help you use the engine with all its modules (Network, Pathfinding, Graphics, Mouse Events ...).
+I could add other stuff but my engine was created in the context of what my game need so far, (well I had stopped to continue my game because of less time I have and other personal stuff) but i still continue make it more advanced
 
-so you had to know or learn.Net technology to finish your game but I am sure that it's not really hard to achieve what you need as i give you a wiki tutorial to start with.
+Yes you need to know how to code with Net technology to achieve what you want but I am sure that it's not really hard.
+
+Remember that there is a Wiki section to help you use this library : 
+https://github.com/melharfi/MELHARFI-2D-Game-Engine/wiki
 
 ### Question 6
 What is the disadvantage of MELHARFI 2D Game Engine ?
