@@ -99,7 +99,11 @@ namespace MELHARFI
                                     {
                                         FillPolygon childF = t as FillPolygon;
                                         if (childF.Visible)
+                                        {
                                             e.Graphics.FillPolygon(childF.brush, childF.point, childF.fillMode);
+                                            if (childF.BorderColor != null)
+                                                e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
+                                        }
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -162,6 +166,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = a.img.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -221,6 +227,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = t.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -280,6 +288,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = r.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -293,6 +303,8 @@ namespace MELHARFI
 
                                 #region parent
                                 e.Graphics.FillPolygon(f.brush, f.point, f.fillMode);
+                                if (f.BorderColor != null)
+                                    e.Graphics.DrawPolygon(new Pen(f.BorderColor, f.BorderWidth), f.point);
                                 #endregion
                                 #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
@@ -339,6 +351,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = f.rectangle.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -412,6 +426,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = b.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -474,6 +490,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = a.img.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -533,6 +551,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = t.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -592,6 +612,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = r.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -605,6 +627,8 @@ namespace MELHARFI
 
                                 #region parent
                                 e.Graphics.FillPolygon(f.brush, f.point, f.fillMode);
+                                if (f.BorderColor != null)
+                                    e.Graphics.DrawPolygon(new Pen(f.BorderColor, f.BorderWidth), f.point);
                                 #endregion
                                 #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
@@ -651,6 +675,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = f.rectangle.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -724,6 +750,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = b.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -786,6 +814,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = a.img.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -845,6 +875,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = t.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -904,6 +936,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = r.point.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////
@@ -917,6 +951,8 @@ namespace MELHARFI
 
                                 #region parent
                                 e.Graphics.FillPolygon(f.brush, f.point, f.fillMode);
+                                if (f.BorderColor != null)
+                                    e.Graphics.DrawPolygon(new Pen(f.BorderColor, f.BorderWidth), f.point);
                                 #endregion
                                 #region childs
                                 ////////// affichage des elements enfants de l'objet Bmp
@@ -963,6 +999,8 @@ namespace MELHARFI
                                             newPoint[cnt].Y = f.rectangle.Y + childF.point[cnt].Y;
                                         }
                                         e.Graphics.FillPolygon(childF.brush, newPoint, childF.fillMode);
+                                        if (childF.BorderColor != null)
+                                            e.Graphics.DrawPolygon(new Pen(childF.BorderColor, childF.BorderWidth), childF.point);
                                     }
                                 }
                                 //////////////////////////////////////////////////

@@ -208,6 +208,16 @@ namespace MELHARFI
                 set { _rectangle = value; }
             }
 
+            /// <summary>
+            /// Color of Border
+            /// </summary>
+            public Color BorderColor;
+
+            /// <summary>
+            /// Width of Border
+            /// </summary>
+            public int BorderWidth;
+
             private Manager parentManager;
 
             /// <summary>
@@ -227,7 +237,17 @@ namespace MELHARFI
             #endregion
 
             #region constructors
-            public FillPolygon(Manager manager, Brush _brush, Point[] _point, TypeGfx _typeGfx, string _name, bool _visible, FillMode _fillMode)
+            /// <summary>
+            /// Draw filled polygon without border
+            /// </summary>
+            /// <param name="_brush">Color of filled area</param>
+            /// <param name="_point">Points of polygone</param>
+            /// <param name="_typeGfx">Type of graphic: Background, Object, Top</param>
+            /// <param name="_name">name</param>
+            /// <param name="_visible">true, false</param>
+            /// <param name="_fillMode">Alternate, Winding</param>
+            /// <param name="manager">manager who hold the object</param>
+            public FillPolygon(Brush _brush, Point[] _point, TypeGfx _typeGfx, string _name, bool _visible, FillMode _fillMode, Manager manager)
             {
                 parentManager = manager;
                 brush = _brush;
@@ -236,25 +256,33 @@ namespace MELHARFI
                 name = _name;
                 visible = _visible;
                 fillMode = _fillMode;
-                rectangle = GetRectangle(_point);
+                rectangle = GetRectangle(_point); 
+            }
 
-                switch (_typeGfx)
-                {
-                    case MELHARFI.Manager.TypeGfx.Background:
-                        zindex = ZOrder.Bgr();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Background;
-                        break;
-                    case MELHARFI.Manager.TypeGfx.Object:
-                        zindex = ZOrder.Obj();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Object;
-                        break;
-                    case MELHARFI.Manager.TypeGfx.Top:
-                        zindex = ZOrder.Top();
-                        TypeGfx = MELHARFI.Manager.TypeGfx.Top;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(_typeGfx), _typeGfx, null);
-                }
+            /// <summary>
+            /// Draw filled polygon without border
+            /// </summary>
+            /// <param name="_brush">Color of filled area</param>
+            /// <param name="_point">Points of polygone</param>
+            /// <param name="_typeGfx">Type of graphic: Background, Object, Top</param>
+            /// <param name="_name">name</param>
+            /// <param name="_visible">true, false</param>
+            /// <param name="_fillMode">Alternate, Winding</param>
+            /// <param name="borderColor">Color of border</param>
+            /// <param name="borderWidth">Border width</param>
+            /// <param name="manager">manager who hold the object</param>
+            public FillPolygon(Brush _brush, Point[] _point, TypeGfx _typeGfx, string _name, bool _visible, FillMode _fillMode, Color borderColor, int borderWidth, Manager manager)
+            {
+                parentManager = manager;
+                brush = _brush;
+                point = _point;
+                TypeGfx = _typeGfx;
+                name = _name;
+                visible = _visible;
+                fillMode = _fillMode;
+                BorderColor = borderColor;
+                BorderWidth = borderWidth;
+                rectangle = GetRectangle(_point);
             }
             #endregion
 
