@@ -29,7 +29,6 @@ namespace MELHARFI
             private int m_sendBufferNumMessages;
             private object m_tag;
             internal NetConnectionStatistics m_statistics;
-            public NetInfos ClientInfos = new NetInfos();
 
             /// <summary>
             /// Gets or sets the application defined object containing data about the connection
