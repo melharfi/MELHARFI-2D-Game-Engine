@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MELHARFI
 {
@@ -11,6 +12,7 @@ namespace MELHARFI
         object Tag { get; set; }
         bool Visible { get; set; }
         int Zindex { get; set; }
+        List<IGfx> Child { get; set; }
         Manager ParentManager { get; set; }
     }
 }
