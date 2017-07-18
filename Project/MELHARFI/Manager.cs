@@ -157,6 +157,7 @@ namespace MELHARFI
             RefreshTimer.Interval = Fps;
             RefreshTimer.Tick += refreshTimer_Tick;
             RefreshTimer.Enabled = true;
+            name = _name;
             ManagerInstances.Add(this, _name);
         }
         #endregion
