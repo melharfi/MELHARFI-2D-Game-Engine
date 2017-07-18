@@ -122,7 +122,19 @@ namespace MELHARFI
             /// <summary>
             /// Layer holding sub graphics that is shown in the front of the parent, and its position is relative to parent
             /// </summary>
-            public List<IGfx> Child = new List<IGfx>();
+            private List<IGfx> child = new List<IGfx>();
+
+            public List<IGfx> Child
+            {
+                get
+                {
+                    return child;
+                }
+                set
+                {
+                    child = value;
+                }
+            }
 
             /// <summary>
             /// Layer to memorise all sequaces of rectangles of a sprite sheet, it's only a user side, and not a engine mechanisme
@@ -297,6 +309,10 @@ namespace MELHARFI
                 if (bmp.RawFormat.Equals(ImageFormat.Gif))
                     ImageAnimator.Animate(bmp, null);
                 rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+
+                zindex = ZOrder.Bgr();
+                TypeGfx = MELHARFI.Manager.TypeGfx.Background;
+
                 parentManager = manager;
             }
 
@@ -317,6 +333,10 @@ namespace MELHARFI
 
                 rectangle = _rectangle;
                 IsSpriteSheet = true;
+
+                zindex = ZOrder.Bgr();
+                TypeGfx = MELHARFI.Manager.TypeGfx.Background;
+
                 parentManager = manager;
             }
 
@@ -346,6 +366,10 @@ namespace MELHARFI
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                 }
                 rectangle = new Rectangle(new Point(0, 0), new Size(bmp.Width, bmp.Height));
+
+                zindex = ZOrder.Bgr();
+                TypeGfx = MELHARFI.Manager.TypeGfx.Background;
+
                 parentManager = manager;
             }
 
@@ -375,6 +399,10 @@ namespace MELHARFI
 
                 rectangle = _rectangle;
                 IsSpriteSheet = true;
+
+                zindex = ZOrder.Bgr();
+                TypeGfx = MELHARFI.Manager.TypeGfx.Background;
+
                 parentManager = manager;
             }
 
@@ -402,6 +430,10 @@ namespace MELHARFI
                 }
                     
                 rectangle = new Rectangle(new Point(0, 0), _size);
+
+                zindex = ZOrder.Bgr();
+                TypeGfx = MELHARFI.Manager.TypeGfx.Background;
+
                 parentManager = manager;
             }
 
@@ -420,6 +452,10 @@ namespace MELHARFI
                 if (bmp.RawFormat.Equals(ImageFormat.Gif))
                     ImageAnimator.Animate(bmp, null);
                 rectangle = new Rectangle(new Point(0, 0), _size);
+
+                zindex = ZOrder.Bgr();
+                TypeGfx = MELHARFI.Manager.TypeGfx.Background;
+
                 parentManager = manager;
             }
 
@@ -449,6 +485,10 @@ namespace MELHARFI
                         throw new Exception("le cryptage d'une image Gif n'est pas possible vus qu'il provoque un probleme generique en GDI+");
                 }
                 rectangle = new Rectangle(new Point(0, 0), _size);
+
+                zindex = ZOrder.Bgr();
+                TypeGfx = MELHARFI.Manager.TypeGfx.Background;
+
                 parentManager = manager;
             }
 

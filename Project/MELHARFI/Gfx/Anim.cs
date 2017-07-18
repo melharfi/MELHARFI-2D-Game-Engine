@@ -60,7 +60,19 @@ namespace MELHARFI
             /// <summary>
             /// Layer holding sub graphics that is shown in the front of the parent, and its position is relative to parent
             /// </summary>
-            public List<IGfx> Child = new List<IGfx>();
+            private List<IGfx> child = new List<IGfx>();
+
+            public List<IGfx> Child
+            {
+                get
+                {
+                    return child;
+                }
+                set
+                {
+                    child = value;
+                }
+            }
 
             /// <summary>
             /// Make the animation run by a reversed mode

@@ -155,7 +155,19 @@ namespace MELHARFI
             /// <summary>
             /// Layer holding sub graphics that is shown in the front of the parent, and its position is relative to parent
             /// </summary>
-            public List<IGfx> Child = new List<IGfx>();
+            private List<IGfx> child = new List<IGfx>();
+
+            public List<IGfx> Child
+            {
+                get
+                {
+                    return child;
+                }
+                set
+                {
+                    child = value;
+                }
+            }
 
             /// <summary>
             /// Text is a string value to be drawn to screen
@@ -262,6 +274,9 @@ namespace MELHARFI
             {
                 Text = _txt;
                 point = _point;
+                zindex = ZOrder.Bgr();
+                TypeGfx = MELHARFI.Manager.TypeGfx.Background;
+
                 parentManager = manager;
             }
 
