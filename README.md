@@ -1,14 +1,16 @@
-# MELHARFI 2D Game Engine 1.5
+# MELHARFI 2D Game Engine 1.6
 2D Game Engine + Network Library + Pathfinding + Windows GUI + Mouse Event handler "ALL-IN-ONE"
 
 ## *Description*
 
-MELHARFI.dll is a standalone DLL to create 2D games easily or add an animated graphics to your application.
-Don't worry about many details in the usual way or adding a complex third party application, only to make some graphics in your form.
+MELHARFI.dll is a standalone DLL that to create 2D games easily or add an animated graphics on a you application.
+Don't worry about many details in the usual way or adding a complex third party application, only to make some dynamic graphics in your form.
 
-It's commonly useful for beginners and for advanced people.
+It's commonly useful for beginners and for advanced people, as I’ll show you my own game that I build with it (at the end of that topic).
 
-The library is built with C# so you can use it in any .NET language such as VB.NET since it supports .Net Framework 4.0 or higher and Visual Studio 2015 or higher (some lambda expression not handled by VS 2013 or older).
+The library is built in C# language so you can use it in any .NET language such as VB.NET while it supports Framework 4.0 or higher and Visual Studio 2015 or higher (some lambda expression not handled by VS 2013 or older).
+
+It's the first and unique library for graphics using GDI+ as far as I know.
 
 ## *Tutorial*
 
@@ -60,7 +62,7 @@ What is 2D Game Engine?
 
 ### Response 1
 The 2D game engine is a library you can integrate into your existing project and lets you build games or graphics representations.
-The engine already handles many details about initializing game parameters, screens, and events. You won't have to get bored with the gritty details and create a game in some few lines of code.
+The engine already handles many details about initializing game parameters, screens, and events. You won't have to get bored with the gritty details and then create a game in some few lines of code.
 
 ### Question 2
 Why another 2D game engine while there are dozens of them?
@@ -72,7 +74,7 @@ I just wanted to create a game like you right now.
 My favorite games were always 2D especially RPG/MMORPGs.
 You'll soon see that there's not a lot of 2D MMORPG games (good ones), nor 2D games engines, maybe some old ones, but they are no longer supported, like SDL or XNA(reported to MONO by now).
 You'll soon get stuck and no one can help you as i already try them and documentation is poor.
-In the other hand, I was only familiar with C# language and the .NET technology, most of the engines was in C++.
+In the other hand, I was only familiar with C# language and the .NET technology, so most of the engines was in C++.
 
 ### Question 3
 What distinguishes it from the others 2D Game Engines
@@ -82,9 +84,9 @@ create a game is not that hard using any library/engine you want with some peace
 
 So you have to create all of them programmatically and design them and I know that create a game is easier than creating a controls itself because it needs to handle some advanced windows events like click/Keyboard on the shape and so many other stuff ... you know it's really complicated.
 
-In fact, there are some GUI Engines shered but i found them ugly, or not in the same language (C++) or it needs special configuration, working only with DirectX or not free ... oh my god.
+In fact, there are some GUI Engines but i found them ugly as far as i know, or not in the same language (C++) or it needs special configuration, working only with DirectX or not free ... oh my god.
 
-I just wanted to use the same controls that all we know, those of Windows, pretty good.
+I just wanted to use the same controls that all we know, those of Windows, pretty good and perfect.
 
 I soon get frustrated by that obstacle, and I found NO game engine that integrates some GUI inside.
 
@@ -100,11 +102,11 @@ After some search I found NOTHING that I can appreciate, so here is the deal
 
 -I need a 2D game engine writing in .Net technology
 
--I need it to be simple, not in DirectX.
+-I need it to be simple, not in DirectX because it's so hard for me.
 
--I need the ability to add the controls (GUI).
+-I need the ability to add the controls (GUI)
 
--I need a network library for my multiplayer game.
+-I need a network library for my multiplayer game
 
 -I need an algorithm of path finding between point A until point B in a Map with obstacles.
 
@@ -135,7 +137,7 @@ Does this library need me to know programming
 Yes, the library only cares about creating a context of gaming, parameters of the screen, double buffering and encapsulation of methods that let you draw things on the screen instead of the original methods not obvious.
 
 There is a code to help you use the engine with all its modules (Network, Pathfinding, Graphics, Mouse Events ...).
-I could add other stuff but my engine was created in the context of what my game need so far, (well I had stopped to continue my game because of less time i have) but i still continue make it more advanced.
+I could add other stuff but my engine was created in the context of what my game need so far, (well I had stopped to continue my game because of less time I have and other personal stuff) but i still continue make it more advanced
 
 Yes you need to know how to code with Net technology to achieve what you want but I am sure that it's not really hard.
 
@@ -154,6 +156,10 @@ It work only in windows form, no cross-platform "Linux / Mac"
 
 I apologize if I say a mistake about something,
 My code may look not optimized for some.
+
+Here is 2 links about one game I design to let you get an idea how is powerful, sorry if it's in French
+https://www.youtube.com/watch?v=D6VQARWxfvs
+https://www.youtube.com/watch?v=ufQObcknmVY
 
 Licensed with MIT
 http://choosealicense.com/licenses/mit

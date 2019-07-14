@@ -12,7 +12,6 @@ namespace MELHARFI
     public partial class Manager
     {
         #region Champs
-
         /// <summary>
         /// Singleton of Manager that lead to deal with all graphic and drawing stuff
         /// </summary>
@@ -24,14 +23,14 @@ namespace MELHARFI
         public Graphics g;
 
         /// <summary>
-        /// mainForm is a pointer to your form where graphics should be drawn
+        /// Where drawing should be
         /// </summary>
         public Control control;
 
         /// <summary>
         /// Changing the background color, Black is the color by default if not initialized
         /// </summary>
-        public Color Background = Color.Black;
+        public Color BackgroundColor = Color.Black;
 
         /// <summary>
         /// Timer to refresh the paint method, it's considered as a part of the loop game system
@@ -39,10 +38,9 @@ namespace MELHARFI
         public Timer RefreshTimer = new Timer();
 
         /// <summary>
-        /// frame skip per seconds is the time the timer "refreshTimer" will call the paint method, it's considered as a part of the loop game system
+        /// frame skip per seconds is the time "refreshTimer" will call the paint method, it's considered as a part of the loop game system
         /// </summary>
         public int Fps = 40;
-
         [DllImport("user32.dll")]
         static extern IntPtr GetDC(IntPtr hWnd);
         [DllImport("user32.dll")]
@@ -131,6 +129,11 @@ namespace MELHARFI
         /// </summary>
         public static bool ShowErrorsInMessageBox = true;
 
+        /// <summary>
+        /// Padding is ... Padding -_-
+        /// </summary>
+        public Point Padding = Point.Empty;
+
         private string name;
 
         public string Name
@@ -189,7 +192,7 @@ namespace MELHARFI
         void control_Paint(object sender, PaintEventArgs e)
         {
             ImageAnimator.UpdateFrames();   // pour metre a jour les images gif animés
-            e.Graphics.Clear(Background);   // effacement de l'ecran
+            e.Graphics.Clear(BackgroundColor);   // effacement de l'ecran
             Draw(e);                        // methode de dessin
         }
 
