@@ -1,4 +1,6 @@
-﻿namespace MELHARFI
+﻿using System;
+
+namespace MELHARFI
 {
     namespace Lidgren.Network
     {
@@ -11,7 +13,7 @@
                 Finished
             }
 
-            private const int c_protocolMaxMTU = (int)(((ushort.MaxValue / 8.0f) - 1.0f));
+            private const int c_protocolMaxMTU = (int)((((float)ushort.MaxValue / 8.0f) - 1.0f));
 
             private ExpandMTUStatus m_expandMTUStatus;
 
@@ -23,6 +25,11 @@
             private int m_mtuAttemptFails;
 
             internal int m_currentMTU;
+
+            /// <summary>
+            /// Gets the current MTU in bytes. If PeerConfiguration.AutoExpandMTU is false, this will be PeerConfiguration.MaximumTransmissionUnit.
+            /// </summary>
+            public int CurrentMTU { get { return m_currentMTU; } }
 
             internal void InitExpandMTU(double now)
             {
@@ -73,13 +80,13 @@
                 if (m_smallestFailedMTU == -1)
                 {
                     // we've never encountered failure; expand by 25% each time
-                    tryMTU = (int)(m_currentMTU * 1.25f);
+                    tryMTU = (int)((float)m_currentMTU * 1.25f);
                     //m_peer.LogDebug("Trying MTU " + tryMTU);
                 }
                 else
                 {
                     // we HAVE encountered failure; so try in between
-                    tryMTU = (int)((m_smallestFailedMTU + (float)m_largestSuccessfulMTU) / 2.0f);
+                    tryMTU = (int)(((float)m_smallestFailedMTU + (float)m_largestSuccessfulMTU) / 2.0f);
                     //m_peer.LogDebug("Trying MTU " + m_smallestFailedMTU + " <-> " + m_largestSuccessfulMTU + " = " + tryMTU);
                 }
 
@@ -128,6 +135,7 @@
                 m_lastSentMTUAttemptTime = now;
 
                 m_statistics.PacketSent(len, 1);
+                m_peer.Recycle(om);
             }
 
             private void FinalizeMTU(int size)
@@ -138,6 +146,7 @@
                 m_currentMTU = size;
                 if (m_currentMTU != m_peerConfiguration.m_maximumTransmissionUnit)
                     m_peer.LogDebug("Expanded Maximum Transmission Unit to: " + m_currentMTU + " bytes");
+                return;
             }
 
             private void SendMTUSuccess(int size)
@@ -148,8 +157,9 @@
                 int len = om.Encode(m_peer.m_sendBuffer, 0, 0);
                 bool connectionReset;
                 m_peer.SendPacket(len, m_remoteEndPoint, 1, out connectionReset);
+                m_peer.Recycle(om);
 
-                // m_peer.LogDebug("Received MTU expand request for " + size + " bytes");
+                //m_peer.LogDebug("Received MTU expand request for " + size + " bytes");
 
                 m_statistics.PacketSent(len, 1);
             }

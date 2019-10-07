@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MELHARFI
 {
@@ -7,7 +8,7 @@ namespace MELHARFI
         /// <summary>
         /// Base for a non-threadsafe encryption class
         /// </summary>
-        public abstract class NetBlockEncryptionBase : INetEncryption
+        public abstract class NetBlockEncryptionBase : NetEncryption
         {
             // temporary space for one block to avoid reallocating every time
             private byte[] m_tmp;
@@ -20,7 +21,8 @@ namespace MELHARFI
             /// <summary>
             /// NetBlockEncryptionBase constructor
             /// </summary>
-            public NetBlockEncryptionBase()
+            public NetBlockEncryptionBase(NetPeer peer)
+                : base(peer)
             {
                 m_tmp = new byte[BlockSize];
             }
@@ -28,12 +30,12 @@ namespace MELHARFI
             /// <summary>
             /// Encrypt am outgoing message with this algorithm; no writing can be done to the message after encryption, or message will be corrupted
             /// </summary>
-            public bool Encrypt(NetOutgoingMessage msg)
+            public override bool Encrypt(NetOutgoingMessage msg)
             {
                 int payloadBitLength = msg.LengthBits;
                 int numBytes = msg.LengthBytes;
                 int blockSize = BlockSize;
-                int numBlocks = (int)Math.Ceiling(numBytes / (double)blockSize);
+                int numBlocks = (int)Math.Ceiling((double)numBytes / (double)blockSize);
                 int dstSize = numBlocks * blockSize;
 
                 msg.EnsureBufferSize(dstSize * 8 + (4 * 8)); // add 4 bytes for payload length at end
@@ -56,7 +58,7 @@ namespace MELHARFI
             /// </summary>
             /// <param name="msg">message to decrypt</param>
             /// <returns>true if successful; false if failed</returns>
-            public bool Decrypt(NetIncomingMessage msg)
+            public override bool Decrypt(NetIncomingMessage msg)
             {
                 int numEncryptedBytes = msg.LengthBytes - 4; // last 4 bytes is true bit length
                 int blockSize = BlockSize;

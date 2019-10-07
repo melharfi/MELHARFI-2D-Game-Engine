@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading;
+
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+#endif
 
 namespace MELHARFI
 {
@@ -16,9 +20,10 @@ namespace MELHARFI
 
             private int m_listenPort;
             private object m_tag;
+            private object m_messageReceivedEventCreationLock = new object();
 
             internal readonly List<NetConnection> m_connections;
-            private readonly Dictionary<IPEndPoint, NetConnection> m_connectionLookup;
+            private readonly Dictionary<NetEndPoint, NetConnection> m_connectionLookup;
 
             private string m_shutdownReason;
 
@@ -38,7 +43,13 @@ namespace MELHARFI
                 get
                 {
                     if (m_messageReceivedEvent == null)
-                        m_messageReceivedEvent = new AutoResetEvent(false);
+                    {
+                        lock (m_messageReceivedEventCreationLock) // make sure we don't create more than one event object
+                        {
+                            if (m_messageReceivedEvent == null)
+                                m_messageReceivedEvent = new AutoResetEvent(false);
+                        }
+                    }
                     return m_messageReceivedEvent;
                 }
             }
@@ -108,11 +119,11 @@ namespace MELHARFI
                 m_configuration = config;
                 m_statistics = new NetPeerStatistics(this);
                 m_releasedIncomingMessages = new NetQueue<NetIncomingMessage>(4);
-                m_unsentUnconnectedMessages = new NetQueue<NetTuple<IPEndPoint, NetOutgoingMessage>>(2);
+                m_unsentUnconnectedMessages = new NetQueue<NetTuple<NetEndPoint, NetOutgoingMessage>>(2);
                 m_connections = new List<NetConnection>();
-                m_connectionLookup = new Dictionary<IPEndPoint, NetConnection>();
-                m_handshakes = new Dictionary<IPEndPoint, NetConnection>();
-                m_senderRemote = new IPEndPoint(IPAddress.Any, 0);
+                m_connectionLookup = new Dictionary<NetEndPoint, NetConnection>();
+                m_handshakes = new Dictionary<NetEndPoint, NetConnection>();
+                m_senderRemote = (EndPoint)new NetEndPoint(IPAddress.Any, 0);
                 m_status = NetPeerStatus.NotRunning;
                 m_receivedFragmentGroups = new Dictionary<NetConnection, Dictionary<int, ReceivedFragmentGroup>>();
             }
@@ -135,13 +146,13 @@ namespace MELHARFI
                 if (m_configuration.NetworkThreadName == "Lidgren network thread")
                 {
                     int pc = Interlocked.Increment(ref s_initializedPeersCount);
-                    m_configuration.NetworkThreadName = "Lidgren network thread " + pc;
+                    m_configuration.NetworkThreadName = "Lidgren network thread " + pc.ToString();
                 }
 
                 InitializeNetwork();
 
                 // start network thread
-                m_networkThread = new Thread(NetworkLoop);
+                m_networkThread = new Thread(new ThreadStart(NetworkLoop));
                 m_networkThread.Name = m_configuration.NetworkThreadName;
                 m_networkThread.IsBackground = true;
                 m_networkThread.Start();
@@ -151,13 +162,13 @@ namespace MELHARFI
                     m_upnp.Discover(this);
 
                 // allow some time for network thread to start up in case they call Connect() or UPnP calls immediately
-                Thread.Sleep(50);
+                NetUtility.Sleep(50);
             }
 
             /// <summary>
             /// Get the connection, if any, for a certain remote endpoint
             /// </summary>
-            public NetConnection GetConnection(IPEndPoint ep)
+            public NetConnection GetConnection(NetEndPoint ep)
             {
                 NetConnection retval;
 
@@ -173,12 +184,21 @@ namespace MELHARFI
             /// </summary>
             public NetIncomingMessage WaitMessage(int maxMillis)
             {
-                var msg = ReadMessage();
-                if (msg != null)
-                    return msg; // no need to wait; we already have a message to deliver
-                if (m_messageReceivedEvent != null)
-                    m_messageReceivedEvent.WaitOne(maxMillis);
-                return ReadMessage();
+                NetIncomingMessage msg = ReadMessage();
+
+                while (msg == null)
+                {
+                    // This could return true...
+                    if (!MessageReceivedEvent.WaitOne(maxMillis))
+                    {
+                        return null;
+                    }
+
+                    // ... while this will still returns null. That's why we need to cycle.
+                    msg = ReadMessage();
+                }
+
+                return msg;
             }
 
             /// <summary>
@@ -196,6 +216,17 @@ namespace MELHARFI
                     }
                 }
                 return retval;
+            }
+
+            /// <summary>
+            /// Reads a pending message from any connection, if any.
+            /// Returns true if message was read, otherwise false.
+            /// </summary>
+            /// <returns>True, if message was read.</returns>
+            public bool ReadMessage(out NetIncomingMessage message)
+            {
+                message = ReadMessage();
+                return message != null;
             }
 
             /// <summary>
@@ -220,8 +251,8 @@ namespace MELHARFI
                 return added;
             }
 
-            // send message immediately
-            internal void SendLibrary(NetOutgoingMessage msg, IPEndPoint recipient)
+            // send message immediately and recycle it
+            internal void SendLibrary(NetOutgoingMessage msg, NetEndPoint recipient)
             {
                 VerifyNetworkThread();
                 NetException.Assert(msg.m_isSent == false);
@@ -229,6 +260,18 @@ namespace MELHARFI
                 bool connReset;
                 int len = msg.Encode(m_sendBuffer, 0, 0);
                 SendPacket(len, recipient, 1, out connReset);
+
+                // no reliability, no multiple recipients - we can just recycle this message immediately
+                msg.m_recyclingCount = 0;
+                Recycle(msg);
+            }
+
+            static NetEndPoint GetNetEndPoint(string host, int port)
+            {
+                IPAddress address = NetUtility.Resolve(host);
+                if (address == null)
+                    throw new NetException("Could not resolve host");
+                return new NetEndPoint(address, port);
             }
 
             /// <summary>
@@ -236,7 +279,7 @@ namespace MELHARFI
             /// </summary>
             public NetConnection Connect(string host, int port)
             {
-                return Connect(new IPEndPoint(NetUtility.Resolve(host), port), null);
+                return Connect(GetNetEndPoint(host, port), null);
             }
 
             /// <summary>
@@ -244,13 +287,13 @@ namespace MELHARFI
             /// </summary>
             public NetConnection Connect(string host, int port, NetOutgoingMessage hailMessage)
             {
-                return Connect(new IPEndPoint(NetUtility.Resolve(host), port), hailMessage);
+                return Connect(GetNetEndPoint(host, port), hailMessage);
             }
 
             /// <summary>
             /// Create a connection to a remote endpoint
             /// </summary>
-            public NetConnection Connect(IPEndPoint remoteEndPoint)
+            public NetConnection Connect(NetEndPoint remoteEndPoint)
             {
                 return Connect(remoteEndPoint, null);
             }
@@ -258,7 +301,7 @@ namespace MELHARFI
             /// <summary>
             /// Create a connection to a remote endpoint
             /// </summary>
-            public virtual NetConnection Connect(IPEndPoint remoteEndPoint, NetOutgoingMessage hailMessage)
+            public virtual NetConnection Connect(NetEndPoint remoteEndPoint, NetOutgoingMessage hailMessage)
             {
                 if (remoteEndPoint == null)
                     throw new ArgumentNullException("remoteEndPoint");
@@ -283,7 +326,7 @@ namespace MELHARFI
                                 break;
                             case NetConnectionStatus.RespondedConnect:
                                 // send another response
-                                hs.SendConnectResponse((float)NetTime.Now, false);
+                                hs.SendConnectResponse(NetTime.Now, false);
                                 break;
                             default:
                                 // weird
@@ -310,16 +353,25 @@ namespace MELHARFI
             /// <summary>
             /// Send raw bytes; only used for debugging
             /// </summary>
-#if DEBUG
-            public void RawSend(byte[] arr, int offset, int length, IPEndPoint destination)
-#else
-		internal void RawSend(byte[] arr, int offset, int length, IPEndPoint destination)
-#endif
+            public void RawSend(byte[] arr, int offset, int length, NetEndPoint destination)
             {
                 // wrong thread - this miiiight crash with network thread... but what's a boy to do.
                 Array.Copy(arr, offset, m_sendBuffer, 0, length);
                 bool unused;
                 SendPacket(length, destination, 1, out unused);
+            }
+
+            /// <summary>
+            /// In DEBUG, throws an exception, in RELEASE logs an error message
+            /// </summary>
+            /// <param name="message"></param>
+            internal void ThrowOrLog(string message)
+            {
+#if DEBUG
+			throw new NetException(message);
+#else
+                LogError(message);
+#endif
             }
 
             /// <summary>

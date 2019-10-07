@@ -16,17 +16,20 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#if !__ANDROID__ && !IOS
-#define IS_FULL_NET_AVAILABLE
+
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+using NetAddress = System.Net.IPAddress;
 #endif
 
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.NetworkInformation;
+
 using System.Net.Sockets;
-using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace MELHARFI
 {
@@ -35,24 +38,26 @@ namespace MELHARFI
         /// <summary>
         /// Utility methods
         /// </summary>
-        public static class NetUtility
+        public static partial class NetUtility
         {
+            private static readonly bool IsMono = Type.GetType("Mono.Runtime") != null;
+
             /// <summary>
             /// Resolve endpoint callback
             /// </summary>
-            public delegate void ResolveEndPointCallback(IPEndPoint endPoint);
+            public delegate void ResolveEndPointCallback(NetEndPoint endPoint);
 
             /// <summary>
             /// Resolve address callback
             /// </summary>
-            public delegate void ResolveAddressCallback(IPAddress adr);
+            public delegate void ResolveAddressCallback(NetAddress adr);
 
             /// <summary>
             /// Get IPv4 endpoint from notation (xxx.xxx.xxx.xxx) or hostname and port number (asynchronous version)
             /// </summary>
             public static void ResolveAsync(string ipOrHost, int port, ResolveEndPointCallback callback)
             {
-                ResolveAsync(ipOrHost, delegate(IPAddress adr)
+                ResolveAsync(ipOrHost, delegate (NetAddress adr)
                 {
                     if (adr == null)
                     {
@@ -60,7 +65,7 @@ namespace MELHARFI
                     }
                     else
                     {
-                        callback(new IPEndPoint(adr, port));
+                        callback(new NetEndPoint(adr, port));
                     }
                 });
             }
@@ -68,10 +73,18 @@ namespace MELHARFI
             /// <summary>
             /// Get IPv4 endpoint from notation (xxx.xxx.xxx.xxx) or hostname and port number
             /// </summary>
-            public static IPEndPoint Resolve(string ipOrHost, int port)
+            public static NetEndPoint Resolve(string ipOrHost, int port)
             {
-                IPAddress adr = Resolve(ipOrHost);
-                return new IPEndPoint(adr, port);
+                var adr = Resolve(ipOrHost);
+                return adr == null ? null : new NetEndPoint(adr, port);
+            }
+
+            private static IPAddress s_broadcastAddress;
+            public static IPAddress GetCachedBroadcastAddress()
+            {
+                if (s_broadcastAddress == null)
+                    s_broadcastAddress = GetBroadcastAddress();
+                return s_broadcastAddress;
             }
 
             /// <summary>
@@ -84,8 +97,8 @@ namespace MELHARFI
 
                 ipOrHost = ipOrHost.Trim();
 
-                IPAddress ipAddress = null;
-                if (IPAddress.TryParse(ipOrHost, out ipAddress))
+                NetAddress ipAddress = null;
+                if (NetAddress.TryParse(ipOrHost, out ipAddress))
                 {
                     if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
                     {
@@ -99,7 +112,7 @@ namespace MELHARFI
                 IPHostEntry entry;
                 try
                 {
-                    Dns.BeginGetHostEntry(ipOrHost, delegate(IAsyncResult result)
+                    Dns.BeginGetHostEntry(ipOrHost, delegate (IAsyncResult result)
                     {
                         try
                         {
@@ -109,11 +122,14 @@ namespace MELHARFI
                         {
                             if (ex.SocketErrorCode == SocketError.HostNotFound)
                             {
-                                //LogWrite(string.Format(CultureInfo.InvariantCulture, "Failed to resolve host '{0}'.", ipOrHost));
-                                callback(null);
+                            //LogWrite(string.Format(CultureInfo.InvariantCulture, "Failed to resolve host '{0}'.", ipOrHost));
+                            callback(null);
                                 return;
                             }
-                            throw;
+                            else
+                            {
+                                throw;
+                            }
                         }
 
                         if (entry == null)
@@ -122,8 +138,8 @@ namespace MELHARFI
                             return;
                         }
 
-                        // check each entry for a valid IP address
-                        foreach (IPAddress ipCurrent in entry.AddressList)
+                    // check each entry for a valid IP address
+                    foreach (var ipCurrent in entry.AddressList)
                         {
                             if (ipCurrent.AddressFamily == AddressFamily.InterNetwork)
                             {
@@ -152,15 +168,15 @@ namespace MELHARFI
             /// <summary>
             /// Get IPv4 address from notation (xxx.xxx.xxx.xxx) or hostname
             /// </summary>
-            public static IPAddress Resolve(string ipOrHost)
+            public static NetAddress Resolve(string ipOrHost)
             {
                 if (string.IsNullOrEmpty(ipOrHost))
                     throw new ArgumentException("Supplied string must not be empty", "ipOrHost");
 
                 ipOrHost = ipOrHost.Trim();
 
-                IPAddress ipAddress = null;
-                if (IPAddress.TryParse(ipOrHost, out ipAddress))
+                NetAddress ipAddress = null;
+                if (NetAddress.TryParse(ipOrHost, out ipAddress))
                 {
                     if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
                         return ipAddress;
@@ -168,20 +184,16 @@ namespace MELHARFI
                 }
 
                 // ok must be a host name
-                IPHostEntry entry;
                 try
                 {
-                    entry = Dns.GetHostEntry(ipOrHost);
-                    if (entry == null)
+                    var addresses = Dns.GetHostAddresses(ipOrHost);
+                    if (addresses == null)
                         return null;
-
-                    // check each entry for a valid IP address
-                    foreach (IPAddress ipCurrent in entry.AddressList)
+                    foreach (var address in addresses)
                     {
-                        if (ipCurrent.AddressFamily == AddressFamily.InterNetwork)
-                            return ipCurrent;
+                        if (address.AddressFamily == AddressFamily.InterNetwork)
+                            return address;
                     }
-
                     return null;
                 }
                 catch (SocketException ex)
@@ -191,59 +203,12 @@ namespace MELHARFI
                         //LogWrite(string.Format(CultureInfo.InvariantCulture, "Failed to resolve host '{0}'.", ipOrHost));
                         return null;
                     }
-                    throw;
-                }
-            }
-
-#if IS_FULL_NET_AVAILABLE
-
-            private static NetworkInterface GetNetworkInterface()
-            {
-                IPGlobalProperties computerProperties = IPGlobalProperties.GetIPGlobalProperties();
-                if (computerProperties == null)
-                    return null;
-
-                NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
-                if (nics == null || nics.Length < 1)
-                    return null;
-
-                NetworkInterface best = null;
-                foreach (NetworkInterface adapter in nics)
-                {
-                    if (adapter.NetworkInterfaceType == NetworkInterfaceType.Loopback || adapter.NetworkInterfaceType == NetworkInterfaceType.Unknown)
-                        continue;
-                    if (!adapter.Supports(NetworkInterfaceComponent.IPv4))
-                        continue;
-                    if (best == null)
-                        best = adapter;
-                    if (adapter.OperationalStatus != OperationalStatus.Up)
-                        continue;
-
-                    // make sure this adapter has any ipv4 addresses
-                    IPInterfaceProperties properties = adapter.GetIPProperties();
-                    foreach (UnicastIPAddressInformation unicastAddress in properties.UnicastAddresses)
+                    else
                     {
-                        if (unicastAddress != null && unicastAddress.Address != null && unicastAddress.Address.AddressFamily == AddressFamily.InterNetwork)
-                        {
-                            // Yes it does, return this network interface.
-                            return adapter;
-                        }
+                        throw;
                     }
                 }
-                return best;
             }
-
-            /// <summary>
-            /// Returns the physical (MAC) address for the first usable network interface
-            /// </summary>
-            public static PhysicalAddress GetMacAddress()
-            {
-                NetworkInterface ni = GetNetworkInterface();
-                if (ni == null)
-                    return null;
-                return ni.GetPhysicalAddress();
-            }
-#endif
 
             /// <summary>
             /// Create a hex string from an Int64 value
@@ -258,134 +223,30 @@ namespace MELHARFI
             /// </summary>
             public static string ToHexString(byte[] data)
             {
-                char[] c = new char[data.Length * 2];
+                return ToHexString(data, 0, data.Length);
+            }
+
+            /// <summary>
+            /// Create a hex string from an array of bytes
+            /// </summary>
+            public static string ToHexString(byte[] data, int offset, int length)
+            {
+                char[] c = new char[length * 2];
                 byte b;
-                for (int i = 0; i < data.Length; ++i)
+                for (int i = 0; i < length; ++i)
                 {
-                    b = ((byte)(data[i] >> 4));
+                    b = ((byte)(data[offset + i] >> 4));
                     c[i * 2] = (char)(b > 9 ? b + 0x37 : b + 0x30);
-                    b = ((byte)(data[i] & 0xF));
+                    b = ((byte)(data[offset + i] & 0xF));
                     c[i * 2 + 1] = (char)(b > 9 ? b + 0x37 : b + 0x30);
                 }
                 return new string(c);
             }
 
             /// <summary>
-            /// Gets the local broadcast address
+            /// Returns true if the endpoint supplied is on the same subnet as this host
             /// </summary>
-            public static IPAddress GetBroadcastAddress()
-            {
-#if __ANDROID__
-			try{
-			Android.Net.Wifi.WifiManager wifi = (Android.Net.Wifi.WifiManager)Android.App.Application.Context.GetSystemService(Android.App.Activity.WifiService);
-			if (wifi.IsWifiEnabled)
-			{
-				var dhcp = wifi.DhcpInfo;
-					
-				int broadcast = (dhcp.IpAddress & dhcp.Netmask) | ~dhcp.Netmask;
-	    		byte[] quads = new byte[4];
-	    		for (int k = 0; k < 4; k++)
-				{
-	      			quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);
-				}
-				return new IPAddress(quads);
-			}
-			}
-			catch // Catch Access Denied Errors
-			{
-				return IPAddress.Broadcast;
-			}
-#endif
-#if IS_FULL_NET_AVAILABLE
-                try
-                {
-                    NetworkInterface ni = GetNetworkInterface();
-                    if (ni == null)
-                    {
-                        return null;
-                    }
-
-                    IPInterfaceProperties properties = ni.GetIPProperties();
-                    foreach (UnicastIPAddressInformation unicastAddress in properties.UnicastAddresses)
-                    {
-                        if (unicastAddress != null && unicastAddress.Address != null && unicastAddress.Address.AddressFamily == AddressFamily.InterNetwork)
-                        {
-                            var mask = unicastAddress.IPv4Mask;
-                            byte[] ipAdressBytes = unicastAddress.Address.GetAddressBytes();
-                            byte[] subnetMaskBytes = mask.GetAddressBytes();
-
-                            if (ipAdressBytes.Length != subnetMaskBytes.Length)
-                                throw new ArgumentException("Lengths of IP address and subnet mask do not match.");
-
-                            byte[] broadcastAddress = new byte[ipAdressBytes.Length];
-                            for (int i = 0; i < broadcastAddress.Length; i++)
-                            {
-                                broadcastAddress[i] = (byte)(ipAdressBytes[i] | (subnetMaskBytes[i] ^ 255));
-                            }
-                            return new IPAddress(broadcastAddress);
-                        }
-                    }
-                }
-                catch // Catch any errors 
-                {
-                    return IPAddress.Broadcast;
-                }
-#endif
-                return IPAddress.Broadcast;
-            }
-
-            /// <summary>
-            /// Gets my local IPv4 address (not necessarily external) and subnet mask
-            /// </summary>
-            public static IPAddress GetMyAddress(out IPAddress mask)
-            {
-                mask = null;
-#if __ANDROID__
-			try
-			{
-				Android.Net.Wifi.WifiManager wifi = (Android.Net.Wifi.WifiManager)Android.App.Application.Context.GetSystemService(Android.App.Activity.WifiService);
-				if (!wifi.IsWifiEnabled) return null;
-				var dhcp = wifi.DhcpInfo;
-					
-				int addr = dhcp.IpAddress;
-	    		byte[] quads = new byte[4];
-	    		for (int k = 0; k < 4; k++)
-				{
-	      			quads[k] = (byte) ((addr >> k * 8) & 0xFF);
-				}			
-				return new IPAddress(quads);
-			}
-			catch // Catch Access Denied errors
-			{
-				return null;
-			}
-				
-#endif
-#if IS_FULL_NET_AVAILABLE
-                NetworkInterface ni = GetNetworkInterface();
-                if (ni == null)
-                {
-                    mask = null;
-                    return null;
-                }
-
-                IPInterfaceProperties properties = ni.GetIPProperties();
-                foreach (UnicastIPAddressInformation unicastAddress in properties.UnicastAddresses)
-                {
-                    if (unicastAddress != null && unicastAddress.Address != null && unicastAddress.Address.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        mask = unicastAddress.IPv4Mask;
-                        return unicastAddress.Address;
-                    }
-                }
-#endif
-                return null;
-            }
-
-            /// <summary>
-            /// Returns true if the IPEndPoint supplied is on the same subnet as this host
-            /// </summary>
-            public static bool IsLocal(IPEndPoint endPoint)
+            public static bool IsLocal(NetEndPoint endPoint)
             {
                 if (endPoint == null)
                     return false;
@@ -395,10 +256,10 @@ namespace MELHARFI
             /// <summary>
             /// Returns true if the IPAddress supplied is on the same subnet as this host
             /// </summary>
-            public static bool IsLocal(IPAddress remote)
+            public static bool IsLocal(NetAddress remote)
             {
-                IPAddress mask;
-                IPAddress local = GetMyAddress(out mask);
+                NetAddress mask;
+                var local = GetMyAddress(out mask);
 
                 if (mask == null)
                     return false;
@@ -414,8 +275,20 @@ namespace MELHARFI
             /// <summary>
             /// Returns how many bits are necessary to hold a certain number
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public static int BitsToHoldUInt(uint value)
+            {
+                int bits = 1;
+                while ((value >>= 1) != 0)
+                    bits++;
+                return bits;
+            }
+
+            /// <summary>
+            /// Returns how many bits are necessary to hold a certain number
+            /// </summary>
+            [CLSCompliant(false)]
+            public static int BitsToHoldUInt64(ulong value)
             {
                 int bits = 1;
                 while ((value >>= 1) != 0)
@@ -482,8 +355,8 @@ namespace MELHARFI
                 if (bytes < 4000) // 1-4 kb is printed in bytes
                     return bytes + " bytes";
                 if (bytes < 1000 * 1000) // 4-999 kb is printed in kb
-                    return Math.Round((bytes / 1000.0), 2) + " kilobytes";
-                return Math.Round((bytes / (1000.0 * 1000.0)), 2) + " megabytes"; // else megabytes
+                    return Math.Round(((double)bytes / 1000.0), 2) + " kilobytes";
+                return Math.Round(((double)bytes / (1000.0 * 1000.0)), 2) + " megabytes"; // else megabytes
             }
 
             internal static int RelativeSequenceNumber(int nr, int expected)
@@ -522,11 +395,11 @@ namespace MELHARFI
             }
 
             // shell sort
-            internal static void SortMembersList(MemberInfo[] list)
+            internal static void SortMembersList(System.Reflection.MemberInfo[] list)
             {
                 int h;
                 int j;
-                MemberInfo tmp;
+                System.Reflection.MemberInfo tmp;
 
                 h = 1;
                 while (h * 3 + 1 <= list.Length)
@@ -564,11 +437,11 @@ namespace MELHARFI
             {
                 if (mtp >= NetMessageType.UserReliableOrdered1)
                     return NetDeliveryMethod.ReliableOrdered;
-                if (mtp >= NetMessageType.UserReliableSequenced1)
+                else if (mtp >= NetMessageType.UserReliableSequenced1)
                     return NetDeliveryMethod.ReliableSequenced;
-                if (mtp >= NetMessageType.UserReliableUnordered)
+                else if (mtp >= NetMessageType.UserReliableUnordered)
                     return NetDeliveryMethod.ReliableUnordered;
-                if (mtp >= NetMessageType.UserSequenced1)
+                else if (mtp >= NetMessageType.UserSequenced1)
                     return NetDeliveryMethod.UnreliableSequenced;
                 return NetDeliveryMethod.Unreliable;
             }
@@ -582,11 +455,17 @@ namespace MELHARFI
                 StringBuilder bdr = new StringBuilder(cnt * 5); // educated guess
                 for (int i = 0; i < cnt; i++)
                 {
-                    bdr.Append(list[i]);
+                    bdr.Append(list[i].ToString());
                     if (i != cnt - 1)
                         bdr.Append(", ");
                 }
                 return bdr.ToString();
+            }
+
+            public static byte[] ComputeSHAHash(byte[] bytes)
+            {
+                // this is defined in the platform specific files
+                return ComputeSHAHash(bytes, 0, bytes.Length);
             }
         }
     }

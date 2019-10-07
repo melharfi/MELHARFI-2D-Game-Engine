@@ -19,8 +19,9 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
 using System;
+using System.Collections.Generic;
+
 using System.Diagnostics;
 
 namespace MELHARFI
@@ -94,6 +95,8 @@ namespace MELHARFI
 
                     destination[destinationByteOffset++] = (byte)(b | (second << secondPartLen));
                 }
+
+                return;
             }
 
             /// <summary>
@@ -179,12 +182,14 @@ namespace MELHARFI
                     destination[dstBytePtr] &= (byte)(255 << firstPartLen); // clear before writing
                     destination[dstBytePtr] |= (byte)(src >> lastPartLen); // write second half
                 }
+
+                return;
             }
 
             /// <summary>
             /// Reads an unsigned 16 bit integer
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
 #if UNSAFE
 		public static unsafe ushort ReadUInt16(byte[] fromBuffer, int numberOfBits, int readBitOffset)
 		{
@@ -230,7 +235,7 @@ namespace MELHARFI
             /// <summary>
             /// Reads the specified number of bits into an UInt32
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
 #if UNSAFE
 		public static unsafe uint ReadUInt32(byte[] fromBuffer, int numberOfBits, int readBitOffset)
 		{
@@ -299,7 +304,7 @@ namespace MELHARFI
             /// <summary>
             /// Writes an unsigned 16 bit integer
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public static void WriteUInt16(ushort source, int numberOfBits, byte[] destination, int destinationBitOffset)
             {
                 if (numberOfBits == 0)
@@ -314,21 +319,21 @@ namespace MELHARFI
 #endif
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)source, numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)source, numberOfBits, destination, destinationBitOffset);
                     return;
                 }
 
-                WriteByte((byte)source, 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)source, 8, destination, destinationBitOffset);
 
                 numberOfBits -= 8;
                 if (numberOfBits > 0)
-                    WriteByte((byte)(source >> 8), numberOfBits, destination, destinationBitOffset + 8);
+                    NetBitWriter.WriteByte((byte)(source >> 8), numberOfBits, destination, destinationBitOffset + 8);
             }
 
             /// <summary>
             /// Writes the specified number of bits into a byte array
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public static int WriteUInt32(uint source, int numberOfBits, byte[] destination, int destinationBitOffset)
             {
 #if BIGENDIAN
@@ -342,39 +347,39 @@ namespace MELHARFI
                 int returnValue = destinationBitOffset + numberOfBits;
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)source, numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)source, numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)source, 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)source, 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)(source >> 8), numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)(source >> 8), numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)(source >> 8), 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)(source >> 8), 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)(source >> 16), numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)(source >> 16), numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)(source >> 16), 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)(source >> 16), 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
-                WriteByte((byte)(source >> 24), numberOfBits, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)(source >> 24), numberOfBits, destination, destinationBitOffset);
                 return returnValue;
             }
 
             /// <summary>
             /// Writes the specified number of bits into a byte array
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public static int WriteUInt64(ulong source, int numberOfBits, byte[] destination, int destinationBitOffset)
             {
 #if BIGENDIAN
@@ -391,73 +396,73 @@ namespace MELHARFI
                 int returnValue = destinationBitOffset + numberOfBits;
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)source, numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)source, numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)source, 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)source, 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)(source >> 8), numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)(source >> 8), numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)(source >> 8), 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)(source >> 8), 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)(source >> 16), numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)(source >> 16), numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)(source >> 16), 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)(source >> 16), 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)(source >> 24), numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)(source >> 24), numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)(source >> 24), 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)(source >> 24), 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)(source >> 32), numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)(source >> 32), numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)(source >> 32), 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)(source >> 32), 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)(source >> 40), numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)(source >> 40), numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)(source >> 40), 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)(source >> 40), 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)(source >> 48), numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)(source >> 48), numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)(source >> 48), 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)(source >> 48), 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
                 if (numberOfBits <= 8)
                 {
-                    WriteByte((byte)(source >> 56), numberOfBits, destination, destinationBitOffset);
+                    NetBitWriter.WriteByte((byte)(source >> 56), numberOfBits, destination, destinationBitOffset);
                     return returnValue;
                 }
-                WriteByte((byte)(source >> 56), 8, destination, destinationBitOffset);
+                NetBitWriter.WriteByte((byte)(source >> 56), 8, destination, destinationBitOffset);
                 destinationBitOffset += 8;
                 numberOfBits -= 8;
 
@@ -472,11 +477,11 @@ namespace MELHARFI
             /// Write Base128 encoded variable sized unsigned integer
             /// </summary>
             /// <returns>number of bytes written</returns>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public static int WriteVariableUInt32(byte[] intoBuffer, int offset, uint value)
             {
                 int retval = 0;
-                uint num1 = value;
+                uint num1 = (uint)value;
                 while (num1 >= 0x80)
                 {
                     intoBuffer[offset + retval] = (byte)(num1 | 0x80);
@@ -490,15 +495,14 @@ namespace MELHARFI
             /// <summary>
             /// Reads a UInt32 written using WriteUnsignedVarInt(); will increment offset!
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public static uint ReadVariableUInt32(byte[] buffer, ref int offset)
             {
                 int num1 = 0;
                 int num2 = 0;
                 while (true)
                 {
-                    if (num2 == 0x23)
-                        throw new FormatException("Bad 7-bit encoded integer");
+                    NetException.Assert(num2 != 0x23, "Bad 7-bit encoded integer");
 
                     byte num3 = buffer[offset++];
                     num1 |= (num3 & 0x7f) << (num2 & 0x1f);

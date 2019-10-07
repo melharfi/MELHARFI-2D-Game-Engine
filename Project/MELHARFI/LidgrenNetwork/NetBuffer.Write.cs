@@ -18,11 +18,12 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-
 using System;
+using System.Collections.Generic;
 using System.Net;
-using System.Runtime.InteropServices;
+using System.Reflection;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace MELHARFI
 {
@@ -44,7 +45,7 @@ namespace MELHARFI
             /// Value as an unsigned 32 bit integer
             /// </summary>
             [FieldOffset(0)]
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public uint UIntValue;
         }
 
@@ -62,7 +63,8 @@ namespace MELHARFI
                     return;
                 }
                 if (m_data.Length < byteLen)
-                    Array.Resize(ref m_data, byteLen + c_overAllocateAmount);
+                    Array.Resize<byte>(ref m_data, byteLen + c_overAllocateAmount);
+                return;
             }
 
             /// <summary>
@@ -77,7 +79,8 @@ namespace MELHARFI
                     return;
                 }
                 if (m_data.Length < byteLen)
-                    Array.Resize(ref m_data, byteLen);
+                    Array.Resize<byte>(ref m_data, byteLen);
+                return;
             }
 
             /// <summary>
@@ -101,9 +104,20 @@ namespace MELHARFI
             }
 
             /// <summary>
+            /// Writes a byte at a given offset in the buffer
+            /// </summary>
+            public void WriteAt(Int32 offset, byte source)
+            {
+                int newBitLength = Math.Max(m_bitLength, offset + 8);
+                EnsureBufferSize(newBitLength);
+                NetBitWriter.WriteByte((byte)source, 8, m_data, offset);
+                m_bitLength = newBitLength;
+            }
+
+            /// <summary>
             /// Writes a signed byte
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public void Write(sbyte source)
             {
                 EnsureBufferSize(m_bitLength + 8);
@@ -152,7 +166,7 @@ namespace MELHARFI
             /// Writes an unsigned 16 bit integer
             /// </summary>
             /// <param name="source"></param>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public void Write(UInt16 source)
             {
                 EnsureBufferSize(m_bitLength + 16);
@@ -161,9 +175,21 @@ namespace MELHARFI
             }
 
             /// <summary>
+            /// Writes a 16 bit unsigned integer at a given offset in the buffer
+            /// </summary>
+            [CLSCompliant(false)]
+            public void WriteAt(Int32 offset, UInt16 source)
+            {
+                int newBitLength = Math.Max(m_bitLength, offset + 16);
+                EnsureBufferSize(newBitLength);
+                NetBitWriter.WriteUInt16(source, 16, m_data, offset);
+                m_bitLength = newBitLength;
+            }
+
+            /// <summary>
             /// Writes an unsigned integer using 1 to 16 bits
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public void Write(UInt16 source, int numberOfBits)
             {
                 NetException.Assert((numberOfBits > 0 && numberOfBits <= 16), "Write(ushort, numberOfBits) can only write between 1 and 16 bits");
@@ -180,6 +206,17 @@ namespace MELHARFI
                 EnsureBufferSize(m_bitLength + 16);
                 NetBitWriter.WriteUInt16((ushort)source, 16, m_data, m_bitLength);
                 m_bitLength += 16;
+            }
+
+            /// <summary>
+            /// Writes a 16 bit signed integer at a given offset in the buffer
+            /// </summary>
+            public void WriteAt(Int32 offset, Int16 source)
+            {
+                int newBitLength = Math.Max(m_bitLength, offset + 16);
+                EnsureBufferSize(newBitLength);
+                NetBitWriter.WriteUInt16((ushort)source, 16, m_data, offset);
+                m_bitLength = newBitLength;
             }
 
 #if UNSAFE
@@ -216,6 +253,17 @@ namespace MELHARFI
             }
 #endif
 
+            /// <summary>
+            /// Writes a 32 bit signed integer at a given offset in the buffer
+            /// </summary>
+            public void WriteAt(Int32 offset, Int32 source)
+            {
+                int newBitLength = Math.Max(m_bitLength, offset + 32);
+                EnsureBufferSize(newBitLength);
+                NetBitWriter.WriteUInt32((UInt32)source, 32, m_data, offset);
+                m_bitLength = newBitLength;
+            }
+
 #if UNSAFE
 		/// <summary>
 		/// Writes a 32 bit unsigned integer
@@ -243,7 +291,7 @@ namespace MELHARFI
             /// <summary>
             /// Writes a 32 bit unsigned integer
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public void Write(UInt32 source)
             {
                 EnsureBufferSize(m_bitLength + 32);
@@ -253,9 +301,21 @@ namespace MELHARFI
 #endif
 
             /// <summary>
+            /// Writes a 32 bit unsigned integer at a given offset in the buffer
+            /// </summary>
+            [CLSCompliant(false)]
+            public void WriteAt(Int32 offset, UInt32 source)
+            {
+                int newBitLength = Math.Max(m_bitLength, offset + 32);
+                EnsureBufferSize(newBitLength);
+                NetBitWriter.WriteUInt32(source, 32, m_data, offset);
+                m_bitLength = newBitLength;
+            }
+
+            /// <summary>
             /// Writes a 32 bit signed integer
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public void Write(UInt32 source, int numberOfBits)
             {
                 NetException.Assert((numberOfBits > 0 && numberOfBits <= 32), "Write(uint, numberOfBits) can only write between 1 and 32 bits");
@@ -290,7 +350,7 @@ namespace MELHARFI
             /// <summary>
             /// Writes a 64 bit unsigned integer
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public void Write(UInt64 source)
             {
                 EnsureBufferSize(m_bitLength + 64);
@@ -299,9 +359,21 @@ namespace MELHARFI
             }
 
             /// <summary>
+            /// Writes a 64 bit unsigned integer at a given offset in the buffer
+            /// </summary>
+            [CLSCompliant(false)]
+            public void WriteAt(Int32 offset, UInt64 source)
+            {
+                int newBitLength = Math.Max(m_bitLength, offset + 64);
+                EnsureBufferSize(newBitLength);
+                NetBitWriter.WriteUInt64(source, 64, m_data, offset);
+                m_bitLength = newBitLength;
+            }
+
+            /// <summary>
             /// Writes an unsigned integer using 1 to 64 bits
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public void Write(UInt64 source, int numberOfBits)
             {
                 EnsureBufferSize(m_bitLength + numberOfBits);
@@ -416,18 +488,18 @@ namespace MELHARFI
             /// Write Base128 encoded variable sized unsigned integer of up to 32 bits
             /// </summary>
             /// <returns>number of bytes written</returns>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public int WriteVariableUInt32(uint value)
             {
                 int retval = 1;
-                uint num1 = value;
+                uint num1 = (uint)value;
                 while (num1 >= 0x80)
                 {
-                    Write((byte)(num1 | 0x80));
+                    this.Write((byte)(num1 | 0x80));
                     num1 = num1 >> 7;
                     retval++;
                 }
-                Write((byte)num1);
+                this.Write((byte)num1);
                 return retval;
             }
 
@@ -455,18 +527,18 @@ namespace MELHARFI
             /// Write Base128 encoded variable sized unsigned integer of up to 64 bits
             /// </summary>
             /// <returns>number of bytes written</returns>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public int WriteVariableUInt64(UInt64 value)
             {
                 int retval = 1;
-                UInt64 num1 = value;
+                UInt64 num1 = (UInt64)value;
                 while (num1 >= 0x80)
                 {
-                    Write((byte)(num1 | 0x80));
+                    this.Write((byte)(num1 | 0x80));
                     num1 = num1 >> 7;
                     retval++;
                 }
-                Write((byte)num1);
+                this.Write((byte)num1);
                 return retval;
             }
 
@@ -479,7 +551,7 @@ namespace MELHARFI
 
                 float unit = (value + 1.0f) * 0.5f;
                 int maxVal = (1 << numberOfBits) - 1;
-                uint writeVal = (uint)(unit * maxVal);
+                uint writeVal = (uint)(unit * (float)maxVal);
 
                 Write(writeVal, numberOfBits);
             }
@@ -492,7 +564,7 @@ namespace MELHARFI
                 NetException.Assert(((value >= 0.0) && (value <= 1.0)), " WriteUnitSingle() must be passed a float in the range 0 to 1; val is " + value);
 
                 int maxValue = (1 << numberOfBits) - 1;
-                uint writeVal = (uint)(value * maxValue);
+                uint writeVal = (uint)(value * (float)maxValue);
 
                 Write(writeVal, numberOfBits);
             }
@@ -507,7 +579,7 @@ namespace MELHARFI
                 float range = max - min;
                 float unit = ((value - min) / range);
                 int maxVal = (1 << numberOfBits) - 1;
-                Write((UInt32)(maxVal * unit), numberOfBits);
+                Write((UInt32)((float)maxVal * unit), numberOfBits);
             }
 
             /// <summary>
@@ -528,13 +600,29 @@ namespace MELHARFI
             }
 
             /// <summary>
+            /// Writes an integer with the least amount of bits need for the specified range
+            /// Returns number of bits written
+            /// </summary>
+            public int WriteRangedInteger(long min, long max, long value)
+            {
+                NetException.Assert(value >= min && value <= max, "Value not within min/max range!");
+
+                ulong range = (ulong)(max - min);
+                int numBits = NetUtility.BitsToHoldUInt64(range);
+
+                ulong rvalue = (ulong)(value - min);
+                Write(rvalue, numBits);
+
+                return numBits;
+            }
+
+            /// <summary>
             /// Write a string
             /// </summary>
             public void Write(string source)
             {
                 if (string.IsNullOrEmpty(source))
                 {
-                    EnsureBufferSize(m_bitLength + 8);
                     WriteVariableUInt32(0);
                     return;
                 }

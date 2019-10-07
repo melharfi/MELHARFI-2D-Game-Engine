@@ -16,10 +16,10 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Security;
 
 namespace MELHARFI
 {
@@ -46,7 +46,8 @@ namespace MELHARFI
             /// <summary>
             /// 16 byte key
             /// </summary>
-            public NetXtea(byte[] key, int rounds)
+            public NetXtea(NetPeer peer, byte[] key, int rounds)
+                : base(peer)
             {
                 if (key.Length < c_keySize)
                     throw new NetException("Key too short!");
@@ -75,17 +76,24 @@ namespace MELHARFI
             /// <summary>
             /// 16 byte key
             /// </summary>
-            public NetXtea(byte[] key)
-                : this(key, 32)
+            public NetXtea(NetPeer peer, byte[] key)
+                : this(peer, key, 32)
             {
             }
 
             /// <summary>
             /// String to hash for key
             /// </summary>
-            public NetXtea(string key)
-                : this(SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(key)), 32)
+            public NetXtea(NetPeer peer, string key)
+                : this(peer, NetUtility.ComputeSHAHash(Encoding.UTF8.GetBytes(key)), 32)
             {
+            }
+
+            public override void SetKey(byte[] data, int offset, int length)
+            {
+                var key = NetUtility.ComputeSHAHash(data, offset, length);
+                NetException.Assert(key.Length >= 16);
+                SetKey(key, 0, 16);
             }
 
             /// <summary>
@@ -104,6 +112,8 @@ namespace MELHARFI
 
                 UIntToBytes(v0, destination, 0);
                 UIntToBytes(v1, destination, 0 + 4);
+
+                return;
             }
 
             /// <summary>
@@ -123,6 +133,8 @@ namespace MELHARFI
 
                 UIntToBytes(v0, destination, 0);
                 UIntToBytes(v1, destination, 0 + 4);
+
+                return;
             }
 
             private static uint BytesToUInt(byte[] bytes, int offset)

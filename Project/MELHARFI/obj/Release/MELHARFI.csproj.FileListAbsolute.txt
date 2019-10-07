@@ -15,3 +15,15 @@ E:\project\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\bin\Release\MELHARFI.
 E:\project\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\bin\Release\MELHARFI.pdb
 E:\project\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\obj\Release\MELHARFI.dll
 E:\project\MELHARFI-2D-Game-Engine-master\Project\MELHARFI\obj\Release\MELHARFI.pdb
+E:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.csproj.CoreCompileInputs.cache
+E:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\bin\Release\MELHARFI.dll
+E:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\bin\Release\MELHARFI.pdb
+E:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.dll
+E:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.pdb
+E:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.csprojResolveAssemblyReference.cache
+D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\bin\Release\MELHARFI.dll
+D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\bin\Release\MELHARFI.pdb
+D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.csproj.CoreCompileInputs.cache
+D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.dll
+D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.pdb
+D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.csprojAssemblyReference.cache

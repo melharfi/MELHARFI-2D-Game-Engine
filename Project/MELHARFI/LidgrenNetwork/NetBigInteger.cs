@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Text;
 using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 
 namespace MELHARFI
 {
@@ -14,7 +14,7 @@ namespace MELHARFI
         internal class NetBigInteger
         {
             private const long IMASK = 0xffffffffL;
-            private const ulong UIMASK = IMASK;
+            private const ulong UIMASK = (ulong)IMASK;
 
             private static readonly int[] ZeroMagnitude = new int[0];
             private static readonly byte[] ZeroEncoding = new byte[0];
@@ -419,7 +419,7 @@ namespace MELHARFI
 
                 while (vI >= 0)
                 {
-                    m += ((uint)a[tI] + (long)(uint)b[vI--]);
+                    m += ((long)(uint)a[tI] + (long)(uint)b[vI--]);
                     a[tI--] = (int)m;
                     m = (long)((ulong)m >> 32);
                 }
@@ -509,7 +509,7 @@ namespace MELHARFI
                     : value.Add(One).m_magnitude;
 
                 bool resultNeg = m_sign < 0 && value.m_sign < 0;
-                int resultLength = Math.Max(aMag.Length, bMag.Length);
+                int resultLength = System.Math.Max(aMag.Length, bMag.Length);
                 int[] resultMag = new int[resultLength];
 
                 int aStart = resultMag.Length - aMag.Length;
@@ -738,7 +738,7 @@ namespace MELHARFI
                     }
                     else
                     {
-                        iCount = new[] { 1 };
+                        iCount = new int[] { 1 };
 
                         int len = y.Length - yStart;
                         c = new int[len];
@@ -1237,13 +1237,13 @@ namespace MELHARFI
 
                 for (int i = x.Length - 1; i != 0; i--)
                 {
-                    ulong v = (uint)x[i];
+                    ulong v = (ulong)(uint)x[i];
 
                     u1 = v * v;
                     u2 = u1 >> 32;
                     u1 = (uint)u1;
 
-                    u1 += (uint)w[wBase];
+                    u1 += (ulong)(uint)w[wBase];
 
                     w[wBase] = (int)(uint)u1;
                     c = u2 + (u1 >> 32);
@@ -1251,16 +1251,16 @@ namespace MELHARFI
                     for (int j = i - 1; j >= 0; j--)
                     {
                         --wBase;
-                        u1 = v * (uint)x[j];
+                        u1 = v * (ulong)(uint)x[j];
                         u2 = u1 >> 31; // multiply by 2!
                         u1 = (uint)(u1 << 1); // multiply by 2!
-                        u1 += c + (uint)w[wBase];
+                        u1 += c + (ulong)(uint)w[wBase];
 
                         w[wBase] = (int)(uint)u1;
                         c = u2 + (u1 >> 32);
                     }
 
-                    c += (uint)w[--wBase];
+                    c += (ulong)(uint)w[--wBase];
                     w[wBase] = (int)(uint)c;
 
                     if (--wBase >= 0)
@@ -1274,17 +1274,17 @@ namespace MELHARFI
                     wBase += i;
                 }
 
-                u1 = (uint)x[0];
+                u1 = (ulong)(uint)x[0];
                 u1 = u1 * u1;
                 u2 = u1 >> 32;
                 u1 = u1 & IMASK;
 
-                u1 += (uint)w[wBase];
+                u1 += (ulong)(uint)w[wBase];
 
                 w[wBase] = (int)(uint)u1;
                 if (--wBase >= 0)
                 {
-                    w[wBase] = (int)(uint)(u2 + (u1 >> 32) + (uint)w[wBase]);
+                    w[wBase] = (int)(uint)(u2 + (u1 >> 32) + (ulong)(uint)w[wBase]);
                 }
                 else
                 {
@@ -1479,7 +1479,7 @@ namespace MELHARFI
                 ulong mQuote)
             {
                 ulong um = m;
-                ulong prod1 = x * (ulong)y;
+                ulong prod1 = (ulong)x * (ulong)y;
                 ulong u = (prod1 * mQuote) & UIMASK;
                 ulong prod2 = u * um;
                 ulong tmp = (prod1 & UIMASK) + (prod2 & UIMASK);
@@ -1728,7 +1728,7 @@ namespace MELHARFI
 
                         return rem == 0
                             ? Zero
-                            : new NetBigInteger(m_sign, new[] { rem }, false);
+                            : new NetBigInteger(m_sign, new int[] { rem }, false);
                     }
                 }
 
@@ -1756,7 +1756,7 @@ namespace MELHARFI
                     return ZeroMagnitude;
 
                 int numWords = (n + BitsPerInt - 1) / BitsPerInt;
-                numWords = Math.Min(numWords, m_magnitude.Length);
+                numWords = System.Math.Min(numWords, m_magnitude.Length);
                 int[] result = new int[numWords];
 
                 Array.Copy(m_magnitude, m_magnitude.Length - numWords, result, 0, numWords);
@@ -2234,11 +2234,11 @@ namespace MELHARFI
                 int lsw = (int)value;
 
                 if (msw != 0)
-                    return new NetBigInteger(1, new[] { msw, lsw }, false);
+                    return new NetBigInteger(1, new int[] { msw, lsw }, false);
 
                 if (lsw != 0)
                 {
-                    NetBigInteger n = new NetBigInteger(1, new[] { lsw }, false);
+                    NetBigInteger n = new NetBigInteger(1, new int[] { lsw }, false);
                     // Check for a power of two
                     if ((lsw & -lsw) == lsw)
                     {
@@ -2297,7 +2297,7 @@ namespace MELHARFI
                         break;
                 }
 
-                int word = m_magnitude[w];
+                int word = (int)m_magnitude[w];
                 Debug.Assert(word != 0);
 
                 int b = (word & 0x0000FFFF) == 0
@@ -2336,5 +2336,20 @@ namespace MELHARFI
                 return ((word >> (n % 32)) & 1) > 0;
             }
         }
+
+#if WINDOWS_RUNTIME
+	internal sealed class Stack
+	{
+		private System.Collections.Generic.List<object> m_list = new System.Collections.Generic.List<object>();
+		public int Count { get { return m_list.Count; } }
+		public void Push(object item) { m_list.Add(item); }
+		public object Pop()
+		{
+			var item = m_list[m_list.Count - 1];
+			m_list.RemoveAt(m_list.Count - 1);
+			return item;
+		}
+	}
+#endif
     }
 }

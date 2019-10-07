@@ -17,11 +17,14 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.Threading;
+
+//
+// Comment for Linux Mono users: reports of library thread hangs on EnterReadLock() suggests switching to plain lock() works better
+//
 
 namespace MELHARFI
 {
@@ -55,12 +58,30 @@ namespace MELHARFI
             /// <summary>
             /// Gets the number of items in the queue
             /// </summary>
-            public int Count { get { return m_size; } }
+            public int Count
+            {
+                get
+                {
+                    m_lock.EnterReadLock();
+                    int count = m_size;
+                    m_lock.ExitReadLock();
+                    return count;
+                }
+            }
 
             /// <summary>
             /// Gets the current capacity for the queue
             /// </summary>
-            public int Capacity { get { return m_items.Length; } }
+            public int Capacity
+            {
+                get
+                {
+                    m_lock.EnterReadLock();
+                    int capacity = m_items.Length;
+                    m_lock.ExitReadLock();
+                    return capacity;
+                }
+            }
 
             /// <summary>
             /// NetQueue constructor
@@ -196,6 +217,15 @@ namespace MELHARFI
 
                     return true;
                 }
+                catch
+                {
+#if DEBUG
+				throw;
+#else
+                    item = default(T);
+                    return false;
+#endif
+                }
                 finally
                 {
                     m_lock.ExitWriteLock();
@@ -203,7 +233,7 @@ namespace MELHARFI
             }
 
             /// <summary>
-            /// Gets an item from the head of the queue, or returns default(T) if empty
+            /// Gets all items from the head of the queue, or returns number of items popped
             /// </summary>
             public int TryDrain(IList<T> addTo)
             {

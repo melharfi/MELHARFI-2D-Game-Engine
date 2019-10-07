@@ -16,6 +16,7 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+using System;
 
 namespace MELHARFI
 {
@@ -170,8 +171,10 @@ namespace MELHARFI
             DiscoveryResponse = 137,
             NatPunchMessage = 138, // send between peers
             NatIntroduction = 139, // send to master server
+            NatIntroductionConfirmRequest = 142,
+            NatIntroductionConfirmed = 143,
             ExpandMTURequest = 140,
-            ExpandMTUSuccess = 141
+            ExpandMTUSuccess = 141,
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace MELHARFI
+﻿using System;
+
+namespace MELHARFI
 {
     namespace Lidgren.Network
     {

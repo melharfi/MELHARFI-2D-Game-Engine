@@ -1,4 +1,6 @@
-﻿namespace MELHARFI
+﻿using System;
+
+namespace MELHARFI
 {
     namespace Lidgren.Network
     {
@@ -42,6 +44,7 @@
 
                 if (relate < 0)
                 {
+                    m_connection.m_statistics.MessageDropped();
                     m_peer.LogVerbose("Received message #" + message.m_sequenceNumber + " DROPPING LATE or DUPE");
                     return;
                 }
@@ -50,6 +53,7 @@
                 if (relate > m_windowSize)
                 {
                     // too early message!
+                    m_connection.m_statistics.MessageDropped();
                     m_peer.LogDebug("Received " + message + " TOO EARLY! Expected " + m_windowStart);
                     return;
                 }
@@ -57,6 +61,7 @@
                 // ok
                 m_windowStart = (m_windowStart + relate) % NetConstants.NumSequenceNumbers;
                 m_peer.ReleaseMessage(message);
+                return;
             }
         }
     }

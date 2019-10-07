@@ -17,7 +17,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
 using System;
 using System.Diagnostics;
 
@@ -33,11 +32,18 @@ namespace MELHARFI
         {
             internal NetMessageType m_messageType;
             internal bool m_isSent;
+
+            // Recycling count is:
+            // * incremented for each recipient on send
+            // * incremented, when reliable, in SenderChannel.ExecuteSend()
+            // * decremented (both reliable and unreliable) in NetConnection.QueueSendMessage()
+            // * decremented, when reliable, in SenderChannel.DestoreMessage()
+            // ... when it reaches zero it can be recycled
             internal int m_recyclingCount;
 
             internal int m_fragmentGroup;             // which group of fragments ths belongs to
             internal int m_fragmentGroupTotalBits;    // total number of bits in this group
-            internal int m_fragmentChunkByteSize;	  // size, in bytes, of every chunk but the last one
+            internal int m_fragmentChunkByteSize;     // size, in bytes, of every chunk but the last one
             internal int m_fragmentChunkNumber;       // which number chunk this is, starting with 0
 
             internal NetOutgoingMessage()
@@ -49,7 +55,7 @@ namespace MELHARFI
                 m_messageType = NetMessageType.LibraryError;
                 m_bitLength = 0;
                 m_isSent = false;
-                m_recyclingCount = 0;
+                NetException.Assert(m_recyclingCount == 0);
                 m_fragmentGroup = 0;
             }
 
@@ -98,7 +104,7 @@ namespace MELHARFI
                     int byteLen = NetUtility.BytesToHoldBits(m_bitLength);
                     if (byteLen > 0)
                     {
-                        Buffer.BlockCopy(m_data, m_fragmentChunkNumber * m_fragmentChunkByteSize, intoBuffer, ptr, byteLen);
+                        Buffer.BlockCopy(m_data, (int)(m_fragmentChunkNumber * m_fragmentChunkByteSize), intoBuffer, ptr, byteLen);
                         ptr += byteLen;
                     }
                 }
@@ -112,14 +118,14 @@ namespace MELHARFI
                 int retval = NetConstants.UnfragmentedMessageHeaderSize; // regular headers
                 if (m_fragmentGroup != 0)
                     retval += NetFragmentationHelper.GetFragmentationHeaderSize(m_fragmentGroup, m_fragmentGroupTotalBits / 8, m_fragmentChunkByteSize, m_fragmentChunkNumber);
-                retval += LengthBytes;
+                retval += this.LengthBytes;
                 return retval;
             }
 
             /// <summary>
             /// Encrypt this message using the provided algorithm; no more writing can be done before sending it or the message will be corrupt!
             /// </summary>
-            public bool Encrypt(INetEncryption encryption)
+            public bool Encrypt(NetEncryption encryption)
             {
                 return encryption.Encrypt(this);
             }
@@ -130,9 +136,9 @@ namespace MELHARFI
             public override string ToString()
             {
                 if (m_isSent)
-                    return "[NetOutgoingMessage " + m_messageType + " " + LengthBytes + " bytes]";
+                    return "[NetOutgoingMessage " + m_messageType + " " + this.LengthBytes + " bytes]";
 
-                return "[NetOutgoingMessage " + LengthBytes + " bytes]";
+                return "[NetOutgoingMessage " + this.LengthBytes + " bytes]";
             }
         }
     }

@@ -17,9 +17,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
 using System;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace MELHARFI
@@ -143,7 +141,7 @@ namespace MELHARFI
             /// <summary>
             /// Gets the bit/bool at the specified index
             /// </summary>
-            [IndexerName("Bit")]
+            [System.Runtime.CompilerServices.IndexerName("Bit")]
             public bool this[int index]
             {
                 get { return Get(index); }
@@ -157,7 +155,7 @@ namespace MELHARFI
             {
                 Array.Clear(m_data, 0, m_data.Length);
                 m_numBitsSet = 0;
-                NetException.Assert(IsEmpty());
+                NetException.Assert(this.IsEmpty());
             }
 
             /// <summary>

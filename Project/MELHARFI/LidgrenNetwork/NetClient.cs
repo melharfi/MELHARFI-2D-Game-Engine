@@ -16,8 +16,12 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-
+using System;
 using System.Net;
+
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+#endif
 
 namespace MELHARFI
 {
@@ -82,7 +86,7 @@ namespace MELHARFI
             /// <param name="remoteEndPoint">The remote endpoint to connect to</param>
             /// <param name="hailMessage">The hail message to pass</param>
             /// <returns>server connection, or null if already connected</returns>
-            public override NetConnection Connect(IPEndPoint remoteEndPoint, NetOutgoingMessage hailMessage)
+            public override NetConnection Connect(NetEndPoint remoteEndPoint, NetOutgoingMessage hailMessage)
             {
                 lock (m_connections)
                 {
@@ -155,6 +159,7 @@ namespace MELHARFI
                 if (serverConnection == null)
                 {
                     LogWarning("Cannot send message, no server connection!");
+                    Recycle(msg);
                     return NetSendResult.FailedNotConnected;
                 }
 

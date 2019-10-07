@@ -16,9 +16,13 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-
-using System.Diagnostics;
+using System;
 using System.Net;
+using System.Diagnostics;
+
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+#endif
 
 namespace MELHARFI
 {
@@ -31,13 +35,13 @@ namespace MELHARFI
         public sealed class NetIncomingMessage : NetBuffer
         {
             internal NetIncomingMessageType m_incomingMessageType;
-            internal IPEndPoint m_senderEndPoint;
+            internal NetEndPoint m_senderEndPoint;
             internal NetConnection m_senderConnection;
             internal int m_sequenceNumber;
             internal NetMessageType m_receivedMessageType;
             internal bool m_isFragment;
             internal double m_receiveTime;
-            //public string Username;
+
             /// <summary>
             /// Gets the type of this incoming message
             /// </summary>
@@ -54,9 +58,9 @@ namespace MELHARFI
             public int SequenceChannel { get { return (int)m_receivedMessageType - (int)NetUtility.GetDeliveryMethod(m_receivedMessageType); } }
 
             /// <summary>
-            /// IPEndPoint of sender, if any
+            /// endpoint of sender, if any
             /// </summary>
-            public IPEndPoint SenderEndPoint { get { return m_senderEndPoint; } }
+            public NetEndPoint SenderEndPoint { get { return m_senderEndPoint; } }
 
             /// <summary>
             /// NetConnection of sender, if any
@@ -92,7 +96,7 @@ namespace MELHARFI
             /// </summary>
             /// <param name="encryption">The encryption algorithm used to encrypt the message</param>
             /// <returns>true on success</returns>
-            public bool Decrypt(INetEncryption encryption)
+            public bool Decrypt(NetEncryption encryption)
             {
                 return encryption.Decrypt(this);
             }
@@ -111,7 +115,7 @@ namespace MELHARFI
             /// </summary>
             public override string ToString()
             {
-                return "[NetIncomingMessage #" + m_sequenceNumber + " " + LengthBytes + " bytes]";
+                return "[NetIncomingMessage #" + m_sequenceNumber + " " + this.LengthBytes + " bytes]";
             }
         }
     }

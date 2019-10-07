@@ -60,7 +60,7 @@ namespace MELHARFI
             /// </summary>
             public long Position
             {
-                get { return m_readPosition; }
+                get { return (long)m_readPosition; }
                 set { m_readPosition = (int)value; }
             }
 
@@ -69,7 +69,7 @@ namespace MELHARFI
             /// </summary>
             public int PositionInBytes
             {
-                get { return m_readPosition / 8; }
+                get { return (int)(m_readPosition / 8); }
             }
 
             static NetBuffer()

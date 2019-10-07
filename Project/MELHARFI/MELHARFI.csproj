@@ -67,23 +67,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gfx\Anim.cs" />
-    <Compile Include="AStar.cs" />
-    <Compile Include="Gfx\Bmp.cs" />
-    <Compile Include="Crypt.cs" />
-    <Compile Include="Draw.cs" />
-    <Compile Include="Events\MouseClicHandleEvents.cs" />
-    <Compile Include="Events\MouseDoubleClicHandleEvents.cs" />
-    <Compile Include="Events\MouseDownHandleEvents.cs" />
-    <Compile Include="Events\MouseMoveHandleEvents.cs" />
-    <Compile Include="Events\MouseUpHandleEvents.cs" />
-    <Compile Include="Gfx\FillPolygon.cs" />
-    <Compile Include="GUIGenerator.cs" />
-    <Compile Include="IGfx.cs" />
-    <Compile Include="LidgrenNetwork\Encryption\INetEncryption.cs" />
+    <Compile Include="Manager\Events\MouseEventHandler.cs" />
+    <Compile Include="Manager\Gfx\Anim.cs" />
+    <Compile Include="AStar\AStar.cs" />
+    <Compile Include="Manager\Gfx\Bmp.cs" />
+    <Compile Include="Manager\Crypt.cs" />
+    <Compile Include="Manager\Draw.cs" />
+    <Compile Include="Manager\Events\MouseMoveHandlerEvents.cs" />
+    <Compile Include="Manager\Gfx\FillPolygon.cs" />
+    <Compile Include="Manager\Gfx\IGfx.cs" />
     <Compile Include="LidgrenNetwork\Encryption\NetAESEncryption.cs" />
     <Compile Include="LidgrenNetwork\Encryption\NetBlockEncryptionBase.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\NetCryptoProviderBase.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\NetCryptoProviderEncryption.cs" />
     <Compile Include="LidgrenNetwork\Encryption\NetDESEncryption.cs" />
+    <Compile Include="LidgrenNetwork\Encryption\NetEncryption.cs" />
     <Compile Include="LidgrenNetwork\Encryption\NetRC2Encryption.cs" />
     <Compile Include="LidgrenNetwork\Encryption\NetTripleDESEncryption.cs" />
     <Compile Include="LidgrenNetwork\Encryption\NetXorEncryption.cs" />
@@ -109,9 +107,9 @@
     <Compile Include="LidgrenNetwork\NetDeliveryMethod.cs" />
     <Compile Include="LidgrenNetwork\NetException.cs" />
     <Compile Include="LidgrenNetwork\NetFragmentationHelper.cs" />
+    <Compile Include="LidgrenNetwork\NetFragmentationInfo.cs" />
     <Compile Include="LidgrenNetwork\NetIncomingMessage.cs" />
     <Compile Include="LidgrenNetwork\NetIncomingMessageType.cs" />
-    <Compile Include="LidgrenNetwork\NetInfos.cs" />
     <Compile Include="LidgrenNetwork\NetMessageType.cs" />
     <Compile Include="LidgrenNetwork\NetNatIntroduction.cs" />
     <Compile Include="LidgrenNetwork\NetOutgoingMessage.cs" />
@@ -128,6 +126,8 @@
     <Compile Include="LidgrenNetwork\NetPeerStatus.cs" />
     <Compile Include="LidgrenNetwork\NetQueue.cs" />
     <Compile Include="LidgrenNetwork\NetRandom.cs" />
+    <Compile Include="LidgrenNetwork\NetRandom.Implementations.cs" />
+    <Compile Include="LidgrenNetwork\NetRandomSeed.cs" />
     <Compile Include="LidgrenNetwork\NetReceiverChannelBase.cs" />
     <Compile Include="LidgrenNetwork\NetReliableOrderedReceiver.cs" />
     <Compile Include="LidgrenNetwork\NetReliableSenderChannel.cs" />
@@ -145,17 +145,21 @@
     <Compile Include="LidgrenNetwork\NetUnreliableUnorderedReceiver.cs" />
     <Compile Include="LidgrenNetwork\NetUPnP.cs" />
     <Compile Include="LidgrenNetwork\NetUtility.cs" />
-    <Compile Include="LidgrenNetwork\SenderChannelBase.cs" />
-    <Compile Include="Manager.cs" />
-    <Compile Include="OldDataMouseMove.cs" />
-    <Compile Include="PressedGfx.cs" />
+    <Compile Include="LidgrenNetwork\Platform\PlatformAndroid.cs" />
+    <Compile Include="LidgrenNetwork\Platform\PlatformConstrained.cs" />
+    <Compile Include="LidgrenNetwork\Platform\PlatformUnityExtras.cs" />
+    <Compile Include="LidgrenNetwork\Platform\PlatformWin32.cs" />
+    <Compile Include="LidgrenNetwork\Platform\PlatformWinRT.cs" />
+    <Compile Include="Manager\Manager.cs" />
+    <Compile Include="Manager\OldDataMouseMove.cs" />
+    <Compile Include="Manager\PressedGfx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Gfx\Rec.cs" />
-    <Compile Include="ReverseZindex.cs" />
-    <Compile Include="SpriteSheet.cs" />
-    <Compile Include="Gfx\Txt.cs" />
-    <Compile Include="Zindex.cs" />
-    <Compile Include="ZOrder.cs" />
+    <Compile Include="Manager\Gfx\Rec.cs" />
+    <Compile Include="Manager\ReverseZindex.cs" />
+    <Compile Include="Manager\SpriteSheet.cs" />
+    <Compile Include="Manager\Gfx\Txt.cs" />
+    <Compile Include="Manager\Zindex.cs" />
+    <Compile Include="Manager\ZOrder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

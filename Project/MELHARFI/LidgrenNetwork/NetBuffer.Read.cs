@@ -1,6 +1,12 @@
 ﻿using System;
-using System.Net;
+using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
+using System.Net;
+
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+#endif
 
 namespace MELHARFI
 {
@@ -53,7 +59,7 @@ namespace MELHARFI
             /// <summary>
             /// Reads a signed byte
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public sbyte ReadSByte()
             {
                 NetException.Assert(m_bitLength - m_readPosition >= 8, c_readOverflowError);
@@ -116,6 +122,7 @@ namespace MELHARFI
 
                 NetBitWriter.ReadBytes(m_data, numberOfBytes, m_readPosition, into, offset);
                 m_readPosition += (8 * numberOfBytes);
+                return;
             }
 
             /// <summary>
@@ -137,6 +144,8 @@ namespace MELHARFI
 
                 if (extraBits > 0)
                     into[offset + numberOfWholeBytes] = ReadByte(extraBits);
+
+                return;
             }
 
             /// <summary>
@@ -153,8 +162,8 @@ namespace MELHARFI
             /// <summary>
             /// Reads a 16 bit unsigned integer written using Write(UInt16)
             /// </summary>
-            //[CLSCompliant(false)]
-            public ushort ReadUInt16()
+            [CLSCompliant(false)]
+            public UInt16 ReadUInt16()
             {
                 NetException.Assert(m_bitLength - m_readPosition >= 16, c_readOverflowError);
                 uint retval = NetBitWriter.ReadUInt16(m_data, 16, m_readPosition);
@@ -176,7 +185,7 @@ namespace MELHARFI
             /// <summary>
             /// Reads a 32 bit signed integer written using Write(Int32)
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public bool ReadInt32(out Int32 result)
             {
                 if (m_bitLength - m_readPosition < 32)
@@ -220,8 +229,8 @@ namespace MELHARFI
             /// <summary>
             /// Reads an 32 bit unsigned integer written using Write(UInt32)
             /// </summary>
-            //[CLSCompliant(false)]
-            public uint ReadUInt32()
+            [CLSCompliant(false)]
+            public UInt32 ReadUInt32()
             {
                 NetException.Assert(m_bitLength - m_readPosition >= 32, c_readOverflowError);
                 uint retval = NetBitWriter.ReadUInt32(m_data, 32, m_readPosition);
@@ -232,7 +241,7 @@ namespace MELHARFI
             /// <summary>
             /// Reads an 32 bit unsigned integer written using Write(UInt32) and returns true for success
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public bool ReadUInt32(out UInt32 result)
             {
                 if (m_bitLength - m_readPosition < 32)
@@ -248,8 +257,8 @@ namespace MELHARFI
             /// <summary>
             /// Reads an unsigned integer stored in 1 to 32 bits, written using Write(UInt32, Int32)
             /// </summary>
-            //[CLSCompliant(false)]
-            public uint ReadUInt32(int numberOfBits)
+            [CLSCompliant(false)]
+            public UInt32 ReadUInt32(int numberOfBits)
             {
                 NetException.Assert(numberOfBits > 0 && numberOfBits <= 32, "ReadUInt32(bits) can only read between 1 and 32 bits");
                 //NetException.Assert(m_bitLength - m_readBitPtr >= numberOfBits, "tried to read past buffer size");
@@ -262,8 +271,8 @@ namespace MELHARFI
             /// <summary>
             /// Reads a 64 bit unsigned integer written using Write(UInt64)
             /// </summary>
-            //[CLSCompliant(false)]
-            public ulong ReadUInt64()
+            [CLSCompliant(false)]
+            public UInt64 ReadUInt64()
             {
                 NetException.Assert(m_bitLength - m_readPosition >= 64, c_readOverflowError);
 
@@ -294,8 +303,8 @@ namespace MELHARFI
             /// <summary>
             /// Reads an unsigned integer stored in 1 to 64 bits, written using Write(UInt64, Int32)
             /// </summary>
-            //[CLSCompliant(false)]
-            public ulong ReadUInt64(int numberOfBits)
+            [CLSCompliant(false)]
+            public UInt64 ReadUInt64(int numberOfBits)
             {
                 NetException.Assert(numberOfBits > 0 && numberOfBits <= 64, "ReadUInt64(bits) can only read between 1 and 64 bits");
                 NetException.Assert(m_bitLength - m_readPosition >= numberOfBits, c_readOverflowError);
@@ -303,12 +312,12 @@ namespace MELHARFI
                 ulong retval;
                 if (numberOfBits <= 32)
                 {
-                    retval = NetBitWriter.ReadUInt32(m_data, numberOfBits, m_readPosition);
+                    retval = (ulong)NetBitWriter.ReadUInt32(m_data, numberOfBits, m_readPosition);
                 }
                 else
                 {
                     retval = NetBitWriter.ReadUInt32(m_data, 32, m_readPosition);
-                    retval |= NetBitWriter.ReadUInt32(m_data, numberOfBits - 32, m_readPosition) << 32;
+                    retval |= (UInt64)NetBitWriter.ReadUInt32(m_data, numberOfBits - 32, m_readPosition + 32) << 32;
                 }
                 m_readPosition += numberOfBits;
                 return retval;
@@ -398,30 +407,33 @@ namespace MELHARFI
             /// <summary>
             /// Reads a variable sized UInt32 written using WriteVariableUInt32()
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public uint ReadVariableUInt32()
             {
                 int num1 = 0;
                 int num2 = 0;
-                while (true)
+                while (m_bitLength - m_readPosition >= 8)
                 {
-                    byte num3 = ReadByte();
+                    byte num3 = this.ReadByte();
                     num1 |= (num3 & 0x7f) << num2;
                     num2 += 7;
                     if ((num3 & 0x80) == 0)
                         return (uint)num1;
                 }
+
+                // ouch; failed to find enough bytes; malformed variable length number?
+                return (uint)num1;
             }
 
             /// <summary>
             /// Reads a variable sized UInt32 written using WriteVariableUInt32() and returns true for success
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public bool ReadVariableUInt32(out uint result)
             {
                 int num1 = 0;
                 int num2 = 0;
-                while (true)
+                while (m_bitLength - m_readPosition >= 8)
                 {
                     byte num3;
                     if (ReadByte(out num3) == false)
@@ -437,6 +449,8 @@ namespace MELHARFI
                         return true;
                     }
                 }
+                result = (uint)num1;
+                return false;
             }
 
             /// <summary>
@@ -453,29 +467,32 @@ namespace MELHARFI
             /// </summary>
             public Int64 ReadVariableInt64()
             {
-                ulong n = ReadVariableUInt64();
+                UInt64 n = ReadVariableUInt64();
                 return (Int64)(n >> 1) ^ -(long)(n & 1); // decode zigzag
             }
 
             /// <summary>
             /// Reads a variable sized UInt32 written using WriteVariableInt64()
             /// </summary>
-            //[CLSCompliant(false)]
-            public ulong ReadVariableUInt64()
+            [CLSCompliant(false)]
+            public UInt64 ReadVariableUInt64()
             {
                 UInt64 num1 = 0;
                 int num2 = 0;
-                while (true)
+                while (m_bitLength - m_readPosition >= 8)
                 {
                     //if (num2 == 0x23)
                     //	throw new FormatException("Bad 7-bit encoded integer");
 
-                    byte num3 = ReadByte();
+                    byte num3 = this.ReadByte();
                     num1 |= ((UInt64)num3 & 0x7f) << num2;
                     num2 += 7;
                     if ((num3 & 0x80) == 0)
                         return num1;
                 }
+
+                // ouch; failed to find enough bytes; malformed variable length number?
+                return num1;
             }
 
             /// <summary>
@@ -487,7 +504,7 @@ namespace MELHARFI
             {
                 uint encodedVal = ReadUInt32(numberOfBits);
                 int maxVal = (1 << numberOfBits) - 1;
-                return ((encodedVal + 1) / (float)(maxVal + 1) - 0.5f) * 2.0f;
+                return ((float)(encodedVal + 1) / (float)(maxVal + 1) - 0.5f) * 2.0f;
             }
 
             /// <summary>
@@ -499,7 +516,7 @@ namespace MELHARFI
             {
                 uint encodedVal = ReadUInt32(numberOfBits);
                 int maxVal = (1 << numberOfBits) - 1;
-                return (encodedVal + 1) / (float)(maxVal + 1);
+                return (float)(encodedVal + 1) / (float)(maxVal + 1);
             }
 
             /// <summary>
@@ -513,8 +530,8 @@ namespace MELHARFI
             {
                 float range = max - min;
                 int maxVal = (1 << numberOfBits) - 1;
-                float encodedVal = ReadUInt32(numberOfBits);
-                float unit = encodedVal / maxVal;
+                float encodedVal = (float)ReadUInt32(numberOfBits);
+                float unit = encodedVal / (float)maxVal;
                 return min + (unit * range);
             }
 
@@ -534,27 +551,52 @@ namespace MELHARFI
             }
 
             /// <summary>
+            /// Reads a 64 bit integer value written using WriteRangedInteger() (64 version)
+            /// </summary>
+            /// <param name="min">The minimum value used when writing the value</param>
+            /// <param name="max">The maximum value used when writing the value</param>
+            /// <returns>A signed integer value larger or equal to MIN and smaller or equal to MAX</returns>
+            public long ReadRangedInteger(long min, long max)
+            {
+                ulong range = (ulong)(max - min);
+                int numBits = NetUtility.BitsToHoldUInt64(range);
+
+                ulong rvalue = ReadUInt64(numBits);
+                return min + (long)rvalue;
+            }
+
+            /// <summary>
             /// Reads a string written using Write(string)
             /// </summary>
             public string ReadString()
             {
                 int byteLen = (int)ReadVariableUInt32();
 
-                if (byteLen == 0)
+                if (byteLen <= 0)
                     return String.Empty;
 
-                NetException.Assert(m_bitLength - m_readPosition >= (byteLen * 8), c_readOverflowError);
+                if ((ulong)(m_bitLength - m_readPosition) < ((ulong)byteLen * 8))
+                {
+                    // not enough data
+#if DEBUG
+				
+				throw new NetException(c_readOverflowError);
+#else
+                    m_readPosition = m_bitLength;
+                    return null; // unfortunate; but we need to protect against DDOS
+#endif
+                }
 
                 if ((m_readPosition & 7) == 0)
                 {
                     // read directly
-                    string retval = Encoding.UTF8.GetString(m_data, m_readPosition >> 3, byteLen);
+                    string retval = System.Text.Encoding.UTF8.GetString(m_data, m_readPosition >> 3, byteLen);
                     m_readPosition += (8 * byteLen);
                     return retval;
                 }
 
                 byte[] bytes = ReadBytes(byteLen);
-                return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
             }
 
             /// <summary>
@@ -569,7 +611,7 @@ namespace MELHARFI
                     return false;
                 }
 
-                if (byteLen == 0)
+                if (byteLen <= 0)
                 {
                     result = String.Empty;
                     return true;
@@ -584,7 +626,7 @@ namespace MELHARFI
                 if ((m_readPosition & 7) == 0)
                 {
                     // read directly
-                    result = Encoding.UTF8.GetString(m_data, m_readPosition >> 3, (int)byteLen);
+                    result = System.Text.Encoding.UTF8.GetString(m_data, m_readPosition >> 3, (int)byteLen);
                     m_readPosition += (8 * (int)byteLen);
                     return true;
                 }
@@ -596,7 +638,7 @@ namespace MELHARFI
                     return false;
                 }
 
-                result = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                result = System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
                 return true;
             }
 
@@ -605,7 +647,7 @@ namespace MELHARFI
             /// </summary>
             public double ReadTime(NetConnection connection, bool highPrecision)
             {
-                double remoteTime = (highPrecision ? ReadDouble() : ReadSingle());
+                double remoteTime = (highPrecision ? ReadDouble() : (double)ReadSingle());
 
                 if (connection == null)
                     throw new NetException("Cannot call ReadTime() on message without a connected sender (ie. unconnected messages)");
@@ -617,14 +659,14 @@ namespace MELHARFI
             /// <summary>
             /// Reads a stored IPv4 endpoint description
             /// </summary>
-            public IPEndPoint ReadIPEndPoint()
+            public NetEndPoint ReadIPEndPoint()
             {
                 byte len = ReadByte();
                 byte[] addressBytes = ReadBytes(len);
-                int port = ReadUInt16();
+                int port = (int)ReadUInt16();
 
-                IPAddress address = new IPAddress(addressBytes);
-                return new IPEndPoint(address, port);
+                var address = NetUtility.CreateAddressFromBytes(addressBytes);
+                return new NetEndPoint(address, port);
             }
 
             /// <summary>

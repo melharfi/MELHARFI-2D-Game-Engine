@@ -1,4 +1,8 @@
-﻿namespace MELHARFI
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace MELHARFI
 {
     namespace Lidgren.Network
     {
@@ -39,7 +43,7 @@
             /// <summary>
             /// Reliable, ordered delivery
             /// </summary>
-            ReliableOrdered = 67
+            ReliableOrdered = 67,
         }
     }
 }

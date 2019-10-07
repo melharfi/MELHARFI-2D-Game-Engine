@@ -16,7 +16,6 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-
 using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
@@ -28,13 +27,13 @@ namespace MELHARFI
         /// <summary>
         /// Exception thrown in the Lidgren Network Library
         /// </summary>
-        [Serializable]
         public sealed class NetException : Exception
         {
             /// <summary>
             /// NetException constructor
             /// </summary>
             public NetException()
+                : base()
             {
             }
 
@@ -51,14 +50,6 @@ namespace MELHARFI
             /// </summary>
             public NetException(string message, Exception inner)
                 : base(message, inner)
-            {
-            }
-
-            /// <summary>
-            /// NetException constructor
-            /// </summary>
-            private NetException(SerializationInfo info, StreamingContext context)
-                : base(info, context)
             {
             }
 

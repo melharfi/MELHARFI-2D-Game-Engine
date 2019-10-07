@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MELHARFI
 {
@@ -25,9 +26,13 @@ namespace MELHARFI
             /// <param name="method">How to deliver the message</param>
             public void SendToAll(NetOutgoingMessage msg, NetDeliveryMethod method)
             {
-                var all = Connections;
+                var all = this.Connections;
                 if (all.Count <= 0)
+                {
+                    if (msg.m_isSent == false)
+                        Recycle(msg);
                     return;
+                }
 
                 SendMessage(msg, all, method, 0);
             }
@@ -41,9 +46,13 @@ namespace MELHARFI
             /// <param name="sequenceChannel">Which sequence channel to use for the message</param>
             public void SendToAll(NetOutgoingMessage msg, NetConnection except, NetDeliveryMethod method, int sequenceChannel)
             {
-                var all = Connections;
+                var all = this.Connections;
                 if (all.Count <= 0)
+                {
+                    if (msg.m_isSent == false)
+                        Recycle(msg);
                     return;
+                }
 
                 if (except == null)
                 {

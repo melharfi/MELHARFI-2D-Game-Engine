@@ -17,7 +17,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MELHARFI
@@ -42,57 +42,57 @@ namespace MELHARFI
             /// <summary>
             /// Status for a connection changed
             /// </summary>
-            StatusChanged = 1 << 0,			// Data (string)
+            StatusChanged = 1 << 0,         // Data (string)
 
             /// <summary>
             /// Data sent using SendUnconnectedMessage
             /// </summary>
-            UnconnectedData = 1 << 1,		// Data					Based on data received
+            UnconnectedData = 1 << 1,       // Data					Based on data received
 
             /// <summary>
             /// Connection approval is needed
             /// </summary>
-            ConnectionApproval = 1 << 2,	// Data
+            ConnectionApproval = 1 << 2,    // Data
 
             /// <summary>
             /// Application data
             /// </summary>
-            Data = 1 << 3,					// Data					Based on data received
+            Data = 1 << 3,                  // Data					Based on data received
 
             /// <summary>
             /// Receipt of delivery
             /// </summary>
-            Receipt = 1 << 4,				// Data
+            Receipt = 1 << 4,               // Data
 
             /// <summary>
             /// Discovery request for a response
             /// </summary>
-            DiscoveryRequest = 1 << 5,		// (no data)
+            DiscoveryRequest = 1 << 5,      // (no data)
 
             /// <summary>
             /// Discovery response to a request
             /// </summary>
-            DiscoveryResponse = 1 << 6,		// Data
+            DiscoveryResponse = 1 << 6,     // Data
 
             /// <summary>
             /// Verbose debug message
             /// </summary>
-            VerboseDebugMessage = 1 << 7,	// Data (string)
+            VerboseDebugMessage = 1 << 7,   // Data (string)
 
             /// <summary>
             /// Debug message
             /// </summary>
-            DebugMessage = 1 << 8,			// Data (string)
+            DebugMessage = 1 << 8,          // Data (string)
 
             /// <summary>
             /// Warning message
             /// </summary>
-            WarningMessage = 1 << 9,		// Data (string)
+            WarningMessage = 1 << 9,        // Data (string)
 
             /// <summary>
             /// Error message
             /// </summary>
-            ErrorMessage = 1 << 10,			// Data (string)
+            ErrorMessage = 1 << 10,         // Data (string)
 
             /// <summary>
             /// NAT introduction was successful
@@ -102,7 +102,7 @@ namespace MELHARFI
             /// <summary>
             /// A roundtrip was measured and NetConnection.AverageRoundtripTime was updated
             /// </summary>
-            ConnectionLatencyUpdated = 1 << 12 // Seconds as a Single
+            ConnectionLatencyUpdated = 1 << 12, // Seconds as a Single
         }
     }
 }

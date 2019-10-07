@@ -1,16 +1,14 @@
-﻿#if !__ANDROID__ && !IOS
-#define IS_MAC_AVAILABLE
-#endif
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
+using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Net.Sockets;
+using System.Collections.Generic;
+
+#if !__NOIPENDPOINT__
+using NetEndPoint = System.Net.IPEndPoint;
+#endif
 
 namespace MELHARFI
 {
@@ -28,13 +26,15 @@ namespace MELHARFI
             private object m_initializeLock = new object();
             private uint m_frameCounter;
             private double m_lastHeartbeat;
+            private double m_lastSocketBind = float.MinValue;
             private NetUPnP m_upnp;
+            internal bool m_needFlushSendQueue;
 
             internal readonly NetPeerConfiguration m_configuration;
             private readonly NetQueue<NetIncomingMessage> m_releasedIncomingMessages;
-            internal readonly NetQueue<NetTuple<IPEndPoint, NetOutgoingMessage>> m_unsentUnconnectedMessages;
+            internal readonly NetQueue<NetTuple<NetEndPoint, NetOutgoingMessage>> m_unsentUnconnectedMessages;
 
-            internal Dictionary<IPEndPoint, NetConnection> m_handshakes;
+            internal Dictionary<NetEndPoint, NetConnection> m_handshakes;
 
             internal readonly NetPeerStatistics m_statistics;
             internal long m_uniqueIdentifier;
@@ -51,13 +51,15 @@ namespace MELHARFI
             /// <summary>
             /// Call this to register a callback for when a new message arrives
             /// </summary>
-            public void RegisterReceivedCallback(SendOrPostCallback callback)
+            public void RegisterReceivedCallback(SendOrPostCallback callback, SynchronizationContext syncContext = null)
             {
-                if (SynchronizationContext.Current == null)
+                if (syncContext == null)
+                    syncContext = SynchronizationContext.Current;
+                if (syncContext == null)
                     throw new NetException("Need a SynchronizationContext to register callback on correct thread!");
                 if (m_receiveCallbacks == null)
                     m_receiveCallbacks = new List<NetTuple<SynchronizationContext, SendOrPostCallback>>();
-                m_receiveCallbacks.Add(new NetTuple<SynchronizationContext, SendOrPostCallback>(SynchronizationContext.Current, callback));
+                m_receiveCallbacks.Add(new NetTuple<SynchronizationContext, SendOrPostCallback>(syncContext, callback));
             }
 
             /// <summary>
@@ -67,7 +69,10 @@ namespace MELHARFI
             {
                 if (m_receiveCallbacks == null)
                     return;
-                m_receiveCallbacks.Remove(new NetTuple<SynchronizationContext, SendOrPostCallback>(SynchronizationContext.Current, callback));
+
+                // remove all callbacks regardless of sync context
+                m_receiveCallbacks.RemoveAll(tuple => tuple.Item2.Equals(callback));
+
                 if (m_receiveCallbacks.Count < 1)
                     m_receiveCallbacks = null;
             }
@@ -90,8 +95,57 @@ namespace MELHARFI
                 if (m_receiveCallbacks != null)
                 {
                     foreach (var tuple in m_receiveCallbacks)
-                        tuple.Item1.Post(tuple.Item2, this);
+                    {
+                        try
+                        {
+                            tuple.Item1.Post(tuple.Item2, this);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogWarning("Receive callback exception:" + ex);
+                        }
+                    }
                 }
+            }
+
+            private void BindSocket(bool reBind)
+            {
+                double now = NetTime.Now;
+                if (now - m_lastSocketBind < 1.0)
+                {
+                    LogDebug("Suppressed socket rebind; last bound " + (now - m_lastSocketBind) + " seconds ago");
+                    return; // only allow rebind once every second
+                }
+                m_lastSocketBind = now;
+
+                if (m_socket == null)
+                    m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+                if (reBind)
+                    m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, (int)1);
+
+                m_socket.ReceiveBufferSize = m_configuration.ReceiveBufferSize;
+                m_socket.SendBufferSize = m_configuration.SendBufferSize;
+                m_socket.Blocking = false;
+
+                var ep = (EndPoint)new NetEndPoint(m_configuration.LocalAddress, reBind ? m_listenPort : m_configuration.Port);
+                m_socket.Bind(ep);
+
+                try
+                {
+                    const uint IOC_IN = 0x80000000;
+                    const uint IOC_VENDOR = 0x18000000;
+                    uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
+                    m_socket.IOControl((int)SIO_UDP_CONNRESET, new byte[] { Convert.ToByte(false) }, null);
+                }
+                catch
+                {
+                    // ignore; SIO_UDP_CONNRESET not supported on this platform
+                }
+
+                var boundEp = m_socket.LocalEndPoint as NetEndPoint;
+                LogDebug("Socket bound to " + boundEp + ": " + m_socket.IsBound);
+                m_listenPort = boundEp.Port;
             }
 
             private void InitializeNetwork()
@@ -113,65 +167,21 @@ namespace MELHARFI
                     m_handshakes.Clear();
 
                     // bind to socket
-                    IPEndPoint iep = null;
-
-                    iep = new IPEndPoint(m_configuration.LocalAddress, m_configuration.Port);
-                    EndPoint ep = iep;
-
-                    m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                    m_socket.ReceiveBufferSize = m_configuration.ReceiveBufferSize;
-                    m_socket.SendBufferSize = m_configuration.SendBufferSize;
-                    m_socket.Blocking = false;
-                    m_socket.Bind(ep);
-
-                    try
-                    {
-                        const uint IOC_IN = 0x80000000;
-                        const uint IOC_VENDOR = 0x18000000;
-                        uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
-                        m_socket.IOControl((int)SIO_UDP_CONNRESET, new[] { Convert.ToByte(false) }, null);
-                    }
-                    catch
-                    {
-                        // ignore; SIO_UDP_CONNRESET not supported on this platform
-                    }
-
-                    IPEndPoint boundEp = m_socket.LocalEndPoint as IPEndPoint;
-                    LogDebug("Socket bound to " + boundEp + ": " + m_socket.IsBound);
-                    m_listenPort = boundEp.Port;
+                    BindSocket(false);
 
                     m_receiveBuffer = new byte[m_configuration.ReceiveBufferSize];
                     m_sendBuffer = new byte[m_configuration.SendBufferSize];
                     m_readHelperMessage = new NetIncomingMessage(NetIncomingMessageType.Error);
                     m_readHelperMessage.m_data = m_receiveBuffer;
 
-                    byte[] macBytes = new byte[8];
-                    NetRandom.Instance.NextBytes(macBytes);
+                    byte[] macBytes = NetUtility.GetMacAddressBytes();
 
-#if IS_MAC_AVAILABLE
-                    try
-                    {
-                        PhysicalAddress pa = NetUtility.GetMacAddress();
-                        if (pa != null)
-                        {
-                            macBytes = pa.GetAddressBytes();
-                            LogVerbose("Mac address is " + NetUtility.ToHexString(macBytes));
-                        }
-                        else
-                        {
-                            LogWarning("Failed to get Mac address");
-                        }
-                    }
-                    catch (NotSupportedException)
-                    {
-                        // not supported; lets just keep the random bytes set above
-                    }
-#endif
+                    var boundEp = m_socket.LocalEndPoint as NetEndPoint;
                     byte[] epBytes = BitConverter.GetBytes(boundEp.GetHashCode());
                     byte[] combined = new byte[epBytes.Length + macBytes.Length];
                     Array.Copy(epBytes, 0, combined, 0, epBytes.Length);
                     Array.Copy(macBytes, 0, combined, epBytes.Length, macBytes.Length);
-                    m_uniqueIdentifier = BitConverter.ToInt64(SHA1.Create().ComputeHash(combined), 0);
+                    m_uniqueIdentifier = BitConverter.ToInt64(NetUtility.ComputeSHAHash(combined), 0);
 
                     m_status = NetPeerStatus.Running;
                 }
@@ -217,25 +227,25 @@ namespace MELHARFI
                     foreach (var conn in m_connections)
                         if (conn != null)
                             list.Add(conn);
-
-                    lock (m_handshakes)
-                    {
-                        foreach (var hs in m_handshakes.Values)
-                            if (hs != null)
-                                list.Add(hs);
-
-                        // shut down connections
-                        foreach (NetConnection conn in list)
-                            conn.Shutdown(m_shutdownReason);
-                    }
                 }
+
+                lock (m_handshakes)
+                {
+                    foreach (var hs in m_handshakes.Values)
+                        if (hs != null && list.Contains(hs) == false)
+                            list.Add(hs);
+                }
+
+                // shut down connections
+                foreach (NetConnection conn in list)
+                    conn.Shutdown(m_shutdownReason);
 
                 FlushDelayedPackets();
 
                 // one final heartbeat, will send stuff and do disconnect
                 Heartbeat();
 
-                Thread.Sleep(10);
+                NetUtility.Sleep(10);
 
                 lock (m_initializeLock)
                 {
@@ -247,14 +257,19 @@ namespace MELHARFI
                             {
                                 m_socket.Shutdown(SocketShutdown.Receive);
                             }
-                            catch { }
-                            m_socket.Close(2); // 2 seconds timeout
-                        }
-                        if (m_messageReceivedEvent != null)
-                        {
-                            m_messageReceivedEvent.Set();
-                            m_messageReceivedEvent.Close();
-                            m_messageReceivedEvent = null;
+                            catch (Exception ex)
+                            {
+                                LogDebug("Socket.Shutdown exception: " + ex.ToString());
+                            }
+
+                            try
+                            {
+                                m_socket.Close(2); // 2 seconds timeout
+                            }
+                            catch (Exception ex)
+                            {
+                                LogDebug("Socket.Close exception: " + ex.ToString());
+                            }
                         }
                     }
                     finally
@@ -262,8 +277,13 @@ namespace MELHARFI
                         m_socket = null;
                         m_status = NetPeerStatus.NotRunning;
                         LogDebug("Shutdown complete");
+
+                        // wake up any threads waiting for server shutdown
+                        if (m_messageReceivedEvent != null)
+                            m_messageReceivedEvent.Set();
                     }
 
+                    m_lastSocketBind = float.MinValue;
                     m_receiveBuffer = null;
                     m_sendBuffer = null;
                     m_unsentUnconnectedMessages.Clear();
@@ -271,46 +291,46 @@ namespace MELHARFI
                     m_connectionLookup.Clear();
                     m_handshakes.Clear();
                 }
+
+                return;
             }
 
             private void Heartbeat()
             {
                 VerifyNetworkThread();
 
-                double dnow = NetTime.Now;
-                float now = (float)dnow;
-
-                double delta = dnow - m_lastHeartbeat;
+                double now = NetTime.Now;
+                double delta = now - m_lastHeartbeat;
 
                 int maxCHBpS = 1250 - m_connections.Count;
                 if (maxCHBpS < 250)
                     maxCHBpS = 250;
-                if (delta > (1.0 / maxCHBpS) || delta < 0.0) // max connection heartbeats/second max
+                if (delta > (1.0 / (double)maxCHBpS) || delta < 0.0) // max connection heartbeats/second max
                 {
                     m_frameCounter++;
-                    m_lastHeartbeat = dnow;
+                    m_lastHeartbeat = now;
 
                     // do handshake heartbeats
                     if ((m_frameCounter % 3) == 0)
                     {
                         foreach (var kvp in m_handshakes)
                         {
-                            NetConnection conn = kvp.Value;
+                            NetConnection conn = kvp.Value as NetConnection;
 #if DEBUG
-                            // sanity check
-                            if (kvp.Key != kvp.Key)
-                                LogWarning("Sanity fail! Connection in handshake list under wrong key!");
+						// sanity check
+						if (kvp.Key != kvp.Key)
+							LogWarning("Sanity fail! Connection in handshake list under wrong key!");
 #endif
                             conn.UnconnectedHeartbeat(now);
                             if (conn.m_status == NetConnectionStatus.Connected || conn.m_status == NetConnectionStatus.Disconnected)
                             {
 #if DEBUG
-                                // sanity check
-                                if (conn.m_status == NetConnectionStatus.Disconnected && m_handshakes.ContainsKey(conn.RemoteEndPoint))
-                                {
-                                    LogWarning("Sanity fail! Handshakes list contained disconnected connection!");
-                                    m_handshakes.Remove(conn.RemoteEndPoint);
-                                }
+							// sanity check
+							if (conn.m_status == NetConnectionStatus.Disconnected && m_handshakes.ContainsKey(conn.RemoteEndPoint))
+							{
+								LogWarning("Sanity fail! Handshakes list contained disconnected connection!");
+								m_handshakes.Remove(conn.RemoteEndPoint);
+							}
 #endif
                                 break; // collection has been modified
                             }
@@ -318,47 +338,54 @@ namespace MELHARFI
                     }
 
 #if DEBUG
-                    SendDelayedPackets();
+				SendDelayedPackets();
 #endif
 
                     // update m_executeFlushSendQueue
-                    if (m_configuration.m_autoFlushSendQueue)
+                    if (m_configuration.m_autoFlushSendQueue && m_needFlushSendQueue == true)
+                    {
                         m_executeFlushSendQueue = true;
+                        m_needFlushSendQueue = false; // a race condition to this variable will simply result in a single superfluous call to FlushSendQueue()
+                    }
 
                     // do connection heartbeats
                     lock (m_connections)
                     {
-                        foreach (NetConnection conn in m_connections)
+                        for (int i = m_connections.Count - 1; i >= 0; i--)
                         {
+                            var conn = m_connections[i];
                             conn.Heartbeat(now, m_frameCounter);
                             if (conn.m_status == NetConnectionStatus.Disconnected)
                             {
                                 //
                                 // remove connection
                                 //
-                                m_connections.Remove(conn);
+                                m_connections.RemoveAt(i);
                                 m_connectionLookup.Remove(conn.RemoteEndPoint);
-                                break; // can't continue iteration here
                             }
                         }
                     }
                     m_executeFlushSendQueue = false;
 
                     // send unsent unconnected messages
-                    NetTuple<IPEndPoint, NetOutgoingMessage> unsent;
+                    NetTuple<NetEndPoint, NetOutgoingMessage> unsent;
                     while (m_unsentUnconnectedMessages.TryDequeue(out unsent))
                     {
                         NetOutgoingMessage om = unsent.Item2;
 
-                        bool connReset;
                         int len = om.Encode(m_sendBuffer, 0, 0);
-                        SendPacket(len, unsent.Item1, 1, out connReset);
 
                         Interlocked.Decrement(ref om.m_recyclingCount);
                         if (om.m_recyclingCount <= 0)
                             Recycle(om);
+
+                        bool connReset;
+                        SendPacket(len, unsent.Item1, 1, out connReset);
                     }
                 }
+
+                if (m_upnp != null)
+                    m_upnp.CheckForDiscoveryTimeout();
 
                 //
                 // read from socket
@@ -373,8 +400,7 @@ namespace MELHARFI
                 //	return;
 
                 // update now
-                dnow = NetTime.Now;
-                now = (float)dnow;
+                now = NetTime.Now;
 
                 do
                 {
@@ -385,17 +411,24 @@ namespace MELHARFI
                     }
                     catch (SocketException sx)
                     {
-                        if (sx.SocketErrorCode == SocketError.ConnectionReset)
+                        switch (sx.SocketErrorCode)
                         {
-                            // connection reset by peer, aka connection forcibly closed aka "ICMP port unreachable" 
-                            // we should shut down the connection; but m_senderRemote seemingly cannot be trusted, so which connection should we shut down?!
-                            // So, what to do?
-                            LogWarning("ConnectionReset");
-                            return;
-                        }
+                            case SocketError.ConnectionReset:
+                                // connection reset by peer, aka connection forcibly closed aka "ICMP port unreachable"
+                                // we should shut down the connection; but m_senderRemote seemingly cannot be trusted, so which connection should we shut down?!
+                                // So, what to do?
+                                LogWarning("ConnectionReset");
+                                return;
 
-                        LogWarning(sx.ToString());
-                        return;
+                            case SocketError.NotConnected:
+                                // socket is unbound; try to rebind it (happens on mobile when process goes to sleep)
+                                BindSocket(true);
+                                return;
+
+                            default:
+                                LogWarning("Socket exception: " + sx.ToString());
+                                return;
+                        }
                     }
 
                     if (bytesReceived < NetConstants.HeaderByteSize)
@@ -403,23 +436,29 @@ namespace MELHARFI
 
                     //LogVerbose("Received " + bytesReceived + " bytes");
 
-                    IPEndPoint ipsender = (IPEndPoint)m_senderRemote;
+                    var ipsender = (NetEndPoint)m_senderRemote;
 
-                    if (m_upnp != null && now < m_upnp.m_discoveryResponseDeadline)
+                    if (m_upnp != null && now < m_upnp.m_discoveryResponseDeadline && bytesReceived > 32)
                     {
                         // is this an UPnP response?
-                        try
+                        string resp = System.Text.Encoding.UTF8.GetString(m_receiveBuffer, 0, bytesReceived);
+                        if (resp.Contains("upnp:rootdevice") || resp.Contains("UPnP/1.0"))
                         {
-                            string resp = Encoding.ASCII.GetString(m_receiveBuffer, 0, bytesReceived);
-                            if (resp.Contains("upnp:rootdevice") || resp.Contains("UPnP/1.0"))
+                            try
                             {
                                 resp = resp.Substring(resp.ToLower().IndexOf("location:") + 9);
                                 resp = resp.Substring(0, resp.IndexOf("\r")).Trim();
                                 m_upnp.ExtractServiceUrl(resp);
                                 return;
                             }
+                            catch (Exception ex)
+                            {
+                                LogDebug("Failed to parse UPnP response: " + ex.ToString());
+
+                                // don't try to parse this packet further
+                                return;
+                            }
                         }
-                        catch { }
                     }
 
                     NetConnection sender = null;
@@ -429,6 +468,7 @@ namespace MELHARFI
                     // parse packet into messages
                     //
                     int numMessages = 0;
+                    int numFragments = 0;
                     int ptr = 0;
                     while ((bytesReceived - ptr) >= NetConstants.HeaderByteSize)
                     {
@@ -446,7 +486,10 @@ namespace MELHARFI
                         byte high = m_receiveBuffer[ptr++];
 
                         bool isFragment = ((low & 1) == 1);
-                        ushort sequenceNumber = (ushort)((low >> 1) | (high << 7));
+                        ushort sequenceNumber = (ushort)((low >> 1) | (((int)high) << 7));
+
+                        if (isFragment)
+                            numFragments++;
 
                         ushort payloadBitLength = (ushort)(m_receiveBuffer[ptr++] | (m_receiveBuffer[ptr++] << 8));
                         int payloadByteLength = NetUtility.BytesToHoldBits(payloadBitLength);
@@ -457,16 +500,20 @@ namespace MELHARFI
                             return;
                         }
 
+                        if (tp >= NetMessageType.Unused1 && tp <= NetMessageType.Unused29)
+                        {
+                            ThrowOrLog("Unexpected NetMessageType: " + tp);
+                            return;
+                        }
+
                         try
                         {
-                            NetException.Assert(tp < NetMessageType.Unused1 || tp > NetMessageType.Unused29);
-
                             if (tp >= NetMessageType.LibraryError)
                             {
                                 if (sender != null)
                                     sender.ReceivedLibraryMessage(tp, ptr, payloadByteLength);
                                 else
-                                    ReceivedUnconnectedLibraryMessage(dnow, ipsender, tp, ptr, payloadByteLength);
+                                    ReceivedUnconnectedLibraryMessage(now, ipsender, tp, ptr, payloadByteLength);
                             }
                             else
                             {
@@ -475,12 +522,13 @@ namespace MELHARFI
 
                                 NetIncomingMessage msg = CreateIncomingMessage(NetIncomingMessageType.Data, payloadByteLength);
                                 msg.m_isFragment = isFragment;
-                                msg.m_receiveTime = dnow;
+                                msg.m_receiveTime = now;
                                 msg.m_sequenceNumber = sequenceNumber;
                                 msg.m_receivedMessageType = tp;
                                 msg.m_senderConnection = sender;
                                 msg.m_senderEndPoint = ipsender;
                                 msg.m_bitLength = payloadBitLength;
+
                                 Buffer.BlockCopy(m_receiveBuffer, ptr, msg.m_data, 0, payloadByteLength);
                                 if (sender != null)
                                 {
@@ -512,9 +560,9 @@ namespace MELHARFI
                         ptr += payloadByteLength;
                     }
 
-                    m_statistics.PacketReceived(bytesReceived, numMessages);
+                    m_statistics.PacketReceived(bytesReceived, numMessages, numFragments);
                     if (sender != null)
-                        sender.m_statistics.PacketReceived(bytesReceived, numMessages);
+                        sender.m_statistics.PacketReceived(bytesReceived, numMessages, numFragments);
 
                 } while (m_socket.Available > 0);
             }
@@ -527,7 +575,7 @@ namespace MELHARFI
                 m_executeFlushSendQueue = true;
             }
 
-            internal void HandleIncomingDiscoveryRequest(double now, IPEndPoint senderEndPoint, int ptr, int payloadByteLength)
+            internal void HandleIncomingDiscoveryRequest(double now, NetEndPoint senderEndPoint, int ptr, int payloadByteLength)
             {
                 if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.DiscoveryRequest))
                 {
@@ -541,7 +589,7 @@ namespace MELHARFI
                 }
             }
 
-            internal void HandleIncomingDiscoveryResponse(double now, IPEndPoint senderEndPoint, int ptr, int payloadByteLength)
+            internal void HandleIncomingDiscoveryResponse(double now, NetEndPoint senderEndPoint, int ptr, int payloadByteLength)
             {
                 if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.DiscoveryResponse))
                 {
@@ -555,7 +603,7 @@ namespace MELHARFI
                 }
             }
 
-            private void ReceivedUnconnectedLibraryMessage(double now, IPEndPoint senderEndPoint, NetMessageType tp, int ptr, int payloadByteLength)
+            private void ReceivedUnconnectedLibraryMessage(double now, NetEndPoint senderEndPoint, NetMessageType tp, int ptr, int payloadByteLength)
             {
                 NetConnection shake;
                 if (m_handshakes.TryGetValue(senderEndPoint, out shake))
@@ -576,10 +624,20 @@ namespace MELHARFI
                         HandleIncomingDiscoveryResponse(now, senderEndPoint, ptr, payloadByteLength);
                         return;
                     case NetMessageType.NatIntroduction:
-                        HandleNatIntroduction(ptr);
+                        if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.NatIntroductionSuccess))
+                            HandleNatIntroduction(ptr);
                         return;
                     case NetMessageType.NatPunchMessage:
-                        HandleNatPunch(ptr, senderEndPoint);
+                        if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.NatIntroductionSuccess))
+                            HandleNatPunch(ptr, senderEndPoint);
+                        return;
+                    case NetMessageType.NatIntroductionConfirmRequest:
+                        if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.NatIntroductionSuccess))
+                            HandleNatPunchConfirmRequest(ptr, senderEndPoint);
+                        return;
+                    case NetMessageType.NatIntroductionConfirmed:
+                        if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.NatIntroductionSuccess))
+                            HandleNatPunchConfirmed(ptr, senderEndPoint);
                         return;
                     case NetMessageType.ConnectResponse:
 

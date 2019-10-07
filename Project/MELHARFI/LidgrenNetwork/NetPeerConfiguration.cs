@@ -17,8 +17,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
-using System.Globalization;
+using System;
 using System.Net;
 
 namespace MELHARFI
@@ -30,6 +29,20 @@ namespace MELHARFI
         /// </summary>
         public sealed class NetPeerConfiguration
         {
+            // Maximum transmission unit
+            // Ethernet can take 1500 bytes of payload, so lets stay below that.
+            // The aim is for a max full packet to be 1440 bytes (30 x 48 bytes, lower than 1468)
+            // -20 bytes IP header
+            //  -8 bytes UDP header
+            //  -4 bytes to be on the safe side and align to 8-byte boundary
+            // Total 1408 bytes
+            // Note that lidgren headers (5 bytes) are not included here; since it's part of the "mtu payload"
+
+            /// <summary>
+            /// Default MTU value in bytes
+            /// </summary>
+            public const int kDefaultMTU = 1408;
+
             private const string c_isLockedMessage = "You may not modify the NetPeerConfiguration after it has been used to initialize a NetPeer";
 
             private bool m_isLocked;
@@ -42,9 +55,12 @@ namespace MELHARFI
             internal int m_defaultOutgoingMessageCapacity;
             internal float m_pingInterval;
             internal bool m_useMessageRecycling;
+            internal int m_recycledCacheMaxCount;
             internal float m_connectionTimeout;
             internal bool m_enableUPnP;
             internal bool m_autoFlushSendQueue;
+            private NetUnreliableSizeBehaviour m_unreliableSizeBehaviour;
+            internal bool m_suppressUnreliableUnorderedAcks;
 
             internal NetIncomingMessageType m_disabledTypes;
             internal int m_port;
@@ -72,12 +88,12 @@ namespace MELHARFI
             {
                 if (string.IsNullOrEmpty(appIdentifier))
                     throw new NetException("App identifier must be at least one character long");
-                m_appIdentifier = appIdentifier.ToString(CultureInfo.InvariantCulture);
+                m_appIdentifier = appIdentifier;
 
                 //
                 // default values
                 //
-                m_disabledTypes = NetIncomingMessageType.ConnectionApproval | NetIncomingMessageType.UnconnectedData | NetIncomingMessageType.VerboseDebugMessage | NetIncomingMessageType.ConnectionLatencyUpdated;
+                m_disabledTypes = NetIncomingMessageType.ConnectionApproval | NetIncomingMessageType.UnconnectedData | NetIncomingMessageType.VerboseDebugMessage | NetIncomingMessageType.ConnectionLatencyUpdated | NetIncomingMessageType.NatIntroductionSuccess;
                 m_networkThreadName = "Lidgren network thread";
                 m_localAddress = IPAddress.Any;
                 m_broadcastAddress = IPAddress.Broadcast;
@@ -95,22 +111,17 @@ namespace MELHARFI
                 m_pingInterval = 4.0f;
                 m_connectionTimeout = 25.0f;
                 m_useMessageRecycling = true;
+                m_recycledCacheMaxCount = 64;
                 m_resendHandshakeInterval = 3.0f;
                 m_maximumHandshakeAttempts = 5;
                 m_autoFlushSendQueue = true;
+                m_suppressUnreliableUnorderedAcks = false;
 
-                // Maximum transmission unit
-                // Ethernet can take 1500 bytes of payload, so lets stay below that.
-                // The aim is for a max full packet to be 1440 bytes (30 x 48 bytes, lower than 1468)
-                // -20 bytes IP header
-                //  -8 bytes UDP header
-                //  -4 bytes to be on the safe side and align to 8-byte boundary
-                // Total 1408 bytes
-                // Note that lidgren headers (5 bytes) are not included here; since it's part of the "mtu payload"
-                m_maximumTransmissionUnit = 1408;
+                m_maximumTransmissionUnit = kDefaultMTU;
                 m_autoExpandMTU = false;
                 m_expandMTUFrequency = 2.0f;
                 m_expandMTUFailAttempts = 5;
+                m_unreliableSizeBehaviour = NetUnreliableSizeBehaviour.IgnoreMTU;
 
                 m_loss = 0.0f;
                 m_minimumOneWayLatency = 0.0f;
@@ -166,6 +177,15 @@ namespace MELHARFI
             public bool IsMessageTypeEnabled(NetIncomingMessageType type)
             {
                 return !((m_disabledTypes & type) == type);
+            }
+
+            /// <summary>
+            /// Gets or sets the behaviour of unreliable sends above MTU
+            /// </summary>
+            public NetUnreliableSizeBehaviour UnreliableSizeBehaviour
+            {
+                get { return m_unreliableSizeBehaviour; }
+                set { m_unreliableSizeBehaviour = value; }
             }
 
             /// <summary>
@@ -245,6 +265,20 @@ namespace MELHARFI
             }
 
             /// <summary>
+            /// Gets or sets the maximum number of incoming/outgoing messages to keep in the recycle cache.
+            /// </summary>
+            public int RecycledCacheMaxCount
+            {
+                get { return m_recycledCacheMaxCount; }
+                set
+                {
+                    if (m_isLocked)
+                        throw new NetException(c_isLockedMessage);
+                    m_recycledCacheMaxCount = value;
+                }
+            }
+
+            /// <summary>
             /// Gets or sets the number of seconds timeout will be postponed on a successful ping/pong
             /// </summary>
             public float ConnectionTimeout
@@ -279,6 +313,20 @@ namespace MELHARFI
             {
                 get { return m_autoFlushSendQueue; }
                 set { m_autoFlushSendQueue = value; }
+            }
+
+            /// <summary>
+            /// If true, will not send acks for unreliable unordered messages. This will save bandwidth, but disable flow control and duplicate detection for this type of messages.
+            /// </summary>
+            public bool SuppressUnreliableUnorderedAcks
+            {
+                get { return m_suppressUnreliableUnorderedAcks; }
+                set
+                {
+                    if (m_isLocked)
+                        throw new NetException(c_isLockedMessage);
+                    m_suppressUnreliableUnorderedAcks = value;
+                }
             }
 
             /// <summary>
@@ -416,49 +464,49 @@ namespace MELHARFI
             }
 
 #if DEBUG
-            /// <summary>
-            /// Gets or sets the simulated amount of sent packets lost from 0.0f to 1.0f
-            /// </summary>
-            public float SimulatedLoss
-            {
-                get { return m_loss; }
-                set { m_loss = value; }
-            }
+		/// <summary>
+		/// Gets or sets the simulated amount of sent packets lost from 0.0f to 1.0f
+		/// </summary>
+		public float SimulatedLoss
+		{
+			get { return m_loss; }
+			set { m_loss = value; }
+		}
 
-            /// <summary>
-            /// Gets or sets the minimum simulated amount of one way latency for sent packets in seconds
-            /// </summary>
-            public float SimulatedMinimumLatency
-            {
-                get { return m_minimumOneWayLatency; }
-                set { m_minimumOneWayLatency = value; }
-            }
+		/// <summary>
+		/// Gets or sets the minimum simulated amount of one way latency for sent packets in seconds
+		/// </summary>
+		public float SimulatedMinimumLatency
+		{
+			get { return m_minimumOneWayLatency; }
+			set { m_minimumOneWayLatency = value; }
+		}
 
-            /// <summary>
-            /// Gets or sets the simulated added random amount of one way latency for sent packets in seconds
-            /// </summary>
-            public float SimulatedRandomLatency
-            {
-                get { return m_randomOneWayLatency; }
-                set { m_randomOneWayLatency = value; }
-            }
+		/// <summary>
+		/// Gets or sets the simulated added random amount of one way latency for sent packets in seconds
+		/// </summary>
+		public float SimulatedRandomLatency
+		{
+			get { return m_randomOneWayLatency; }
+			set { m_randomOneWayLatency = value; }
+		}
 
-            /// <summary>
-            /// Gets the average simulated one way latency in seconds
-            /// </summary>
-            public float SimulatedAverageLatency
-            {
-                get { return m_minimumOneWayLatency + (m_randomOneWayLatency * 0.5f); }
-            }
+		/// <summary>
+		/// Gets the average simulated one way latency in seconds
+		/// </summary>
+		public float SimulatedAverageLatency
+		{
+			get { return m_minimumOneWayLatency + (m_randomOneWayLatency * 0.5f); }
+		}
 
-            /// <summary>
-            /// Gets or sets the simulated amount of duplicated packets from 0.0f to 1.0f
-            /// </summary>
-            public float SimulatedDuplicatesChance
-            {
-                get { return m_duplicates; }
-                set { m_duplicates = value; }
-            }
+		/// <summary>
+		/// Gets or sets the simulated amount of duplicated packets from 0.0f to 1.0f
+		/// </summary>
+		public float SimulatedDuplicatesChance
+		{
+			get { return m_duplicates; }
+			set { m_duplicates = value; }
+		}
 #endif
 
             /// <summary>
@@ -466,10 +514,31 @@ namespace MELHARFI
             /// </summary>
             public NetPeerConfiguration Clone()
             {
-                NetPeerConfiguration retval = MemberwiseClone() as NetPeerConfiguration;
+                NetPeerConfiguration retval = this.MemberwiseClone() as NetPeerConfiguration;
                 retval.m_isLocked = false;
                 return retval;
             }
+        }
+
+        /// <summary>
+        /// Behaviour of unreliable sends above MTU
+        /// </summary>
+        public enum NetUnreliableSizeBehaviour
+        {
+            /// <summary>
+            /// Sending an unreliable message will ignore MTU and send everything in a single packet; this is the new default
+            /// </summary>
+            IgnoreMTU = 0,
+
+            /// <summary>
+            /// Old behaviour; use normal fragmentation for unreliable messages - if a fragment is dropped, memory for received fragments are never reclaimed!
+            /// </summary>
+            NormalFragmentation = 1,
+
+            /// <summary>
+            /// Alternate behaviour; just drops unreliable messages above MTU
+            /// </summary>
+            DropAboveMTU = 2,
         }
     }
 }

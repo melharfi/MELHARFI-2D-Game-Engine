@@ -16,7 +16,6 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-
 using System;
 using System.Reflection;
 
@@ -53,7 +52,7 @@ namespace MELHARFI
                     // find the appropriate Write method
                     MethodInfo writeMethod;
                     if (s_writeMethods.TryGetValue(fi.FieldType, out writeMethod))
-                        writeMethod.Invoke(this, new[] { value });
+                        writeMethod.Invoke(this, new object[] { value });
                     else
                         throw new NetException("Failed to find write method for type " + fi.FieldType);
                 }
@@ -81,13 +80,16 @@ namespace MELHARFI
 
                 foreach (PropertyInfo fi in fields)
                 {
-                    MethodInfo getMethod = fi.GetGetMethod((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
-                    object value = getMethod.Invoke(ob, null);
+                    MethodInfo getMethod = fi.GetGetMethod();
+                    if (getMethod != null)
+                    {
+                        object value = getMethod.Invoke(ob, null);
 
-                    // find the appropriate Write method
-                    MethodInfo writeMethod;
-                    if (s_writeMethods.TryGetValue(fi.PropertyType, out writeMethod))
-                        writeMethod.Invoke(this, new[] { value });
+                        // find the appropriate Write method
+                        MethodInfo writeMethod;
+                        if (s_writeMethods.TryGetValue(fi.PropertyType, out writeMethod))
+                            writeMethod.Invoke(this, new object[] { value });
+                    }
                 }
             }
         }

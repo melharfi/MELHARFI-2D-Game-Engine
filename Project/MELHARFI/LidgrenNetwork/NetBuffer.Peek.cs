@@ -17,8 +17,9 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
 using System;
+using System.Diagnostics;
+using System.Net;
 
 namespace MELHARFI
 {
@@ -60,7 +61,7 @@ namespace MELHARFI
             /// <summary>
             /// Reads an SByte without advancing the read pointer
             /// </summary>
-            //[CLSCompliant(false)]
+            [CLSCompliant(false)]
             public sbyte PeekSByte()
             {
                 NetException.Assert(m_bitLength - m_readPosition >= 8, c_readOverflowError);
@@ -98,6 +99,7 @@ namespace MELHARFI
                 NetException.Assert(offset + numberOfBytes <= into.Length);
 
                 NetBitWriter.ReadBytes(m_data, numberOfBytes, m_readPosition, into, offset);
+                return;
             }
 
             //
@@ -116,8 +118,8 @@ namespace MELHARFI
             /// <summary>
             /// Reads a UInt16 without advancing the read pointer
             /// </summary>
-            //[CLSCompliant(false)]
-            public ushort PeekUInt16()
+            [CLSCompliant(false)]
+            public UInt16 PeekUInt16()
             {
                 NetException.Assert(m_bitLength - m_readPosition >= 16, c_readOverflowError);
                 uint retval = NetBitWriter.ReadUInt16(m_data, 16, m_readPosition);
@@ -166,8 +168,8 @@ namespace MELHARFI
             /// <summary>
             /// Reads a UInt32 without advancing the read pointer
             /// </summary>
-            //[CLSCompliant(false)]
-            public uint PeekUInt32()
+            [CLSCompliant(false)]
+            public UInt32 PeekUInt32()
             {
                 NetException.Assert(m_bitLength - m_readPosition >= 32, c_readOverflowError);
                 uint retval = NetBitWriter.ReadUInt32(m_data, 32, m_readPosition);
@@ -177,8 +179,8 @@ namespace MELHARFI
             /// <summary>
             /// Reads the specified number of bits into a UInt32 without advancing the read pointer
             /// </summary>
-            //[CLSCompliant(false)]
-            public uint PeekUInt32(int numberOfBits)
+            [CLSCompliant(false)]
+            public UInt32 PeekUInt32(int numberOfBits)
             {
                 NetException.Assert((numberOfBits > 0 && numberOfBits <= 32), "ReadUInt() can only read between 1 and 32 bits");
                 //NetException.Assert(m_bitLength - m_readBitPtr >= numberOfBits, "tried to read past buffer size");
@@ -193,8 +195,8 @@ namespace MELHARFI
             /// <summary>
             /// Reads a UInt64 without advancing the read pointer
             /// </summary>
-            //[CLSCompliant(false)]
-            public ulong PeekUInt64()
+            [CLSCompliant(false)]
+            public UInt64 PeekUInt64()
             {
                 NetException.Assert(m_bitLength - m_readPosition >= 64, c_readOverflowError);
 
@@ -223,8 +225,8 @@ namespace MELHARFI
             /// <summary>
             /// Reads the specified number of bits into an UInt64 without advancing the read pointer
             /// </summary>
-            //[CLSCompliant(false)]
-            public ulong PeekUInt64(int numberOfBits)
+            [CLSCompliant(false)]
+            public UInt64 PeekUInt64(int numberOfBits)
             {
                 NetException.Assert((numberOfBits > 0 && numberOfBits <= 64), "ReadUInt() can only read between 1 and 64 bits");
                 NetException.Assert(m_bitLength - m_readPosition >= numberOfBits, c_readOverflowError);
@@ -232,12 +234,12 @@ namespace MELHARFI
                 ulong retval;
                 if (numberOfBits <= 32)
                 {
-                    retval = NetBitWriter.ReadUInt32(m_data, numberOfBits, m_readPosition);
+                    retval = (ulong)NetBitWriter.ReadUInt32(m_data, numberOfBits, m_readPosition);
                 }
                 else
                 {
                     retval = NetBitWriter.ReadUInt32(m_data, 32, m_readPosition);
-                    retval |= NetBitWriter.ReadUInt32(m_data, numberOfBits - 32, m_readPosition) << 32;
+                    retval |= (UInt64)NetBitWriter.ReadUInt32(m_data, numberOfBits - 32, m_readPosition + 32) << 32;
                 }
                 return retval;
             }

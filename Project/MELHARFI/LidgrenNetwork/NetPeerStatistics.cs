@@ -21,8 +21,9 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 // Uncomment the line below to get statistics in RELEASE builds
 //#define USE_RELEASE_STATISTICS
 
-using System.Diagnostics;
+using System;
 using System.Text;
+using System.Diagnostics;
 
 namespace MELHARFI
 {
@@ -40,6 +41,7 @@ namespace MELHARFI
 
             internal int m_sentMessages;
             internal int m_receivedMessages;
+            internal int m_receivedFragments;
 
             internal int m_sentBytes;
             internal int m_receivedBytes;
@@ -59,6 +61,7 @@ namespace MELHARFI
 
                 m_sentMessages = 0;
                 m_receivedMessages = 0;
+                m_receivedFragments = 0;
 
                 m_sentBytes = 0;
                 m_receivedBytes = 0;
@@ -104,41 +107,35 @@ namespace MELHARFI
             /// <summary>
             /// Gets the number of bytes in the recycled pool
             /// </summary>
-            public int BytesInRecyclePool { get { return m_peer.m_storagePoolBytes; } }
+            public int BytesInRecyclePool
+            {
+                get
+                {
+                    lock (m_peer.m_storagePool)
+                        return m_peer.m_storagePoolBytes;
+                }
+            }
 
-#if USE_RELEASE_STATISTICS
-		internal void PacketSent(int numBytes, int numMessages)
-		{
-			m_sentPackets++;
-			m_sentBytes += numBytes;
-			m_sentMessages += numMessages;
-		}
-#else
+#if !USE_RELEASE_STATISTICS
             [Conditional("DEBUG")]
+#endif
             internal void PacketSent(int numBytes, int numMessages)
             {
                 m_sentPackets++;
                 m_sentBytes += numBytes;
                 m_sentMessages += numMessages;
             }
-#endif
 
-#if USE_RELEASE_STATISTICS
-		internal void PacketReceived(int numBytes, int numMessages)
-		{
-			m_receivedPackets++;
-			m_receivedBytes += numBytes;
-			m_receivedMessages += numMessages;
-		}
-#else
+#if !USE_RELEASE_STATISTICS
             [Conditional("DEBUG")]
-            internal void PacketReceived(int numBytes, int numMessages)
+#endif
+            internal void PacketReceived(int numBytes, int numMessages, int numFragments)
             {
                 m_receivedPackets++;
                 m_receivedBytes += numBytes;
                 m_receivedMessages += numMessages;
+                m_receivedFragments += numFragments;
             }
-#endif
 
             /// <summary>
             /// Returns a string that represents this object
@@ -146,16 +143,17 @@ namespace MELHARFI
             public override string ToString()
             {
                 StringBuilder bdr = new StringBuilder();
-                bdr.AppendLine(m_peer.ConnectionsCount + " connections");
+                bdr.AppendLine(m_peer.ConnectionsCount.ToString() + " connections");
 #if DEBUG || USE_RELEASE_STATISTICS
-                bdr.AppendLine("Sent " + m_sentBytes + " bytes in " + m_sentMessages + " messages in " + m_sentPackets + " packets");
-                bdr.AppendLine("Received " + m_receivedBytes + " bytes in " + m_receivedMessages + " messages in " + m_receivedPackets + " packets");
+			bdr.AppendLine("Sent " + m_sentBytes + " bytes in " + m_sentMessages + " messages in " + m_sentPackets + " packets");
+			bdr.AppendLine("Received " + m_receivedBytes + " bytes in " + m_receivedMessages + " messages (of which " + m_receivedFragments + " fragments) in " + m_receivedPackets + " packets");
 #else
-			bdr.AppendLine("Sent (n/a) bytes in (n/a) messages in (n/a) packets");
-			bdr.AppendLine("Received (n/a) bytes in (n/a) messages in (n/a) packets");
+                bdr.AppendLine("Sent (n/a) bytes in (n/a) messages in (n/a) packets");
+                bdr.AppendLine("Received (n/a) bytes in (n/a) messages in (n/a) packets");
 #endif
                 bdr.AppendLine("Storage allocated " + m_bytesAllocated + " bytes");
-                bdr.AppendLine("Recycled pool " + m_peer.m_storagePoolBytes + " bytes");
+                if (m_peer.m_storagePool != null)
+                    bdr.AppendLine("Recycled pool " + m_peer.m_storagePoolBytes + " bytes (" + m_peer.m_storageSlotsUsedCount + " entries)");
                 return bdr.ToString();
             }
         }

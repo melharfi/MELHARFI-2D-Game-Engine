@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace MELHARFI
 {
@@ -14,12 +15,19 @@ namespace MELHARFI
             private int m_windowSize;
             private int m_sendStart;
 
+            private bool m_anyStoredResends;
+
             private NetBitVector m_receivedAcks;
             internal NetStoredReliableMessage[] m_storedMessages;
 
-            internal float m_resendDelay;
+            internal double m_resendDelay;
 
             internal override int WindowSize { get { return m_windowSize; } }
+
+            internal override bool NeedToSendMessages()
+            {
+                return base.NeedToSendMessages() || m_anyStoredResends;
+            }
 
             internal NetReliableSenderChannel(NetConnection connection, int windowSize)
             {
@@ -27,6 +35,7 @@ namespace MELHARFI
                 m_windowSize = windowSize;
                 m_windowStart = 0;
                 m_sendStart = 0;
+                m_anyStoredResends = false;
                 m_receivedAcks = new NetBitVector(NetConstants.NumSequenceNumbers);
                 m_storedMessages = new NetStoredReliableMessage[m_windowSize];
                 m_queuedSends = new NetQueue<NetOutgoingMessage>(8);
@@ -45,6 +54,7 @@ namespace MELHARFI
                 m_receivedAcks.Clear();
                 for (int i = 0; i < m_storedMessages.Length; i++)
                     m_storedMessages[i].Reset();
+                m_anyStoredResends = false;
                 m_queuedSends.Clear();
                 m_windowStart = 0;
                 m_sendStart = 0;
@@ -53,27 +63,29 @@ namespace MELHARFI
             internal override NetSendResult Enqueue(NetOutgoingMessage message)
             {
                 m_queuedSends.Enqueue(message);
-
-                int queueLen = m_queuedSends.Count;
-                int left = m_windowSize - ((m_sendStart + NetConstants.NumSequenceNumbers) - m_windowStart) % NetConstants.NumSequenceNumbers;
-                if (queueLen <= left)
+                m_connection.m_peer.m_needFlushSendQueue = true; // a race condition to this variable will simply result in a single superflous call to FlushSendQueue()
+                if (m_queuedSends.Count <= GetAllowedSends())
                     return NetSendResult.Sent;
                 return NetSendResult.Queued;
             }
 
             // call this regularely
-            internal override void SendQueuedMessages(float now)
+            internal override void SendQueuedMessages(double now)
             {
                 //
                 // resends
                 //
+                m_anyStoredResends = false;
                 for (int i = 0; i < m_storedMessages.Length; i++)
                 {
-                    NetOutgoingMessage om = m_storedMessages[i].Message;
+                    var storedMsg = m_storedMessages[i];
+                    NetOutgoingMessage om = storedMsg.Message;
                     if (om == null)
                         continue;
 
-                    float t = m_storedMessages[i].LastSent;
+                    m_anyStoredResends = true;
+
+                    double t = storedMsg.LastSent;
                     if (t > 0 && (now - t) > m_resendDelay)
                     {
                         // deduce sequence number
@@ -92,7 +104,8 @@ namespace MELHARFI
                         //m_connection.m_peer.LogVerbose("Resending due to delay #" + m_storedMessages[i].SequenceNumber + " " + om.ToString());
                         m_connection.m_statistics.MessageResent(MessageResendReason.Delay);
 
-                        m_connection.QueueSendMessage(om, m_storedMessages[i].SequenceNumber);
+                        Interlocked.Increment(ref om.m_recyclingCount); // increment this since it's being decremented in QueueSendMessage
+                        m_connection.QueueSendMessage(om, storedMsg.SequenceNumber);
 
                         m_storedMessages[i].LastSent = now;
                         m_storedMessages[i].NumSent++;
@@ -104,7 +117,7 @@ namespace MELHARFI
                     return;
 
                 // queued sends
-                while (m_queuedSends.Count > 0 && num > 0)
+                while (num > 0 && m_queuedSends.Count > 0)
                 {
                     NetOutgoingMessage om;
                     if (m_queuedSends.TryDequeue(out om))
@@ -114,10 +127,14 @@ namespace MELHARFI
                 }
             }
 
-            private void ExecuteSend(float now, NetOutgoingMessage message)
+            private void ExecuteSend(double now, NetOutgoingMessage message)
             {
                 int seqNr = m_sendStart;
                 m_sendStart = (m_sendStart + 1) % NetConstants.NumSequenceNumbers;
+
+                // must increment recycle count here, since it's decremented in QueueSendMessage and we want to keep it for the future in case or resends
+                // we will decrement once more in DestoreMessage for final recycling
+                Interlocked.Increment(ref message.m_recyclingCount);
 
                 m_connection.QueueSendMessage(message, seqNr);
 
@@ -128,31 +145,41 @@ namespace MELHARFI
                 m_storedMessages[storeIndex].Message = message;
                 m_storedMessages[storeIndex].LastSent = now;
                 m_storedMessages[storeIndex].SequenceNumber = seqNr;
+                m_anyStoredResends = true;
+
+                return;
             }
 
-            private void DestoreMessage(int storeIndex)
+            private void DestoreMessage(double now, int storeIndex, out bool resetTimeout)
             {
-                NetOutgoingMessage storedMessage = m_storedMessages[storeIndex].Message;
-#if DEBUG
-                if (storedMessage == null)
-                    throw new NetException("m_storedMessages[" + storeIndex + "].Message is null; sent " + m_storedMessages[storeIndex].NumSent + " times, last time " + (NetTime.Now - m_storedMessages[storeIndex].LastSent) + " seconds ago");
-#else
-			if (storedMessage != null)
-			{
-#endif
+                // reset timeout if we receive ack within kThreshold of sending it
+                const double kThreshold = 2.0;
+                var srm = m_storedMessages[storeIndex];
+                resetTimeout = (srm.NumSent == 1) && (now - srm.LastSent < kThreshold);
+
+                var storedMessage = srm.Message;
+
+                // on each destore; reduce recyclingcount so that when all instances are destored, the outgoing message can be recycled
                 Interlocked.Decrement(ref storedMessage.m_recyclingCount);
-                if (storedMessage.m_recyclingCount <= 0)
-                    m_connection.m_peer.Recycle(storedMessage);
+#if DEBUG
+			if (storedMessage == null)
+				throw new NetException("m_storedMessages[" + storeIndex + "].Message is null; sent " + m_storedMessages[storeIndex].NumSent + " times, last time " + (NetTime.Now - m_storedMessages[storeIndex].LastSent) + " seconds ago");
+#else
+                if (storedMessage != null)
+                {
+#endif
+                    if (storedMessage.m_recyclingCount <= 0)
+                        m_connection.m_peer.Recycle(storedMessage);
 
 #if !DEBUG
-			}
+                }
 #endif
                 m_storedMessages[storeIndex] = new NetStoredReliableMessage();
             }
 
             // remoteWindowStart is remote expected sequence number; everything below this has arrived properly
             // seqNr is the actual nr received
-            internal override void ReceiveAcknowledge(float now, int seqNr)
+            internal override void ReceiveAcknowledge(double now, int seqNr)
             {
                 // late (dupe), on time or early ack?
                 int relate = NetUtility.RelativeSequenceNumber(seqNr, m_windowStart);
@@ -170,8 +197,9 @@ namespace MELHARFI
                     // ack arrived right on time
                     NetException.Assert(seqNr == m_windowStart);
 
+                    bool resetTimeout;
                     m_receivedAcks[m_windowStart] = false;
-                    DestoreMessage(m_windowStart % m_windowSize);
+                    DestoreMessage(now, m_windowStart % m_windowSize, out resetTimeout);
                     m_windowStart = (m_windowStart + 1) % NetConstants.NumSequenceNumbers;
 
                     // advance window if we already have early acks
@@ -179,13 +207,16 @@ namespace MELHARFI
                     {
                         //m_connection.m_peer.LogDebug("Using early ack for #" + m_windowStart + "...");
                         m_receivedAcks[m_windowStart] = false;
-                        DestoreMessage(m_windowStart % m_windowSize);
+                        bool rt;
+                        DestoreMessage(now, m_windowStart % m_windowSize, out rt);
+                        resetTimeout |= rt;
 
                         NetException.Assert(m_storedMessages[m_windowStart % m_windowSize].Message == null); // should already be destored
                         m_windowStart = (m_windowStart + 1) % NetConstants.NumSequenceNumbers;
                         //m_connection.m_peer.LogDebug("Advancing window to #" + m_windowStart);
                     }
-
+                    if (resetTimeout)
+                        m_connection.ResetTimeout(now);
                     return;
                 }
 
@@ -240,7 +271,7 @@ namespace MELHARFI
                             NetOutgoingMessage rmsg = m_storedMessages[slot].Message;
                             //m_connection.m_peer.LogVerbose("Resending #" + rnr + " (" + rmsg + ")");
 
-                            if (now - m_storedMessages[slot].LastSent < (m_resendDelay * 0.35f))
+                            if (now - m_storedMessages[slot].LastSent < (m_resendDelay * 0.35))
                             {
                                 // already resent recently
                             }
@@ -249,6 +280,7 @@ namespace MELHARFI
                                 m_storedMessages[slot].LastSent = now;
                                 m_storedMessages[slot].NumSent++;
                                 m_connection.m_statistics.MessageResent(MessageResendReason.HoleInSequence);
+                                Interlocked.Increment(ref rmsg.m_recyclingCount); // increment this since it's being decremented in QueueSendMessage
                                 m_connection.QueueSendMessage(rmsg, rnr);
                             }
                         }

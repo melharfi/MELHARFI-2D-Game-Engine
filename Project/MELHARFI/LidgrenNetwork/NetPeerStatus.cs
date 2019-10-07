@@ -17,6 +17,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
+using System;
 
 namespace MELHARFI
 {
@@ -45,7 +46,7 @@ namespace MELHARFI
             /// <summary>
             /// Shutdown has been requested and will be executed shortly
             /// </summary>
-            ShutdownRequested = 3
+            ShutdownRequested = 3,
         }
     }
 }
