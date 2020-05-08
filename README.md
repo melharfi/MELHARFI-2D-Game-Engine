@@ -157,12 +157,15 @@ It work only in windows form, no cross-platform "Linux / Mac"
 I apologize if I say a mistake about something,
 My code may look not optimized for some.
 
-Here is 2 links about one game I design to let you get an idea how is powerful, sorry if it's in French
-https://www.youtube.com/watch?v=D6VQARWxfvs
-https://www.youtube.com/watch?v=ufQObcknmVY
+Here is 3 links about one game I design to let you get an idea about what we can do with it, sorry if it's in French
 
-Licensed with MIT
-http://choosealicense.com/licenses/mit
+Partie 1 https://www.youtube.com/watch?v=D6VQARWxfvs
+
+Partie 2 https://www.youtube.com/watch?v=ufQObcknmVY
+
+Partie 3 https://www.youtube.com/watch?v=BCrMBdIy9xk
+
+https://github.com/melharfi/Nova
 
 Feel free to contact me for any purpose or issue you find by my address email:
 
