@@ -27,3 +27,9 @@ D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.csproj.
 D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.dll
 D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.pdb
 D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.csprojAssemblyReference.cache
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\bin\Release\MELHARFI.dll
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\bin\Release\MELHARFI.pdb
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.csprojAssemblyReference.cache
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.csproj.CoreCompileInputs.cache
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.dll
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Release\MELHARFI.pdb
