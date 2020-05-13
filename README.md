@@ -5,7 +5,7 @@
 
 ## *Description*
 
-MELHARFI.dll is a standalone DLL to create 2D games easily or add an animated graphics on a you application.
+MELHARFI is a standalone DLL to create 2D games easily or add an animated graphics on a you application.
 Don't worry about many details in the usual way or adding a complex third party application, only to make some dynamic graphics in your form.
 
 It's commonly useful for beginners and for advanced people, as I’ll show you my own game that I build with it (at the end of that topic).
