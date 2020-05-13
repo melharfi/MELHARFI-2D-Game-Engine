@@ -70,3 +70,9 @@ D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\bin\Debug\MELHARFI.pdb
 D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Debug\MELHARFI.dll
 D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Debug\MELHARFI.pdb
 D:\project\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Debug\MELHARFI.csprojAssemblyReference.cache
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\bin\Debug\MELHARFI.pdb
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Debug\MELHARFI.csproj.CoreCompileInputs.cache
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Debug\MELHARFI.dll
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Debug\MELHARFI.pdb
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\bin\Debug\MELHARFI.dll
+D:\Project\Repos\Github\MELHARFI-2D-Game-Engine\Project\MELHARFI\obj\Debug\MELHARFI.csprojAssemblyReference.cache
