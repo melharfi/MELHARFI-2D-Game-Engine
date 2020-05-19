@@ -1,7 +1,7 @@
 <img src="assets/logo.png" width = "100">
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/melharfi/MELHARFI-2D-Game-Engine/blob/master/LICENSE)
-[![GitHub Release](https://img.shields.io/badge/version-1.2.3-blue)](https://github.com/melharfi/MELHARFI-2D-Game-Engine/releases) 
+[![GitHub Release](https://img.shields.io/badge/version-1.6-blue)](https://github.com/melharfi/MELHARFI-2D-Game-Engine/releases) 
 
 # MELHARFI 2D Game Engine 1.6
 2D Game Engine + Network Library + Pathfinding + Windows GUI + Mouse Event handler "ALL-IN-ONE"
