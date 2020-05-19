@@ -1,6 +1,7 @@
 <img src="assets/logo.png" width = "100">
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/melharfi/MELHARFI-2D-Game-Engine/blob/master/LICENSE)
+[![Version](https://badge.fury.io/gh/tterb%2FHyde.svg)](https://github.com/melharfi/MELHARFI-2D-Game-Engine)
 [![GitHub Release](https://img.shields.io/github/v/release/melharfi/MELHARFI-2D-Game-Engine)](https://github.com/melharfi/MELHARFI-2D-Game-Engine/releases) 
 
 # MELHARFI 2D Game Engine 1.6
