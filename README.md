@@ -3,6 +3,7 @@
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/melharfi/MELHARFI-2D-Game-Engine/blob/master/LICENSE)
 [![Version](https://badge.fury.io/gh/tterb%2FHyde.svg)](https://github.com/melharfi/MELHARFI-2D-Game-Engine)
 [![GitHub Release](https://img.shields.io/github/v/release/melharfi/MELHARFI-2D-Game-Engine)](https://github.com/melharfi/MELHARFI-2D-Game-Engine/releases) 
+[![PayPal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VN92ND2CDMX92)
 
 # MELHARFI 2D Game Engine 1.6
 2D Game Engine + Network Library + Pathfinding + Windows GUI + Mouse Event handler "ALL-IN-ONE"
