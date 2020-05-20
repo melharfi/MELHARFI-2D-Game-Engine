@@ -6,7 +6,7 @@
 [![PayPal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VN92ND2CDMX92)
 [![Nuget](https://img.shields.io/nuget/v/melharfi?color=red)](https://www.nuget.org/packages/MELHARFI/)
 ![GitHub Release Date](https://img.shields.io/github/release-date/melharfi/MELHARFI-2D-Game-Engine?color=Green)
-![GitHub language count](https://img.shields.io/github/languages/count/melharfi/MELHARFI-2D-Game-Engine)
+![GitHub language count](https://img.shields.io/github/languages/count/melharfi/CryptDecrypt?color=red)
 
 # MELHARFI 2D Game Engine 1.6
 2D Game Engine + Network Library + Pathfinding + Windows GUI + Mouse Event handler "ALL-IN-ONE"
