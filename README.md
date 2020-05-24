@@ -128,7 +128,7 @@ What a good challenge if I write it myself and include all that in ALL-In-One an
 and job done for you, don't worry anymore ^^
 
 ### Question 4
-Why GDI+? DirectX is more powerful that GDI+
+Why GDI+? DirectX is more powerful than GDI+
 
 ### Response 4
 Windows use GDI+ to draw some stuff on the Forms of its applications, it was not created for gaming purpose, even it's not supposed to support so many stuff on the same form, BUT nothing stops you from using it.
