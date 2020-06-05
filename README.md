@@ -13,12 +13,12 @@
 
 ## *Description*
 
-MELHARFI is a standalone DLL to create 2D games easily or add an animated graphics to your application.
-Don't worry about many details in the usual way or adding a complex third party application, only to make some dynamic graphics in your form.
+MELHARFI is a standalone DLL to create 2D games easily or to add some animation into your application's forms.
+Don't worry about many details in the usual way or adding some complex third party applications, only to make some dynamic graphics in your form.
 
 It's commonly useful for beginners and for advanced people, as I’ll show you my own game that I build with it (at the end of that topic).
 
-The library is built in C# language so you can use it in any .NET language such as VB.NET while it supports Framework 4.0 or higher and Visual Studio 2015 or higher (some lambda expression not handled by VS 2013 or older).
+The library is built in C# language so you can use it in any .NET language such as VB.NET or C# while it supports Framework 4.0 or higher and Visual Studio 2015 or higher (some lambda expression not handled by VS 2013 or older).
 
 It's the first and unique library for graphics using GDI+ as far as I know.
 
