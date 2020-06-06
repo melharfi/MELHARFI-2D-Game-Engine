@@ -25,7 +25,7 @@ It's the first and unique library for graphics using GDI+ as far as I know.
 ## *Tutorial*
 
 See tutorials section
-[https://melharfi.github.io/repos/melharfi-2d-game-engine/description.html](https://melharfi.github.io/repos/melharfi-2d-game-engine/description.html)
+[https://melharfi.github.io/repos/MELHARFI-2D-Game-Engine/description.html](https://melharfi.github.io/repos/MELHARFI-2D-Game-Engine/description.html)
 
 ## *Features:*
 
